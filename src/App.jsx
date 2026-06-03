@@ -36,19 +36,53 @@ function csvEscape(value) {
   return /[",\n\r;]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
 }
 
-function downloadCsv(filename, rows) {
-  if (!rows.length) return
+function exportColumns(rows) {
   const priority = ["hasta_id", "merkez", "pibo", "ptbo", "cinsiyet", "dogum_tarihi", "tani_tarihi", "yas_ay"]
   const keys = Array.from(new Set(rows.flatMap(row => Object.keys(row))))
-  const columns = [
+  return [
     ...priority.filter(key => keys.includes(key)),
     ...keys.filter(key => !priority.includes(key)).sort(),
   ]
+}
+
+function downloadCsv(filename, rows) {
+  if (!rows.length) return
+  const columns = exportColumns(rows)
   const csv = [
     columns.map(csvEscape).join(";"),
     ...rows.map(row => columns.map(column => csvEscape(row[column])).join(";")),
   ].join("\n")
   const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+function htmlEscape(value) {
+  if (value == null) return ""
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+}
+
+function downloadExcel(filename, rows) {
+  if (!rows.length) return
+  const columns = exportColumns(rows)
+  const table = [
+    "<table>",
+    `<thead><tr>${columns.map(column => `<th>${htmlEscape(column)}</th>`).join("")}</tr></thead>`,
+    `<tbody>${rows.map(row => `<tr>${columns.map(column => `<td>${htmlEscape(row[column])}</td>`).join("")}</tr>`).join("")}</tbody>`,
+    "</table>",
+  ].join("")
+  const html = `<!doctype html><html><head><meta charset="utf-8"></head><body>${table}</body></html>`
+  const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel;charset=utf-8" })
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
@@ -1326,15 +1360,27 @@ Türkçe yanıt ver. Örneklem küçüklüğünü belirt.`
     }
   }
 
-  function handleExportPatients() {
-    const today = new Date().toISOString().slice(0, 10)
-    const rows = patients.map(patient => ({
+  function buildExportRows() {
+    return patients.map(patient => ({
       ...patient,
       ...calculateDerivedFields(patient),
       merkez: patient.hasta_id.split("-")[0],
     }))
+  }
+
+  function handleExportPatientsCsv() {
+    const today = new Date().toISOString().slice(0, 10)
+    const rows = buildExportRows()
     downloadCsv(`pibo_registry_hastalar_${today}.csv`, rows)
     setDeleteMessage(`${rows.length} hasta Excel/CSV dosyası olarak indirildi.`)
+    setTimeout(() => setDeleteMessage(""), 2500)
+  }
+
+  function handleExportPatientsExcel() {
+    const today = new Date().toISOString().slice(0, 10)
+    const rows = buildExportRows()
+    downloadExcel(`pibo_registry_hastalar_${today}.xls`, rows)
+    setDeleteMessage(`${rows.length} hasta Excel dosyası olarak indirildi.`)
     setTimeout(() => setDeleteMessage(""), 2500)
   }
 
@@ -1375,12 +1421,15 @@ Türkçe yanıt ver. Örneklem küçüklüğünü belirt.`
           <button onClick={handleRecalculateAll} disabled={recalcLoading} style={s.btnPrimary}>
             {recalcLoading ? "Yeniden hesaplanıyor..." : "Tüm otomatik alanları yeniden hesapla"}
           </button>
-          <button onClick={handleExportPatients} style={s.btn}>
-            Hasta verisini Excel/CSV indir
+          <button onClick={handleExportPatientsExcel} style={s.btn}>
+            Hasta verisini Excel indir
+          </button>
+          <button onClick={handleExportPatientsCsv} style={s.btn}>
+            CSV indir
           </button>
         </div>
         <div style={{fontSize:12, color:"#6b7280"}}>
-          Eski kayıtların hesaplanan alanlarını tekrar kaydeder; indirme düğmesi tüm hasta tablosunu Excel uyumlu CSV olarak dışa aktarır.
+          Eski kayıtların hesaplanan alanlarını tekrar kaydeder; indirme düğmeleri tüm hasta tablosunu dışa aktarır.
         </div>
       </div>
 
