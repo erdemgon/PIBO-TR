@@ -101,6 +101,59 @@ function calculateGrowthFields(patient, ageMonths, vkiBas) {
   }
 }
 
+function calculateTreatmentFields(patient) {
+  const sistemikDoz = numberOrNull(patient.sistemik_steroid_mgkg_gun ?? patient.steroid_baslangic_dozu)
+  const sistemikGun = numberOrNull(patient.sistemik_steroid_gun ?? patient.steroid_suresi_gun)
+  const sistemikPlanGun = numberOrNull(patient.sistemik_steroid_plan_gun)
+  const kumulatifSistemik = sistemikDoz != null && sistemikGun != null ? round(sistemikDoz * sistemikGun, 2) : null
+
+  const neb2 = numberOrNull(patient.flutikazon_neb_2mg_gun)
+  const neb05 = numberOrNull(patient.flutikazon_neb_05mg_gun)
+  const inh125Puff = numberOrNull(patient.flutikazon_inhaler_125_puff_gun)
+  const inh125Gun = numberOrNull(patient.flutikazon_inhaler_125_gun)
+  const inh50Puff = numberOrNull(patient.flutikazon_inhaler_50_puff_gun)
+  const inh50Gun = numberOrNull(patient.flutikazon_inhaler_50_gun)
+  const seretide125Puff = numberOrNull(patient.seretide_125_puff_gun)
+  const seretide125Gun = numberOrNull(patient.seretide_125_gun)
+  const seretide250Puff = numberOrNull(patient.seretide_250_puff_gun)
+  const seretide250Gun = numberOrNull(patient.seretide_250_gun)
+
+  const flutikazonNebMcg =
+    (neb2 != null ? neb2 * 2000 : 0) +
+    (neb05 != null ? neb05 * 500 : 0)
+  const flutikazonInhalerMcg =
+    (inh125Puff != null && inh125Gun != null ? inh125Puff * inh125Gun * 125 : 0) +
+    (inh50Puff != null && inh50Gun != null ? inh50Puff * inh50Gun * 50 : 0)
+  const seretideFlutikazonMcg =
+    (seretide125Puff != null && seretide125Gun != null ? seretide125Puff * seretide125Gun * 125 : 0) +
+    (seretide250Puff != null && seretide250Gun != null ? seretide250Puff * seretide250Gun * 250 : 0)
+  const toplamInhaleSteroidMcg = flutikazonNebMcg + flutikazonInhalerMcg + seretideFlutikazonMcg
+
+  const azitromisin = patient.azitromisin == 1 || patient.azitromisin_aldi == 1
+  const montelukast = patient.montelukast == 1 || patient.montelukast_aldi == 1
+  const inhaleSteroid = toplamInhaleSteroidMcg > 0 || patient.flutikazon == 1 || patient.inhale_steroid_aldi == 1
+
+  return {
+    ...(sistemikDoz != null ? { sistemik_steroid_mgkg_gun: sistemikDoz, steroid_baslangic_dozu: sistemikDoz } : {}),
+    ...(sistemikGun != null ? { sistemik_steroid_gun: sistemikGun, steroid_suresi_gun: sistemikGun } : {}),
+    ...(sistemikPlanGun != null ? { sistemik_steroid_plan_gun: sistemikPlanGun } : {}),
+    ...(kumulatifSistemik != null ? { kumulatif_sistemik_steroid_mgkg: kumulatifSistemik, kumulatif_steroid: kumulatifSistemik } : {}),
+    sistemik_steroid: sistemikDoz != null || sistemikGun != null || kumulatifSistemik != null || patient.sistemik_steroid == 1 ? 1 : 0,
+    flutikazon_neb_toplam_mcg: flutikazonNebMcg || null,
+    flutikazon_inhaler_toplam_mcg: flutikazonInhalerMcg || null,
+    seretide_toplam_flutikazon_mcg: seretideFlutikazonMcg || null,
+    toplam_inhale_steroid_mcg: toplamInhaleSteroidMcg || null,
+    inhale_steroid_aldi: inhaleSteroid ? 1 : 0,
+    flutikazon: inhaleSteroid ? 1 : patient.flutikazon ?? null,
+    azitromisin_aldi: azitromisin ? 1 : 0,
+    montelukast_aldi: montelukast ? 1 : 0,
+    fam_aldi: inhaleSteroid || azitromisin || montelukast ? 1 : 0,
+    ivig_aldi: patient.ivig == 1 || patient.ivig_aliyor == 1 ? 1 : 0,
+    seretide_aldi: seretideFlutikazonMcg > 0 ? 1 : patient.seretide_aldi ?? null,
+    ventolin_aldi: patient.ventolin_aldi ?? null,
+  }
+}
+
 function calculateDerivedFields(patient) {
   const calculatedTaniYasGun = daysBetween(patient.tani_tarihi, patient.dogum_tarihi)
   const taniYasGun = calculatedTaniYasGun ?? numberOrNull(patient.tani_yas_gun)
@@ -113,6 +166,7 @@ function calculateDerivedFields(patient) {
   const vkiBas = weightKg && heightCm ? round(weightKg / ((heightCm / 100) ** 2), 2) : null
   const ageMonths = taniYasGun == null ? numberOrNull(patient.yas_ay) : round(taniYasGun / 30.4375, 1)
   const growthFields = calculateGrowthFields(patient, ageMonths, vkiBas)
+  const treatmentFields = calculateTreatmentFields(patient)
 
   const derived = {
     tani_yas_gun: taniYasGun,
@@ -124,6 +178,7 @@ function calculateDerivedFields(patient) {
     muayene_bronkoskopi_gun: muayeneBronkoskopiGun,
     semptom_bronkoskopi_gun: semptomBronkoskopiGun,
     ...growthFields,
+    ...treatmentFields,
     dogum_yil: parseDate(patient.dogum_tarihi)?.getFullYear() ?? patient.dogum_yil ?? null,
     dogum_ay: parseDate(patient.dogum_tarihi) ? parseDate(patient.dogum_tarihi).getMonth() + 1 : patient.dogum_ay ?? null,
     tani_yil: parseDate(patient.tani_tarihi)?.getFullYear() ?? patient.tani_yil ?? null,
