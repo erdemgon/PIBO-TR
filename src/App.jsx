@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { supabase } from "./supabase.js"
 import { calculateCdcGrowth } from "./growth/cdcGrowth.js"
+import { calculateImmunologyReferenceFields } from "./immunology/reference.js"
 
 const CENTERS = {
   "ADMIN": { label: "Koordinatör (Admin)", prefix: null, isAdmin: true },
@@ -182,6 +183,7 @@ function calculateDerivedFields(patient) {
   const ageMonths = taniYasGun == null ? numberOrNull(patient.yas_ay) : round(taniYasGun / 30.4375, 1)
   const growthFields = calculateGrowthFields(patient, ageMonths, vkiBas)
   const treatmentFields = calculateTreatmentFields(patient)
+  const immunologyFields = calculateImmunologyReferenceFields(patient, ageMonths)
 
   const derived = {
     tani_yas_gun: taniYasGun,
@@ -194,6 +196,7 @@ function calculateDerivedFields(patient) {
     semptom_bronkoskopi_gun: semptomBronkoskopiGun,
     ...growthFields,
     ...treatmentFields,
+    ...immunologyFields,
     dogum_yil: parseDate(patient.dogum_tarihi)?.getFullYear() ?? patient.dogum_yil ?? null,
     dogum_ay: parseDate(patient.dogum_tarihi) ? parseDate(patient.dogum_tarihi).getMonth() + 1 : patient.dogum_ay ?? null,
     tani_yil: parseDate(patient.tani_tarihi)?.getFullYear() ?? patient.tani_yil ?? null,
@@ -519,39 +522,61 @@ const FIELD_GROUPS = {
       {key:"kisisel_atopi", label:"Kişisel atopi", type:"bool"},
       {key:"aile_atopi", label:"Aile atopi", type:"bool"},
       {key:"spesifik_ige_pozitif", label:"Spesifik IgE pozitif", type:"bool"},
+      {key:"immunology_ig_ref_age_band", label:"Ig referans yaş bandı", type:"text", readonly:true},
       {key:"iga", label:"IgA (g/L)", type:"num"},
-      {key:"iga_dusuk", label:"IgA düşük", type:"bool"},
+      {key:"iga_alt_limit_mgdl", label:"IgA alt limit (mg/dL)", type:"num", readonly:true},
+      {key:"iga_dusuk", label:"IgA düşük", type:"bool", readonly:true},
       {key:"igm", label:"IgM (g/L)", type:"num"},
-      {key:"igm_dusuk", label:"IgM düşük", type:"bool"},
+      {key:"igm_alt_limit_mgdl", label:"IgM alt limit (mg/dL)", type:"num", readonly:true},
+      {key:"igm_dusuk", label:"IgM düşük", type:"bool", readonly:true},
       {key:"igg", label:"IgG (g/L)", type:"num"},
-      {key:"igg_dusuk", label:"IgG düşük", type:"bool"},
+      {key:"igg_alt_limit_mgdl", label:"IgG alt limit (mg/dL)", type:"num", readonly:true},
+      {key:"igg_dusuk", label:"IgG düşük", type:"bool", readonly:true},
       {key:"ige", label:"IgE (IU/mL)", type:"num"},
       {key:"igg1", label:"IgG1", type:"num"},
+      {key:"igg1_dusuk", label:"IgG1 düşük", type:"bool", readonly:true},
       {key:"igg2", label:"IgG2", type:"num"},
+      {key:"igg2_dusuk", label:"IgG2 düşük", type:"bool", readonly:true},
       {key:"igg3", label:"IgG3", type:"num"},
+      {key:"igg3_dusuk", label:"IgG3 düşük", type:"bool", readonly:true},
       {key:"igg4", label:"IgG4", type:"num"},
+      {key:"igg4_dusuk", label:"IgG4 düşük", type:"bool", readonly:true},
+      {key:"lymphocyte_ref_age_band", label:"Lenfosit subset referans yaş bandı", type:"text", readonly:true},
+      {key:"lenfosit_subset_dusuk", label:"Lenfosit subset düşük var", type:"bool", readonly:true},
       {key:"cbc_bk", label:"Lökosit (/mm³)", type:"num"},
       {key:"cbc_neu", label:"Nötrofil (/mm³)", type:"num"},
       {key:"cbc_lym", label:"Lenfosit (/mm³)", type:"num"},
+      {key:"lym_abs_alt_limit", label:"Lenfosit alt limit", type:"num", readonly:true},
+      {key:"lym_abs_dusuk", label:"Lenfosit düşük", type:"bool", readonly:true},
       {key:"cbc_eos", label:"Eozinofil (/mm³)", type:"num"},
       {key:"cbc_nlr", label:"NLR", type:"num"},
       {key:"cd3", label:"Kan CD3 (%)", type:"num"},
+      {key:"cd3_pct_dusuk", label:"CD3 % düşük", type:"bool", readonly:true},
       {key:"cd4", label:"Kan CD4 (%)", type:"num"},
+      {key:"cd4_pct_dusuk", label:"CD4 % düşük", type:"bool", readonly:true},
       {key:"cd8", label:"Kan CD8 (%)", type:"num"},
+      {key:"cd8_pct_dusuk", label:"CD8 % düşük", type:"bool", readonly:true},
       {key:"cd4_cd8", label:"Kan CD4/CD8", type:"num"},
       {key:"cd19", label:"Kan CD19", type:"num"},
+      {key:"cd19_pct_dusuk", label:"CD19 % düşük", type:"bool", readonly:true},
       {key:"cd16_cd56", label:"Kan CD16/CD56", type:"num"},
+      {key:"cd16_cd56_pct_dusuk", label:"CD16/56 % düşük", type:"bool", readonly:true},
       {key:"lswbc", label:"Lenfosit subset WBC", type:"num"},
       {key:"lslym_pct", label:"LS lenfosit %", type:"num"},
       {key:"lscd3_pct", label:"LS CD3 %", type:"num"},
       {key:"lscd3_abs", label:"LS CD3 abs", type:"num"},
+      {key:"cd3_abs_dusuk", label:"CD3 abs düşük", type:"bool", readonly:true},
       {key:"lscd4_pct", label:"LS CD4 %", type:"num"},
       {key:"lscd4_abs", label:"LS CD4 abs", type:"num"},
+      {key:"cd4_abs_dusuk", label:"CD4 abs düşük", type:"bool", readonly:true},
       {key:"lscd8_pct", label:"LS CD8 %", type:"num"},
       {key:"lscd8_abs", label:"LS CD8 abs", type:"num"},
+      {key:"cd8_abs_dusuk", label:"CD8 abs düşük", type:"bool", readonly:true},
       {key:"lscd4_cd8", label:"LS CD4/CD8", type:"num"},
       {key:"lscd19", label:"LS CD19", type:"num"},
+      {key:"cd19_abs_dusuk", label:"CD19 abs düşük", type:"bool", readonly:true},
       {key:"lscd56", label:"LS CD56", type:"num"},
+      {key:"cd16_cd56_abs_dusuk", label:"CD16/56 abs düşük", type:"bool", readonly:true},
     ]
   },
   bal_immunoloji: {
