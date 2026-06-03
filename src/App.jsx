@@ -107,8 +107,10 @@ function calculateTreatmentFields(patient) {
   const sistemikPlanGun = numberOrNull(patient.sistemik_steroid_plan_gun)
   const kumulatifSistemik = sistemikDoz != null && sistemikGun != null ? round(sistemikDoz * sistemikGun, 2) : null
 
-  const neb2 = numberOrNull(patient.flutikazon_neb_2mg_gun)
-  const neb05 = numberOrNull(patient.flutikazon_neb_05mg_gun)
+  const neb2AdetGun = numberOrNull(patient.flutikazon_neb_2mg_adet_gun)
+  const neb2Gun = numberOrNull(patient.flutikazon_neb_2mg_gun)
+  const neb05AdetGun = numberOrNull(patient.flutikazon_neb_05mg_adet_gun)
+  const neb05Gun = numberOrNull(patient.flutikazon_neb_05mg_gun)
   const inh125Puff = numberOrNull(patient.flutikazon_inhaler_125_puff_gun)
   const inh125Gun = numberOrNull(patient.flutikazon_inhaler_125_gun)
   const inh50Puff = numberOrNull(patient.flutikazon_inhaler_50_puff_gun)
@@ -119,8 +121,8 @@ function calculateTreatmentFields(patient) {
   const seretide250Gun = numberOrNull(patient.seretide_250_gun)
 
   const flutikazonNebMcg =
-    (neb2 != null ? neb2 * 2000 : 0) +
-    (neb05 != null ? neb05 * 500 : 0)
+    (neb2AdetGun != null && neb2Gun != null ? neb2AdetGun * neb2Gun * 2000 : 0) +
+    (neb05AdetGun != null && neb05Gun != null ? neb05AdetGun * neb05Gun * 500 : 0)
   const flutikazonInhalerMcg =
     (inh125Puff != null && inh125Gun != null ? inh125Puff * inh125Gun * 125 : 0) +
     (inh50Puff != null && inh50Gun != null ? inh50Puff * inh50Gun * 50 : 0)
@@ -132,6 +134,7 @@ function calculateTreatmentFields(patient) {
   const azitromisin = patient.azitromisin == 1 || patient.azitromisin_aldi == 1
   const montelukast = patient.montelukast == 1 || patient.montelukast_aldi == 1
   const inhaleSteroid = toplamInhaleSteroidMcg > 0 || patient.flutikazon == 1 || patient.inhale_steroid_aldi == 1
+  const ivig = patient.ivig == 1 || patient.ivig_aldi == 1 || patient.ivig_aliyor == 1
 
   return {
     ...(sistemikDoz != null ? { sistemik_steroid_mgkg_gun: sistemikDoz, steroid_baslangic_dozu: sistemikDoz } : {}),
@@ -145,10 +148,13 @@ function calculateTreatmentFields(patient) {
     toplam_inhale_steroid_mcg: toplamInhaleSteroidMcg || null,
     inhale_steroid_aldi: inhaleSteroid ? 1 : 0,
     flutikazon: inhaleSteroid ? 1 : patient.flutikazon ?? null,
+    azitromisin: azitromisin ? 1 : patient.azitromisin ?? null,
     azitromisin_aldi: azitromisin ? 1 : 0,
+    montelukast: montelukast ? 1 : patient.montelukast ?? null,
     montelukast_aldi: montelukast ? 1 : 0,
     fam_aldi: inhaleSteroid || azitromisin || montelukast ? 1 : 0,
-    ivig_aldi: patient.ivig == 1 || patient.ivig_aliyor == 1 ? 1 : 0,
+    ivig: ivig ? 1 : patient.ivig ?? null,
+    ivig_aldi: ivig ? 1 : 0,
     seretide_aldi: seretideFlutikazonMcg > 0 ? 1 : patient.seretide_aldi ?? null,
     ventolin_aldi: patient.ventolin_aldi ?? null,
   }
@@ -219,6 +225,9 @@ const FOLLOWUP_FIELDS = [
   {key:"imv", label:"İnvaziv MV", type:"bool"},
   {key:"ecmo", label:"ECMO", type:"bool"},
   {key:"yeni_oksijen_ihtiyaci", label:"Yeni oksijen ihtiyacı", type:"bool"},
+  {key:"sistemik_steroid_mgkg_gun", label:"Steroid dozu (mg/kg/gün)", type:"num"},
+  {key:"sistemik_steroid_gun", label:"Steroid günü", type:"num"},
+  {key:"sistemik_steroid_plan_gun", label:"Planlanan steroid günü", type:"num"},
   {key:"va", label:"Ağırlık (kg)", type:"num"},
   {key:"boy", label:"Boy (cm)", type:"num"},
   {key:"spo2", label:"SpO2 (%)", type:"num"},
@@ -354,20 +363,42 @@ const FIELD_GROUPS = {
   },
   tedavi: {
     label: "Tedavi", fields: [
-      {key:"sistemik_steroid", label:"Sistemik steroid", type:"bool"},
+      {key:"sistemik_steroid", label:"Sistemik steroid aldı", type:"bool", readonly:true},
+      {key:"sistemik_steroid_mgkg_gun", label:"Sistemik steroid dozu (mg/kg/gün)", type:"num"},
+      {key:"sistemik_steroid_gun", label:"Sistemik steroid aldığı gün", type:"num"},
+      {key:"sistemik_steroid_plan_gun", label:"Planlanan sistemik steroid günü", type:"num"},
+      {key:"kumulatif_sistemik_steroid_mgkg", label:"Kümülatif sistemik steroid (mg/kg)", type:"num", readonly:true},
       {key:"pulse_steroid", label:"Pulse steroid", type:"bool"},
-      {key:"azitromisin", label:"Azitromisin", type:"bool"},
-      {key:"flutikazon", label:"Flutikazon", type:"bool"},
-      {key:"montelukast", label:"Montelukast", type:"bool"},
+      {key:"tanidan_once_antibiyotik", label:"Tanı öncesi antibiyotik", type:"bool"},
+      {key:"inhale_steroid_aldi", label:"İnhale steroid aldı", type:"bool", readonly:true},
+      {key:"flutikazon_neb_2mg_adet_gun", label:"Flutikazon neb 2 mg uygulama/gün", type:"num"},
+      {key:"flutikazon_neb_2mg_gun", label:"Flutikazon neb 2 mg gün", type:"num"},
+      {key:"flutikazon_neb_05mg_adet_gun", label:"Flutikazon neb 0.5 mg uygulama/gün", type:"num"},
+      {key:"flutikazon_neb_05mg_gun", label:"Flutikazon neb 0.5 mg gün", type:"num"},
+      {key:"flutikazon_neb_toplam_mcg", label:"Neb flutikazon toplam (mcg)", type:"num", readonly:true},
+      {key:"flutikazon_inhaler_125_puff_gun", label:"Flutikazon 125 mcg puff/gün", type:"num"},
+      {key:"flutikazon_inhaler_125_gun", label:"Flutikazon 125 mcg gün", type:"num"},
+      {key:"flutikazon_inhaler_50_puff_gun", label:"Flutikazon 50 mcg puff/gün", type:"num"},
+      {key:"flutikazon_inhaler_50_gun", label:"Flutikazon 50 mcg gün", type:"num"},
+      {key:"flutikazon_inhaler_toplam_mcg", label:"İnhaler flutikazon toplam (mcg)", type:"num", readonly:true},
+      {key:"seretide_125_puff_gun", label:"Seretide 125 puff/gün", type:"num"},
+      {key:"seretide_125_gun", label:"Seretide 125 gün", type:"num"},
+      {key:"seretide_250_puff_gun", label:"Seretide 250 puff/gün", type:"num"},
+      {key:"seretide_250_gun", label:"Seretide 250 gün", type:"num"},
+      {key:"seretide_aldi", label:"Seretide aldı", type:"bool", readonly:true},
+      {key:"seretide_toplam_flutikazon_mcg", label:"Seretide flutikazon toplam (mcg)", type:"num", readonly:true},
+      {key:"toplam_inhale_steroid_mcg", label:"Toplam inhale steroid (mcg)", type:"num", readonly:true},
+      {key:"azitromisin_aldi", label:"Azitromisin", type:"bool"},
+      {key:"montelukast_aldi", label:"Montelukast", type:"bool"},
+      {key:"fam_aldi", label:"FAM aldı", type:"bool", readonly:true},
       {key:"bronchomunal", label:"Bronchomunal", type:"bool"},
-      {key:"ivig", label:"IVIG", type:"bool"},
+      {key:"ivig_aldi", label:"IVIG verildi", type:"bool"},
+      {key:"ivig_aliyor", label:"IVIG halen alıyor", type:"bool"},
+      {key:"ventolin_aldi", label:"Ventolin", type:"bool"},
       {key:"o2", label:"O2 desteği", type:"bool"},
       {key:"bipap", label:"BiPAP", type:"bool"},
       {key:"imv", label:"İnvaziv MV", type:"bool"},
       {key:"ecmo", label:"ECMO", type:"bool"},
-      {key:"steroid_baslangic_dozu", label:"Steroid başlangıç dozu (mg/kg)", type:"num"},
-      {key:"kumulatif_steroid", label:"Kümülatif steroid (mg/kg)", type:"num"},
-      {key:"steroid_suresi_gun", label:"Steroid süresi (gün)", type:"num"},
       {key:"tedavi_suresi_gun", label:"Tedavi süresi (gün)", type:"num"},
     ]
   },
@@ -641,12 +672,17 @@ function FollowUpPanel({ patient }) {
 
     const takipGun = daysBetween(draft.visit_date, patient.tani_tarihi)
     const otomatikGidis = classifyClinicalCourse(draft)
+    const steroidDoz = numberOrNull(draft.sistemik_steroid_mgkg_gun)
+    const steroidGun = numberOrNull(draft.sistemik_steroid_gun)
+    const kumulatifSteroid = steroidDoz != null && steroidGun != null ? round(steroidDoz * steroidGun, 2) : null
     const record = {
       ...draft,
       hasta_id: patient.hasta_id,
       takip_suresi_gun: takipGun,
       takip_suresi_ay: takipGun == null ? null : round(takipGun / 30.4375, 1),
       klinik_gidis_otomatik: otomatikGidis,
+      sistemik_steroid: steroidDoz != null || steroidGun != null ? 1 : null,
+      kumulatif_sistemik_steroid_mgkg: kumulatifSteroid,
       created_at: new Date().toISOString(),
     }
 
@@ -745,7 +781,7 @@ function FollowUpPanel({ patient }) {
         <table style={{width:"100%", borderCollapse:"collapse", fontSize:12}}>
           <thead>
             <tr style={{borderBottom:"1px solid #e5e7eb"}}>
-              {["Tarih","Takip","Klinik gidiş","Atak","Pnömoni","SpO2","FEV1",""].map(h => (
+              {["Tarih","Takip","Klinik gidiş","Atak","Pnömoni","Steroid","SpO2","FEV1",""].map(h => (
                 <th key={h} style={{textAlign:"left", padding:"6px 8px", color:"#6b7280", fontWeight:500}}>{h}</th>
               ))}
             </tr>
@@ -758,6 +794,7 @@ function FollowUpPanel({ patient }) {
                 <td style={{padding:"5px 8px"}}>{clinicalCourseLabel(visit.klinik_gidis || visit.klinik_gidis_otomatik)}</td>
                 <td style={{padding:"5px 8px"}}>{visit.atak_sayisi ?? "-"}</td>
                 <td style={{padding:"5px 8px"}}>{visit.pnomoni_sayisi ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{visit.kumulatif_sistemik_steroid_mgkg != null ? `${visit.kumulatif_sistemik_steroid_mgkg} mg/kg` : "-"}</td>
                 <td style={{padding:"5px 8px"}}>{visit.spo2 ?? "-"}</td>
                 <td style={{padding:"5px 8px"}}>{visit.fev1 ?? "-"}</td>
                 <td style={{padding:"5px 8px", textAlign:"right"}}>
@@ -766,7 +803,7 @@ function FollowUpPanel({ patient }) {
               </tr>
             ))}
             {sortedVisits.length === 0 && (
-              <tr><td colSpan={8} style={{padding:12, textAlign:"center", color:"#9ca3af"}}>Henüz izlem ziyareti yok</td></tr>
+              <tr><td colSpan={9} style={{padding:12, textAlign:"center", color:"#9ca3af"}}>Henüz izlem ziyareti yok</td></tr>
             )}
           </tbody>
         </table>
@@ -854,7 +891,7 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
                   {f.note==="kln" && <span style={{marginLeft:4, fontSize:10, opacity:.7}}>(klinisyen)</span>}
                 </label>
                 {f.readonly ? (
-                  <input value={val??""} readOnly style={{...s.input, color:"#6b7280", background:"#f3f4f6"}} />
+                  <input value={f.type==="bool" ? (val == null ? "" : val == 1 ? "Evet" : "Hayır") : val??""} readOnly style={{...s.input, color:"#6b7280", background:"#f3f4f6"}} />
                 ) : f.type==="bool" ? (
                   <select value={val??""} onChange={e => set(f.key, e.target.value===""?null:Number(e.target.value))} style={s.select}>
                     <option value="">— bilinmiyor</option>

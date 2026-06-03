@@ -64,7 +64,36 @@ alter table public.hastalar
   add column if not exists bal_cd22 numeric,
   add column if not exists bal_cd20 numeric,
   add column if not exists bal_cd16 numeric,
-  add column if not exists bal_cd3_hladr numeric;
+  add column if not exists bal_cd3_hladr numeric,
+  add column if not exists sistemik_steroid_mgkg_gun numeric,
+  add column if not exists sistemik_steroid_gun numeric,
+  add column if not exists sistemik_steroid_plan_gun numeric,
+  add column if not exists kumulatif_sistemik_steroid_mgkg numeric,
+  add column if not exists tanidan_once_antibiyotik numeric,
+  add column if not exists flutikazon_neb_2mg_adet_gun numeric,
+  add column if not exists flutikazon_neb_2mg_gun numeric,
+  add column if not exists flutikazon_neb_05mg_adet_gun numeric,
+  add column if not exists flutikazon_neb_05mg_gun numeric,
+  add column if not exists flutikazon_neb_toplam_mcg numeric,
+  add column if not exists flutikazon_inhaler_125_puff_gun numeric,
+  add column if not exists flutikazon_inhaler_125_gun numeric,
+  add column if not exists flutikazon_inhaler_50_puff_gun numeric,
+  add column if not exists flutikazon_inhaler_50_gun numeric,
+  add column if not exists flutikazon_inhaler_toplam_mcg numeric,
+  add column if not exists seretide_125_puff_gun numeric,
+  add column if not exists seretide_125_gun numeric,
+  add column if not exists seretide_250_puff_gun numeric,
+  add column if not exists seretide_250_gun numeric,
+  add column if not exists seretide_aldi numeric,
+  add column if not exists seretide_toplam_flutikazon_mcg numeric,
+  add column if not exists toplam_inhale_steroid_mcg numeric,
+  add column if not exists inhale_steroid_aldi numeric,
+  add column if not exists fam_aldi numeric,
+  add column if not exists azitromisin_aldi numeric,
+  add column if not exists montelukast_aldi numeric,
+  add column if not exists ivig_aldi numeric,
+  add column if not exists ivig_aliyor numeric,
+  add column if not exists ventolin_aldi numeric;
 
 create table if not exists public.follow_up_visits (
   id uuid primary key default gen_random_uuid(),
@@ -92,6 +121,13 @@ create table if not exists public.follow_up_visits (
   notlar text,
   created_at timestamptz default now()
 );
+
+alter table public.follow_up_visits
+  add column if not exists sistemik_steroid numeric,
+  add column if not exists sistemik_steroid_mgkg_gun numeric,
+  add column if not exists sistemik_steroid_gun numeric,
+  add column if not exists sistemik_steroid_plan_gun numeric,
+  add column if not exists kumulatif_sistemik_steroid_mgkg numeric;
 
 create index if not exists follow_up_visits_hasta_id_visit_date_idx
   on public.follow_up_visits (hasta_id, visit_date desc);
