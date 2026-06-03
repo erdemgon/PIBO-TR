@@ -106,6 +106,7 @@ function calculateTreatmentFields(patient) {
   const sistemikGun = numberOrNull(patient.sistemik_steroid_gun ?? patient.steroid_suresi_gun)
   const sistemikPlanGun = numberOrNull(patient.sistemik_steroid_plan_gun)
   const kumulatifSistemik = sistemikDoz != null && sistemikGun != null ? round(sistemikDoz * sistemikGun, 2) : null
+  const pulseSteroidDoz = numberOrNull(patient.pulse_steroid_mgkg)
 
   const neb2AdetGun = numberOrNull(patient.flutikazon_neb_2mg_adet_gun)
   const neb2Gun = numberOrNull(patient.flutikazon_neb_2mg_gun)
@@ -142,6 +143,14 @@ function calculateTreatmentFields(patient) {
     ...(sistemikPlanGun != null ? { sistemik_steroid_plan_gun: sistemikPlanGun } : {}),
     ...(kumulatifSistemik != null ? { kumulatif_sistemik_steroid_mgkg: kumulatifSistemik, kumulatif_steroid: kumulatifSistemik } : {}),
     sistemik_steroid: sistemikDoz != null || sistemikGun != null || kumulatifSistemik != null || patient.sistemik_steroid == 1 ? 1 : 0,
+    ...(pulseSteroidDoz != null ? { pulse_steroid_mgkg: pulseSteroidDoz } : {}),
+    pulse_steroid: pulseSteroidDoz != null || patient.pulse_steroid == 1 ? 1 : patient.pulse_steroid ?? null,
+    ...(neb2AdetGun != null ? { flutikazon_neb_2mg_adet_gun: neb2AdetGun } : {}),
+    ...(neb05AdetGun != null ? { flutikazon_neb_05mg_adet_gun: neb05AdetGun } : {}),
+    ...(inh125Puff != null ? { flutikazon_inhaler_125_puff_gun: inh125Puff } : {}),
+    ...(inh50Puff != null ? { flutikazon_inhaler_50_puff_gun: inh50Puff } : {}),
+    ...(seretide125Puff != null ? { seretide_125_puff_gun: seretide125Puff } : {}),
+    ...(seretide250Puff != null ? { seretide_250_puff_gun: seretide250Puff } : {}),
     flutikazon_neb_toplam_mcg: flutikazonNebMcg || null,
     flutikazon_inhaler_toplam_mcg: flutikazonInhalerMcg || null,
     seretide_toplam_flutikazon_mcg: seretideFlutikazonMcg || null,
@@ -269,6 +278,13 @@ const PFT_FIELDS = [
   {key:"tlc", label:"TLC (%)", type:"num"},
   {key:"rv_tlc", label:"RV/TLC (%)", type:"num"},
   {key:"notlar", label:"Not", type:"text"},
+]
+
+const DOSING_FREQUENCY_OPTIONS = [
+  {v:"1", l:"1x"},
+  {v:"2", l:"2x"},
+  {v:"3", l:"3x"},
+  {v:"4", l:"4x"},
 ]
 
 const FIELD_GROUPS = {
@@ -440,22 +456,27 @@ const FIELD_GROUPS = {
       {key:"sistemik_steroid_gun", label:"Sistemik steroid aldığı gün", type:"num"},
       {key:"sistemik_steroid_plan_gun", label:"Planlanan sistemik steroid günü", type:"num"},
       {key:"kumulatif_sistemik_steroid_mgkg", label:"Kümülatif sistemik steroid (mg/kg)", type:"num", readonly:true},
-      {key:"pulse_steroid", label:"Pulse steroid", type:"bool"},
+      {key:"pulse_steroid", label:"Pulse steroid aldı", type:"bool", readonly:true},
+      {key:"pulse_steroid_mgkg", label:"Pulse steroid dozu (mg/kg)", type:"select", options:[
+        {v:"10", l:"10 mg/kg"},
+        {v:"20", l:"20 mg/kg"},
+        {v:"30", l:"30 mg/kg"},
+      ]},
       {key:"tanidan_once_antibiyotik", label:"Tanı öncesi antibiyotik", type:"bool"},
       {key:"inhale_steroid_aldi", label:"İnhale steroid aldı", type:"bool", readonly:true},
-      {key:"flutikazon_neb_2mg_adet_gun", label:"Flutikazon neb 2 mg uygulama/gün", type:"num"},
+      {key:"flutikazon_neb_2mg_adet_gun", label:"Flutikazon neb 2 mg sıklık", type:"select", options:DOSING_FREQUENCY_OPTIONS},
       {key:"flutikazon_neb_2mg_gun", label:"Flutikazon neb 2 mg gün", type:"num"},
-      {key:"flutikazon_neb_05mg_adet_gun", label:"Flutikazon neb 0.5 mg uygulama/gün", type:"num"},
+      {key:"flutikazon_neb_05mg_adet_gun", label:"Flutikazon neb 0.5 mg sıklık", type:"select", options:DOSING_FREQUENCY_OPTIONS},
       {key:"flutikazon_neb_05mg_gun", label:"Flutikazon neb 0.5 mg gün", type:"num"},
       {key:"flutikazon_neb_toplam_mcg", label:"Neb flutikazon toplam (mcg)", type:"num", readonly:true},
-      {key:"flutikazon_inhaler_125_puff_gun", label:"Flutikazon 125 mcg puff/gün", type:"num"},
+      {key:"flutikazon_inhaler_125_puff_gun", label:"Flutikazon 125 mcg sıklık", type:"select", options:DOSING_FREQUENCY_OPTIONS},
       {key:"flutikazon_inhaler_125_gun", label:"Flutikazon 125 mcg gün", type:"num"},
-      {key:"flutikazon_inhaler_50_puff_gun", label:"Flutikazon 50 mcg puff/gün", type:"num"},
+      {key:"flutikazon_inhaler_50_puff_gun", label:"Flutikazon 50 mcg sıklık", type:"select", options:DOSING_FREQUENCY_OPTIONS},
       {key:"flutikazon_inhaler_50_gun", label:"Flutikazon 50 mcg gün", type:"num"},
       {key:"flutikazon_inhaler_toplam_mcg", label:"İnhaler flutikazon toplam (mcg)", type:"num", readonly:true},
-      {key:"seretide_125_puff_gun", label:"Seretide 125 puff/gün", type:"num"},
+      {key:"seretide_125_puff_gun", label:"Seretide 125 sıklık", type:"select", options:DOSING_FREQUENCY_OPTIONS},
       {key:"seretide_125_gun", label:"Seretide 125 gün", type:"num"},
-      {key:"seretide_250_puff_gun", label:"Seretide 250 puff/gün", type:"num"},
+      {key:"seretide_250_puff_gun", label:"Seretide 250 sıklık", type:"select", options:DOSING_FREQUENCY_OPTIONS},
       {key:"seretide_250_gun", label:"Seretide 250 gün", type:"num"},
       {key:"seretide_aldi", label:"Seretide aldı", type:"bool", readonly:true},
       {key:"seretide_toplam_flutikazon_mcg", label:"Seretide flutikazon toplam (mcg)", type:"num", readonly:true},

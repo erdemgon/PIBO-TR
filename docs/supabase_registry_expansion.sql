@@ -73,6 +73,7 @@ alter table public.hastalar
   add column if not exists sistemik_steroid_gun numeric,
   add column if not exists sistemik_steroid_plan_gun numeric,
   add column if not exists kumulatif_sistemik_steroid_mgkg numeric,
+  add column if not exists pulse_steroid_mgkg numeric,
   add column if not exists tanidan_once_antibiyotik numeric,
   add column if not exists flutikazon_neb_2mg_adet_gun numeric,
   add column if not exists flutikazon_neb_2mg_gun numeric,
