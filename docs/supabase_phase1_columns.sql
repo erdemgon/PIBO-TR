@@ -1,0 +1,15 @@
+alter table public.hastalar
+  add column if not exists dogum_tarihi date,
+  add column if not exists semptom_baslangic_tarihi date,
+  add column if not exists ilk_muayene_tarihi date,
+  add column if not exists tani_tarihi date,
+  add column if not exists bt_tarihi date,
+  add column if not exists bronkoskopi_tarihi date,
+  add column if not exists spo2_bas numeric,
+  add column if not exists ates_bas numeric,
+  add column if not exists solunum_sayisi_bas numeric,
+  add column if not exists kalp_tepe_atimi_bas numeric,
+  add column if not exists tani_yas_ay numeric,
+  add column if not exists semptom_tani_gun integer,
+  add column if not exists growth_reference_status text,
+  add column if not exists raw_excel_payload jsonb;
