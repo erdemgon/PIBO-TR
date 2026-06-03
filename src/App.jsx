@@ -239,6 +239,7 @@ function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
             <span style={{fontSize:13, fontWeight:500, minWidth:90}}>{p.hasta_id}</span>
             <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
             <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"E":"K"} · {p.yas_ay?.toFixed(0)} ay</span>
+            <span style={{fontSize:12, color:"#9ca3af"}}>D: {p.dogum_yil}/{String(p.dogum_ay).padStart(2,"0")}</span>
             <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>{p.tani_yil}/{p.tani_ay}</span>
           </div>
         ))}
@@ -266,6 +267,7 @@ function SelectPatient({ patients, centerInfo, onSelect, onBack }) {
           <span style={{fontSize:14, fontWeight:500, minWidth:90}}>{p.hasta_id}</span>
           <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
           <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"Erkek":"Kız"} · {p.yas_ay?.toFixed(1)} ay</span>
+          <span style={{fontSize:12, color:"#9ca3af"}}>D: {p.dogum_yil}/{String(p.dogum_ay).padStart(2,"0")}</span>
           <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {p.tani_yil}/{p.tani_ay}</span>
         </button>
       ))}
