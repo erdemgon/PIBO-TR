@@ -1304,26 +1304,14 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
         pibo_bronsektazi_pct: pibo.length ? Math.round(pibo.filter(p=>p.bt_bronsektazi==1).length/pibo.length*100) : null,
         merkezler: [...new Set(patients.map(p=>p.hasta_id.split("-")[0]))]
       }
-      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      const resp = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1200,
-          messages: [{
-            role: "user",
-            content: `Sen bir pediatrik göğüs hastalıkları uzmanısın. Registry verisi hakkında şu soruyu yanıtla:
-
-"${query}"
-
-Veri özeti: ${JSON.stringify(summary)}
-
-Türkçe yanıt ver. Örneklem küçüklüğünü belirt.`
-          }]
-        })
+        body: JSON.stringify({ query, summary })
       })
       const data = await resp.json()
-      setResult(data.content?.[0]?.text || "Yanıt alınamadı.")
+      if (!resp.ok) throw new Error(data.error || "API hatası")
+      setResult(data.result || "Yanıt alınamadı.")
     } catch(e) { setResult("Hata: " + e.message) }
     setLoading(false)
   }
