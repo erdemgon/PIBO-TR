@@ -97,7 +97,20 @@ alter table public.hastalar
   add column if not exists montelukast_aldi numeric,
   add column if not exists ivig_aldi numeric,
   add column if not exists ivig_aliyor numeric,
-  add column if not exists ventolin_aldi numeric;
+  add column if not exists ventolin_aldi numeric,
+  add column if not exists sft_bas_tarihi date,
+  add column if not exists sft_bit_tarihi date,
+  add column if not exists akciger_goruntuleme_yapildi numeric,
+  add column if not exists akciger_goruntuleme_tarihi date,
+  add column if not exists akciger_goruntuleme_yontemi text,
+  add column if not exists akciger_goruntuleme_bulgu text,
+  add column if not exists ppd_mm numeric,
+  add column if not exists ppd_sonuc text,
+  add column if not exists tb_igra_sonuc text,
+  add column if not exists tb_igra_tarihi date,
+  add column if not exists tb_mikrobiyoloji_pozitif numeric,
+  add column if not exists tb_tedavi_baslangic_tarihi date,
+  add column if not exists tb_tedavi_suresi_ay numeric;
 
 create table if not exists public.follow_up_visits (
   id uuid primary key default gen_random_uuid(),
@@ -135,3 +148,32 @@ alter table public.follow_up_visits
 
 create index if not exists follow_up_visits_hasta_id_visit_date_idx
   on public.follow_up_visits (hasta_id, visit_date desc);
+
+create table if not exists public.pft_records (
+  id uuid primary key default gen_random_uuid(),
+  hasta_id text not null references public.hastalar(hasta_id) on delete cascade,
+  test_date date not null,
+  test_type text,
+  tani_sonrasi_gun integer,
+  tani_sonrasi_ay numeric,
+  fev1 numeric,
+  fev1_z numeric,
+  fvc numeric,
+  fvc_z numeric,
+  fev1_fvc numeric,
+  fev1_fvc_z numeric,
+  mef2575 numeric,
+  mef2575_z numeric,
+  bd_fev1 numeric,
+  bd_mef2575 numeric,
+  dlco numeric,
+  dlco_z numeric,
+  rv numeric,
+  tlc numeric,
+  rv_tlc numeric,
+  notlar text,
+  created_at timestamptz default now()
+);
+
+create index if not exists pft_records_hasta_id_test_date_idx
+  on public.pft_records (hasta_id, test_date desc);

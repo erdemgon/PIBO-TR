@@ -245,6 +245,32 @@ const FOLLOWUP_FIELDS = [
   {key:"notlar", label:"Not", type:"text"},
 ]
 
+const PFT_FIELDS = [
+  {key:"test_date", label:"Tetkik tarihi", type:"date", required:true},
+  {key:"test_type", label:"Tetkik tipi", type:"select", options:[
+    {v:"", l:"—"},
+    {v:"bazal", l:"Bazal"},
+    {v:"izlem", l:"İzlem"},
+    {v:"bronkodilatator", l:"BD sonrası"},
+  ]},
+  {key:"fev1", label:"FEV1 (%)", type:"num"},
+  {key:"fev1_z", label:"FEV1 z-skor", type:"num"},
+  {key:"fvc", label:"FVC (%)", type:"num"},
+  {key:"fvc_z", label:"FVC z-skor", type:"num"},
+  {key:"fev1_fvc", label:"FEV1/FVC", type:"num"},
+  {key:"fev1_fvc_z", label:"FEV1/FVC z-skor", type:"num"},
+  {key:"mef2575", label:"MEF25-75 (%)", type:"num"},
+  {key:"mef2575_z", label:"MEF25-75 z-skor", type:"num"},
+  {key:"bd_fev1", label:"BD FEV1 değişim (%)", type:"num"},
+  {key:"bd_mef2575", label:"BD MEF25-75 değişim (%)", type:"num"},
+  {key:"dlco", label:"DLCO (%)", type:"num"},
+  {key:"dlco_z", label:"DLCO z-skor", type:"num"},
+  {key:"rv", label:"RV (%)", type:"num"},
+  {key:"tlc", label:"TLC (%)", type:"num"},
+  {key:"rv_tlc", label:"RV/TLC (%)", type:"num"},
+  {key:"notlar", label:"Not", type:"text"},
+]
+
 const FIELD_GROUPS = {
   baslangic: {
     label: "Başlangıç", fields: [
@@ -356,13 +382,55 @@ const FIELD_GROUPS = {
   },
   sft: {
     label: "Solunum Fonksiyon Testleri", fields: [
+      {key:"sft_bas_tarihi", label:"Bazal SFT tarihi", type:"date"},
       {key:"fev1_bas", label:"FEV1 başlangıç (%)", type:"num"},
       {key:"fvc_bas", label:"FVC başlangıç (%)", type:"num"},
       {key:"mef2575_bas", label:"MEF25-75 başlangıç (%)", type:"num"},
+      {key:"fev1_bd_bas", label:"Bazal BD FEV1 değişim (%)", type:"num"},
+      {key:"mef2575_bd_bas", label:"Bazal BD MEF25-75 değişim (%)", type:"num"},
+      {key:"dlco_bas", label:"DLCO başlangıç (%)", type:"num"},
+      {key:"rv_bas", label:"RV başlangıç (%)", type:"num"},
+      {key:"tlc_bas", label:"TLC başlangıç (%)", type:"num"},
+      {key:"rv_tlc_bas", label:"RV/TLC başlangıç (%)", type:"num"},
+      {key:"sft_bit_tarihi", label:"Son SFT tarihi", type:"date"},
       {key:"fev1_bit", label:"FEV1 bitiş (%)", type:"num"},
       {key:"fvc_bit", label:"FVC bitiş (%)", type:"num"},
       {key:"mef2575_bit", label:"MEF25-75 bitiş (%)", type:"num"},
+      {key:"dlco_bit", label:"DLCO bitiş (%)", type:"num"},
+      {key:"rv_bit", label:"RV bitiş (%)", type:"num"},
+      {key:"tlc_bit", label:"TLC bitiş (%)", type:"num"},
+      {key:"rv_tlc_bit", label:"RV/TLC bitiş (%)", type:"num"},
       {key:"xu_siddet", label:"Xu klinik şiddet (1-5)", type:"num", note:"kln"},
+    ]
+  },
+  ptbo_tb: {
+    label: "PTBO/TB", fields: [
+      {key:"akciger_goruntuleme_yapildi", label:"Akciğer görüntüleme yapıldı", type:"bool"},
+      {key:"akciger_goruntuleme_tarihi", label:"Akciğer görüntüleme tarihi", type:"date"},
+      {key:"akciger_goruntuleme_yontemi", label:"Görüntüleme yöntemi", type:"select", options:[
+        {v:"akciger_grafisi", l:"Akciğer grafisi"},
+        {v:"toraks_bt", l:"Toraks BT"},
+        {v:"hrct", l:"HRCT"},
+        {v:"diger", l:"Diğer"},
+      ]},
+      {key:"akciger_goruntuleme_bulgu", label:"Görüntüleme bulgusu", type:"text"},
+      {key:"ppd_mm", label:"PPD endürasyon (mm)", type:"num"},
+      {key:"ppd_sonuc", label:"PPD sonucu", type:"select", options:[
+        {v:"negatif", l:"Negatif"},
+        {v:"pozitif", l:"Pozitif"},
+        {v:"supheli", l:"Şüpheli"},
+        {v:"yapilmadi", l:"Yapılmadı"},
+      ]},
+      {key:"tb_igra_sonuc", label:"TB IGRA sonucu", type:"select", options:[
+        {v:"negatif", l:"Negatif"},
+        {v:"pozitif", l:"Pozitif"},
+        {v:"indeterminate", l:"Belirsiz"},
+        {v:"yapilmadi", l:"Yapılmadı"},
+      ]},
+      {key:"tb_igra_tarihi", label:"TB IGRA tarihi", type:"date"},
+      {key:"tb_mikrobiyoloji_pozitif", label:"TB mikrobiyoloji pozitif", type:"bool"},
+      {key:"tb_tedavi_baslangic_tarihi", label:"TB tedavi başlangıç tarihi", type:"date"},
+      {key:"tb_tedavi_suresi_ay", label:"TB tedavi süresi (ay)", type:"num"},
     ]
   },
   tedavi: {
@@ -816,6 +884,167 @@ function FollowUpPanel({ patient }) {
   )
 }
 
+function PftPanel({ patient }) {
+  const [records, setRecords] = useState([])
+  const [draft, setDraft] = useState({ test_date: new Date().toISOString().slice(0, 10), test_type: "izlem" })
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (!patient?.hasta_id) return
+    ;(async () => {
+      setLoading(true)
+      setError("")
+      const { data, error } = await supabase
+        .from("pft_records")
+        .select("*")
+        .eq("hasta_id", patient.hasta_id)
+        .order("test_date", { ascending: false })
+      if (error) setError(formatSupabaseError(error) || "SFT kayıtları yüklenemedi.")
+      else setRecords(data || [])
+      setLoading(false)
+    })()
+  }, [patient?.hasta_id])
+
+  function setDraftField(key, value) {
+    setDraft(prev => ({ ...prev, [key]: value }))
+  }
+
+  async function savePft() {
+    setError("")
+    setMessage("")
+    if (!draft.test_date) {
+      setError("Tetkik tarihi gerekli.")
+      return
+    }
+
+    const taniGun = daysBetween(draft.test_date, patient.tani_tarihi)
+    const record = {
+      ...draft,
+      hasta_id: patient.hasta_id,
+      tani_sonrasi_gun: taniGun,
+      tani_sonrasi_ay: taniGun == null ? null : round(taniGun / 30.4375, 1),
+      created_at: new Date().toISOString(),
+    }
+
+    const { data, error } = await supabase
+      .from("pft_records")
+      .insert(record)
+      .select("*")
+      .single()
+    if (error) {
+      setError(formatSupabaseError(error) || "SFT kaydı kaydedilemedi. SQL tablosu oluşturuldu mu?")
+      return
+    }
+
+    setRecords(prev => [data, ...prev])
+    setDraft({ test_date: new Date().toISOString().slice(0, 10), test_type: "izlem" })
+    setMessage("SFT kaydı kaydedildi.")
+    setTimeout(() => setMessage(""), 2500)
+  }
+
+  async function deletePft(id) {
+    const ok = window.confirm("Bu SFT kaydı silinsin mi?")
+    if (!ok) return
+    const { error } = await supabase.from("pft_records").delete().eq("id", id)
+    if (error) {
+      setError(formatSupabaseError(error) || "SFT kaydı silinemedi.")
+      return
+    }
+    setRecords(prev => prev.filter(record => record.id !== id))
+  }
+
+  function renderPftField(field) {
+    const val = draft[field.key]
+    if (field.type === "select") {
+      return (
+        <select value={val??""} onChange={e => setDraftField(field.key, e.target.value || null)} style={s.select}>
+          {field.options?.map(option => <option key={option.v} value={option.v}>{option.l}</option>)}
+        </select>
+      )
+    }
+    if (field.type === "date") {
+      return <input type="date" value={dateToInput(val)} onChange={e => setDraftField(field.key, e.target.value || null)} style={s.input} />
+    }
+    return (
+      <input
+        type={field.type==="num" ? "number" : "text"}
+        value={val??""}
+        onChange={e => setDraftField(field.key, e.target.value===""?null:(field.type==="num"?Number(e.target.value):e.target.value))}
+        style={s.input}
+      />
+    )
+  }
+
+  const sortedRecords = [...records].sort((a, b) => String(b.test_date).localeCompare(String(a.test_date)))
+
+  return (
+    <div style={{...s.card, marginTop:16}}>
+      <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:12}}>
+        <div style={{fontSize:14, fontWeight:500}}>Solunum fonksiyon kayıtları</div>
+        <span style={{fontSize:12, color:"#6b7280"}}>{records.length} kayıt</span>
+      </div>
+      {(error || message) && (
+        <div style={{
+          border:"1px solid",
+          borderColor: error ? "#fecaca" : "#bbf7d0",
+          background: error ? "#fef2f2" : "#f0fdf4",
+          color: error ? "#991b1b" : "#166534",
+          borderRadius:8,
+          padding:"8px 10px",
+          fontSize:12,
+          marginBottom:12,
+        }}>
+          {error || message}
+        </div>
+      )}
+      <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))", gap:10, marginBottom:12}}>
+        {PFT_FIELDS.map(field => (
+          <div key={field.key}>
+            <label style={s.label}>{field.label}</label>
+            {renderPftField(field)}
+          </div>
+        ))}
+      </div>
+      <button onClick={savePft} disabled={loading} style={{...s.btnPrimary, marginBottom:14}}>
+        SFT kaydını kaydet
+      </button>
+      <div style={{overflowX:"auto"}}>
+        <table style={{width:"100%", borderCollapse:"collapse", fontSize:12}}>
+          <thead>
+            <tr style={{borderBottom:"1px solid #e5e7eb"}}>
+              {["Tarih","Tip","Tanıdan sonra","FEV1","FVC","MEF25-75","DLCO","RV/TLC",""].map(h => (
+                <th key={h} style={{textAlign:"left", padding:"6px 8px", color:"#6b7280", fontWeight:500}}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sortedRecords.map(record => (
+              <tr key={record.id} style={{borderBottom:"1px solid #f3f4f6"}}>
+                <td style={{padding:"5px 8px", fontWeight:500}}>{dateToInput(record.test_date)}</td>
+                <td style={{padding:"5px 8px"}}>{record.test_type || "-"}</td>
+                <td style={{padding:"5px 8px"}}>{record.tani_sonrasi_ay != null ? `${record.tani_sonrasi_ay} ay` : "-"}</td>
+                <td style={{padding:"5px 8px"}}>{record.fev1 ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{record.fvc ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{record.mef2575 ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{record.dlco ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{record.rv_tlc ?? "-"}</td>
+                <td style={{padding:"5px 8px", textAlign:"right"}}>
+                  <button onClick={() => deletePft(record.id)} style={{...s.btn, fontSize:11, padding:"4px 8px", color:"#b91c1c", borderColor:"#fecaca"}}>Sil</button>
+                </td>
+              </tr>
+            ))}
+            {sortedRecords.length === 0 && (
+              <tr><td colSpan={9} style={{padding:12, textAlign:"center", color:"#9ca3af"}}>Henüz SFT kaydı yok</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 function PatientForm({ patient, isNew, onSave, onBack }) {
   const [form, setForm] = useState({...patient})
   const [saving, setSaving] = useState(false)
@@ -823,6 +1052,10 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
   const [saveMessage, setSaveMessage] = useState("")
   const [saveError, setSaveError] = useState("")
   const [activeGroup, setActiveGroup] = useState("baslangic")
+
+  useEffect(() => {
+    if (activeGroup === "ptbo_tb" && form.ptbo != 1) setActiveGroup("baslangic")
+  }, [activeGroup, form.ptbo])
 
   function set(key, val) { setForm(f => ({...f, [key]: val})) }
 
@@ -843,7 +1076,7 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
     }
   }
 
-  const groups = Object.entries(FIELD_GROUPS)
+  const groups = Object.entries(FIELD_GROUPS).filter(([key]) => key !== "ptbo_tb" || form.ptbo == 1)
   const displayForm = {...form, ...calculateDerivedFields(form)}
 
   return (
@@ -881,13 +1114,18 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
           )
         })}
         {!isNew && (
-          <button onClick={() => setActiveGroup("izlem")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="izlem"?"#3b82f6":"#e5e7eb", background: activeGroup==="izlem"?"#eff6ff":"#fff", color: activeGroup==="izlem"?"#1d4ed8":"#6b7280", cursor:"pointer", fontWeight: activeGroup==="izlem"?500:400}}>
-            İzlem ziyaretleri
-          </button>
+          <>
+            <button onClick={() => setActiveGroup("izlem")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="izlem"?"#3b82f6":"#e5e7eb", background: activeGroup==="izlem"?"#eff6ff":"#fff", color: activeGroup==="izlem"?"#1d4ed8":"#6b7280", cursor:"pointer", fontWeight: activeGroup==="izlem"?500:400}}>
+              İzlem ziyaretleri
+            </button>
+            <button onClick={() => setActiveGroup("sft_kayitlari")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="sft_kayitlari"?"#3b82f6":"#e5e7eb", background: activeGroup==="sft_kayitlari"?"#eff6ff":"#fff", color: activeGroup==="sft_kayitlari"?"#1d4ed8":"#6b7280", cursor:"pointer", fontWeight: activeGroup==="sft_kayitlari"?500:400}}>
+              SFT kayıtları
+            </button>
+          </>
         )}
       </div>
 
-      {activeGroup === "izlem" ? <FollowUpPanel patient={displayForm} /> : <div style={s.card}>
+      {activeGroup === "izlem" ? <FollowUpPanel patient={displayForm} /> : activeGroup === "sft_kayitlari" ? <PftPanel patient={displayForm} /> : <div style={s.card}>
         <div style={{fontSize:14, fontWeight:500, marginBottom:14}}>{FIELD_GROUPS[activeGroup].label}</div>
         <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12}}>
           {FIELD_GROUPS[activeGroup].fields.map(f => {
@@ -922,7 +1160,7 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
           })}
         </div>
       </div>}
-      {activeGroup !== "izlem" && (
+      {activeGroup !== "izlem" && activeGroup !== "sft_kayitlari" && (
         <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, width:"100%", marginTop:12, padding:10, fontSize:14}}>
           {saving ? "Kaydediliyor..." : saved ? "Kaydedildi ✓" : "Kaydet"}
         </button>
