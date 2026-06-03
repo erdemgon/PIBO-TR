@@ -30,6 +30,35 @@ function formatSupabaseError(error) {
   return [error?.message, error?.details, error?.hint].filter(Boolean).join(" ")
 }
 
+function csvEscape(value) {
+  if (value == null) return ""
+  const text = String(value)
+  return /[",\n\r;]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text
+}
+
+function downloadCsv(filename, rows) {
+  if (!rows.length) return
+  const priority = ["hasta_id", "merkez", "pibo", "ptbo", "cinsiyet", "dogum_tarihi", "tani_tarihi", "yas_ay"]
+  const keys = Array.from(new Set(rows.flatMap(row => Object.keys(row))))
+  const columns = [
+    ...priority.filter(key => keys.includes(key)),
+    ...keys.filter(key => !priority.includes(key)).sort(),
+  ]
+  const csv = [
+    columns.map(csvEscape).join(";"),
+    ...rows.map(row => columns.map(column => csvEscape(row[column])).join(";")),
+  ].join("\n")
+  const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
 function parseDate(value) {
   if (!value) return null
   const date = value instanceof Date ? value : new Date(value)
@@ -1297,6 +1326,18 @@ Türkçe yanıt ver. Örneklem küçüklüğünü belirt.`
     }
   }
 
+  function handleExportPatients() {
+    const today = new Date().toISOString().slice(0, 10)
+    const rows = patients.map(patient => ({
+      ...patient,
+      ...calculateDerivedFields(patient),
+      merkez: patient.hasta_id.split("-")[0],
+    }))
+    downloadCsv(`pibo_registry_hastalar_${today}.csv`, rows)
+    setDeleteMessage(`${rows.length} hasta Excel/CSV dosyası olarak indirildi.`)
+    setTimeout(() => setDeleteMessage(""), 2500)
+  }
+
   return (
     <div style={{maxWidth:900, margin:"0 auto", padding:"20px"}}>
       <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:20}}>
@@ -1330,11 +1371,16 @@ Türkçe yanıt ver. Örneklem küçüklüğünü belirt.`
 
       <div style={{...s.card, marginBottom:14}}>
         <div style={{fontSize:13, fontWeight:500, marginBottom:8}}>Veri bakım</div>
-        <button onClick={handleRecalculateAll} disabled={recalcLoading} style={{...s.btnPrimary, marginBottom:8}}>
-          {recalcLoading ? "Yeniden hesaplanıyor..." : "Tüm otomatik alanları yeniden hesapla"}
-        </button>
+        <div style={{display:"flex", flexWrap:"wrap", gap:8, marginBottom:8}}>
+          <button onClick={handleRecalculateAll} disabled={recalcLoading} style={s.btnPrimary}>
+            {recalcLoading ? "Yeniden hesaplanıyor..." : "Tüm otomatik alanları yeniden hesapla"}
+          </button>
+          <button onClick={handleExportPatients} style={s.btn}>
+            Hasta verisini Excel/CSV indir
+          </button>
+        </div>
         <div style={{fontSize:12, color:"#6b7280"}}>
-          Eski kayıtların Ig/subset düşük bayraklarını, z-skorlarını ve diğer hesaplanan alanlarını mevcut ölçümlere göre tekrar kaydeder.
+          Eski kayıtların hesaplanan alanlarını tekrar kaydeder; indirme düğmesi tüm hasta tablosunu Excel uyumlu CSV olarak dışa aktarır.
         </div>
       </div>
 
