@@ -16,4 +16,5 @@ alter table public.hastalar
   add column if not exists boy_z_bas numeric,
   add column if not exists vki_z_bas numeric,
   add column if not exists growth_reference_status text,
+  add column if not exists guncelleme_tarihi timestamptz,
   add column if not exists raw_excel_payload jsonb;
