@@ -1284,6 +1284,7 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
   const [query, setQuery] = useState("")
   const [result, setResult] = useState("")
   const [loading, setLoading] = useState(false)
+  const [reportLoading, setReportLoading] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState("")
   const [deleteError, setDeleteError] = useState("")
   const [recalcLoading, setRecalcLoading] = useState(false)
@@ -1307,13 +1308,34 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
       const resp = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, summary })
+        body: JSON.stringify({ query, patients })
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data.error || "API hatası")
       setResult(data.result || "Yanıt alınamadı.")
     } catch(e) { setResult("Hata: " + e.message) }
     setLoading(false)
+  }
+
+  async function downloadReport() {
+    setReportLoading(true)
+    try {
+      const resp = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ patients })
+      })
+      const data = await resp.json()
+      if (!resp.ok) throw new Error(data.error || "Rapor oluşturulamadı")
+      const blob = new Blob([data.html], { type: "text/html;charset=utf-8" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `PIBO_Registry_Rapor_${new Date().toISOString().slice(0,10)}.html`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch(e) { alert("Rapor hatası: " + e.message) }
+    setReportLoading(false)
   }
 
   async function handleDelete(patient) {
@@ -1424,14 +1446,19 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
       <div style={{...s.card, marginBottom:14}}>
         <div style={{fontSize:13, fontWeight:500, marginBottom:8}}>Yapay zeka destekli analiz</div>
         <div style={{display:"flex", flexWrap:"wrap", gap:6, marginBottom:8}}>
-          {["PIBO grubunu demografik olarak özetle","FEV1 değişimini yorumla","Etken dağılımını analiz et","Tedavi sonuçlarını değerlendir"].map(q => (
+          {["PIBO grubunu demografik olarak özetle","Etken dağılımını analiz et","Tedavi sonuçlarını değerlendir","BT bulgularını özetle","FEV1 değişimini yorumla","İmmünolojik profili değerlendir"].map(q => (
             <button key={q} onClick={() => setQuery(q)} style={{...s.btn, fontSize:11, padding:"3px 10px"}}>{q}</button>
           ))}
         </div>
         <textarea value={query} onChange={e => setQuery(e.target.value)} rows={2} placeholder="Sorunuzu yazın..." style={{...s.input, resize:"vertical", marginBottom:8}} />
-        <button onClick={runAnalysis} disabled={loading} style={s.btnPrimary}>
-          {loading ? "Analiz yapılıyor..." : "Analiz et →"}
-        </button>
+        <div style={{display:"flex", gap:8}}>
+          <button onClick={runAnalysis} disabled={loading} style={s.btnPrimary}>
+            {loading ? "Analiz yapılıyor..." : "Analiz et →"}
+          </button>
+          <button onClick={downloadReport} disabled={reportLoading} style={{...s.btn, background:"#f0fdf4", borderColor:"#86efac", color:"#166534"}}>
+            {reportLoading ? "Rapor oluşturuluyor..." : "📄 Tam Rapor İndir"}
+          </button>
+        </div>
         {result && <div style={{marginTop:12, fontSize:13, lineHeight:1.7, whiteSpace:"pre-wrap", borderTop:"1px solid #f3f4f6", paddingTop:12}}>{result}</div>}
       </div>
 
