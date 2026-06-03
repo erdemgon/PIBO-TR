@@ -1216,13 +1216,14 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
 }
 
 // ─── Admin Panel ──────────────────────────────────────────────────────────────
-function AdminPanel({ patients, onBack, onDelete }) {
+function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
   const [filterGroup, setFilterGroup] = useState("all")
   const [query, setQuery] = useState("")
   const [result, setResult] = useState("")
   const [loading, setLoading] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState("")
   const [deleteError, setDeleteError] = useState("")
+  const [recalcLoading, setRecalcLoading] = useState(false)
 
   const pibo = patients.filter(p => p.pibo == 1)
   const ptbo = patients.filter(p => p.ptbo == 1)
@@ -1279,6 +1280,23 @@ Türkçe yanıt ver. Örneklem küçüklüğünü belirt.`
     }
   }
 
+  async function handleRecalculateAll() {
+    const ok = window.confirm("Tüm hasta kayıtları yaş, büyüme, tedavi ve immünoloji otomatik alanlarıyla yeniden hesaplansın mı?")
+    if (!ok) return
+
+    setDeleteError("")
+    setDeleteMessage("")
+    setRecalcLoading(true)
+    try {
+      const result = await onRecalculateAll()
+      setDeleteMessage(`${result.count} hasta yeniden hesaplandı. Ig/subset ölçümü olan ${result.immunologyCount} kayıt güncellendi.`)
+    } catch (error) {
+      setDeleteError(error.message || "Toplu yeniden hesaplama başarısız.")
+    } finally {
+      setRecalcLoading(false)
+    }
+  }
+
   return (
     <div style={{maxWidth:900, margin:"0 auto", padding:"20px"}}>
       <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:20}}>
@@ -1309,6 +1327,16 @@ Türkçe yanıt ver. Örneklem küçüklüğünü belirt.`
           {deleteError || deleteMessage}
         </div>
       )}
+
+      <div style={{...s.card, marginBottom:14}}>
+        <div style={{fontSize:13, fontWeight:500, marginBottom:8}}>Veri bakım</div>
+        <button onClick={handleRecalculateAll} disabled={recalcLoading} style={{...s.btnPrimary, marginBottom:8}}>
+          {recalcLoading ? "Yeniden hesaplanıyor..." : "Tüm otomatik alanları yeniden hesapla"}
+        </button>
+        <div style={{fontSize:12, color:"#6b7280"}}>
+          Eski kayıtların Ig/subset düşük bayraklarını, z-skorlarını ve diğer hesaplanan alanlarını mevcut ölçümlere göre tekrar kaydeder.
+        </div>
+      </div>
 
       <div style={{...s.card, marginBottom:14}}>
         <div style={{fontSize:13, fontWeight:500, marginBottom:8}}>Yapay zeka destekli analiz</div>
@@ -1433,6 +1461,45 @@ export default function App() {
     setPatients(prev => prev.filter(patient => patient.hasta_id !== hastaId))
   }
 
+  async function recalculateAllPatients() {
+    const recalculated = patients.map(patient => ({
+      ...patient,
+      ...calculateDerivedFields(patient),
+      merkez: patient.hasta_id.split("-")[0],
+      guncelleme_tarihi: new Date().toISOString(),
+    }))
+    const { error } = await supabase.from("hastalar").upsert(recalculated, { onConflict: "hasta_id" })
+    if (error) {
+      console.error("Supabase recalculation failed:", error)
+      throw new Error(formatSupabaseError(error) || "Supabase toplu güncelleme hatası.")
+    }
+
+    setPatients(recalculated)
+    const immunologyCount = recalculated.filter(patient =>
+      [
+        patient.iga,
+        patient.igm,
+        patient.igg,
+        patient.igg1,
+        patient.igg2,
+        patient.igg3,
+        patient.igg4,
+        patient.cbc_lym,
+        patient.cd3,
+        patient.cd4,
+        patient.cd8,
+        patient.cd19,
+        patient.cd16_cd56,
+        patient.lscd3_abs,
+        patient.lscd4_abs,
+        patient.lscd8_abs,
+        patient.lscd19,
+        patient.lscd56,
+      ].some(value => value != null)
+    ).length
+    return { count: recalculated.length, immunologyCount }
+  }
+
   if (loading) return (
     <div style={{minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:"#f9fafb"}}>
       <div style={{textAlign:"center"}}>
@@ -1484,7 +1551,7 @@ export default function App() {
   )
 
   if (screen==="admin") return (
-    <AdminPanel patients={patients} onBack={() => setScreen("action")} onDelete={deletePatient} />
+    <AdminPanel patients={patients} onBack={() => setScreen("action")} onDelete={deletePatient} onRecalculateAll={recalculateAllPatients} />
   )
 
   return null
