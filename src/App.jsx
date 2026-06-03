@@ -378,54 +378,61 @@ const DOSING_FREQUENCY_OPTIONS = [
 ]
 
 const FIELD_GROUPS = {
-  baslangic: {
-    label: "Başlangıç", fields: [
+  genel: {
+    label: "Genel", fields: [
       {key:"hasta_id", label:"Hasta ID", type:"text", required:true},
       {key:"pibo", label:"PIBO", type:"bool", required:true},
       {key:"ptbo", label:"PTBO", type:"bool", required:true},
       {key:"cinsiyet", label:"Cinsiyet", type:"select", options:[{v:"e",l:"Erkek"},{v:"k",l:"Kız"}]},
       {key:"yabanci", label:"Yabancı uyruklu", type:"bool"},
       {key:"dogum_tarihi", label:"Doğum tarihi", type:"date", required:true},
-      {key:"va_bas", label:"Vücut ağırlığı (kg)", type:"num"},
-      {key:"boy_bas", label:"Boy (cm)", type:"num"},
-      {key:"spo2_bas", label:"SpO2 (%)", type:"num"},
-      {key:"ates_bas", label:"Ateş (°C)", type:"num"},
-      {key:"solunum_sayisi_bas", label:"Solunum sayısı (/dk)", type:"num"},
-      {key:"kalp_tepe_atimi_bas", label:"Kalp tepe atımı (/dk)", type:"num"},
       {key:"semptom_baslangic_tarihi", label:"Yakınmaların başladığı tarih", type:"date"},
       {key:"ilk_muayene_tarihi", label:"İlk çocuk göğüs muayene tarihi", type:"date"},
       {key:"tani_tarihi", label:"PIBO/PTBO tanı tarihi", type:"date"},
       {key:"bt_tarihi", label:"BT inceleme tarihi", type:"date"},
       {key:"bronkoskopi_tarihi", label:"Bronkoskopi tarihi", type:"date"},
-    ]
-  },
-  zaman: {
-    label: "Hesaplanan", fields: [
       {key:"yas_ay", label:"Tanı yaşı (ay)", type:"num", readonly:true},
       {key:"tani_yas_gun", label:"Tanı anındaki yaş (gün)", type:"num", readonly:true},
       {key:"semptom_tani_gun", label:"Semptom → tanı (gün)", type:"num", readonly:true},
       {key:"muayene_tani_gun", label:"İlk muayene → tanı (gün)", type:"num", readonly:true},
       {key:"muayene_bronkoskopi_gun", label:"İlk muayene → bronkoskopi (gün)", type:"num", readonly:true},
       {key:"semptom_bronkoskopi_gun", label:"Semptom → bronkoskopi (gün)", type:"num", readonly:true},
-      {key:"vki_bas", label:"VKI başlangıç", type:"num", readonly:true},
-      {key:"va_z_bas", label:"Ağırlık z-skor başlangıç", type:"num", readonly:true},
-      {key:"boy_z_bas", label:"Boy z-skor başlangıç", type:"num", readonly:true},
-      {key:"vki_z_bas", label:"VKI z-skor başlangıç", type:"num", readonly:true},
     ]
   },
-  oyku: {
-    label: "Öykü & Akut Dönem", fields: [
+  vitaller: {
+    label: "Vitaller & Antropometri", fields: [
+      {key:"spo2_bas", label:"SpO2 (%)", type:"num"},
+      {key:"ates_bas", label:"Ateş (°C)", type:"num"},
+      {key:"solunum_sayisi_bas", label:"Solunum sayısı (/dk)", type:"num"},
+      {key:"kalp_tepe_atimi_bas", label:"Kalp tepe atımı (/dk)", type:"num"},
+      {key:"va_bas", label:"Ağırlık başlangıç (kg)", type:"num"},
+      {key:"va_z_bas", label:"Ağırlık z-skor başlangıç", type:"num", readonly:true},
+      {key:"va_bit", label:"Ağırlık bitiş (kg)", type:"num"},
+      {key:"va_z_bit", label:"Ağırlık z-skor bitiş", type:"num", readonly:true},
+      {key:"boy_bas", label:"Boy başlangıç (cm)", type:"num"},
+      {key:"boy_z_bas", label:"Boy z-skor başlangıç", type:"num", readonly:true},
+      {key:"boy_bit", label:"Boy bitiş (cm)", type:"num"},
+      {key:"boy_z_bit", label:"Boy z-skor bitiş", type:"num", readonly:true},
+      {key:"vki_bas", label:"VKI başlangıç", type:"num", readonly:true},
+      {key:"vki_z_bas", label:"VKI z-skor başlangıç", type:"num", readonly:true},
+      {key:"vki_bit", label:"VKI bitiş", type:"num", readonly:true},
+      {key:"vki_z_bit", label:"VKI z-skor bitiş", type:"num", readonly:true},
+      {key:"vki_fark", label:"VKI z-skor fark", type:"num", readonly:true},
       {key:"premature", label:"Prematüre doğum", type:"bool"},
       {key:"gestasyon_haftasi", label:"Gestasyon haftası", type:"num"},
       {key:"dogum_agirligi_g", label:"Doğum ağırlığı (g)", type:"num"},
       {key:"yenidogan_yogun_bakim", label:"Yenidoğan yoğun bakım", type:"bool"},
       {key:"neonatal_oksijen", label:"Neonatal oksijen", type:"bool"},
       {key:"bpd_oykusu", label:"BPD öyküsü", type:"bool"},
-      {key:"akut_asye_tarihi", label:"İlk akut ASYE/ağır ASYE tarihi", type:"date"},
+    ]
+  },
+  akut: {
+    label: "Akut Dönem", fields: [
+      {key:"akut_asye_tarihi", label:"İlk akut ASYE tarihi", type:"date"},
       {key:"ates_suresi_gun", label:"Ateş süresi (gün)", type:"num"},
       {key:"agir_pnomoni", label:"Ağır pnömoni", type:"bool"},
       {key:"ilk_akut_asye_yatis_gun", label:"İlk akut ASYE yatış süresi (gün)", type:"num"},
-      {key:"tekrarlayan_pnomoni", label:"Tekrarlayan pnömoni", type:"bool"},
+      {key:"tekrarlayan_pnomoni", label:"Tekrarlayan pnömoni öyküsü", type:"bool"},
       {key:"pnomoni_atak_sayisi", label:"Toplam pnömoni atağı", type:"num"},
       {key:"toplam_pnomoni_yatis_gun", label:"Toplam pnömoni yatış süresi (gün)", type:"num"},
       {key:"akut_hipoksemi", label:"Akut hipoksemi", type:"bool"},
@@ -437,6 +444,11 @@ const FIELD_GROUPS = {
       {key:"akut_imv", label:"Akut invaziv MV", type:"bool"},
       {key:"akut_ivig", label:"Akut IVIG", type:"bool"},
       {key:"akut_glukokortikoid", label:"Akut glukokortikoid", type:"bool"},
+      {key:"yatis", label:"Toplam hastane yatışı", type:"bool"},
+      {key:"o2", label:"O2 desteği", type:"bool"},
+      {key:"bipap", label:"BiPAP", type:"bool"},
+      {key:"imv", label:"İnvaziv MV", type:"bool"},
+      {key:"ecmo", label:"ECMO", type:"bool"},
     ]
   },
   etiyoloji: {
@@ -486,59 +498,6 @@ const FIELD_GROUPS = {
       {key:"webb_skoru", label:"WEBB skoru", type:"num", note:"rad"},
     ]
   },
-  sft: {
-    label: "Solunum Fonksiyon Testleri", fields: [
-      {key:"sft_bas_tarihi", label:"Bazal SFT tarihi", type:"date"},
-      {key:"fev1_bas", label:"FEV1 başlangıç (%)", type:"num"},
-      {key:"fvc_bas", label:"FVC başlangıç (%)", type:"num"},
-      {key:"mef2575_bas", label:"MEF25-75 başlangıç (%)", type:"num"},
-      {key:"fev1_bd_bas", label:"Bazal BD FEV1 değişim (%)", type:"num"},
-      {key:"mef2575_bd_bas", label:"Bazal BD MEF25-75 değişim (%)", type:"num"},
-      {key:"dlco_bas", label:"DLCO başlangıç (%)", type:"num"},
-      {key:"rv_bas", label:"RV başlangıç (%)", type:"num"},
-      {key:"tlc_bas", label:"TLC başlangıç (%)", type:"num"},
-      {key:"rv_tlc_bas", label:"RV/TLC başlangıç (%)", type:"num"},
-      {key:"sft_bit_tarihi", label:"Son SFT tarihi", type:"date"},
-      {key:"fev1_bit", label:"FEV1 bitiş (%)", type:"num"},
-      {key:"fvc_bit", label:"FVC bitiş (%)", type:"num"},
-      {key:"mef2575_bit", label:"MEF25-75 bitiş (%)", type:"num"},
-      {key:"dlco_bit", label:"DLCO bitiş (%)", type:"num"},
-      {key:"rv_bit", label:"RV bitiş (%)", type:"num"},
-      {key:"tlc_bit", label:"TLC bitiş (%)", type:"num"},
-      {key:"rv_tlc_bit", label:"RV/TLC bitiş (%)", type:"num"},
-      {key:"xu_siddet", label:"Xu klinik şiddet (1-5)", type:"num", note:"kln"},
-    ]
-  },
-  ptbo_tb: {
-    label: "PTBO/TB", fields: [
-      {key:"akciger_goruntuleme_yapildi", label:"Akciğer görüntüleme yapıldı", type:"bool"},
-      {key:"akciger_goruntuleme_tarihi", label:"Akciğer görüntüleme tarihi", type:"date"},
-      {key:"akciger_goruntuleme_yontemi", label:"Görüntüleme yöntemi", type:"select", options:[
-        {v:"akciger_grafisi", l:"Akciğer grafisi"},
-        {v:"toraks_bt", l:"Toraks BT"},
-        {v:"hrct", l:"HRCT"},
-        {v:"diger", l:"Diğer"},
-      ]},
-      {key:"akciger_goruntuleme_bulgu", label:"Görüntüleme bulgusu", type:"text"},
-      {key:"ppd_mm", label:"PPD endürasyon (mm)", type:"num"},
-      {key:"ppd_sonuc", label:"PPD sonucu", type:"select", options:[
-        {v:"negatif", l:"Negatif"},
-        {v:"pozitif", l:"Pozitif"},
-        {v:"supheli", l:"Şüpheli"},
-        {v:"yapilmadi", l:"Yapılmadı"},
-      ]},
-      {key:"tb_igra_sonuc", label:"TB IGRA sonucu", type:"select", options:[
-        {v:"negatif", l:"Negatif"},
-        {v:"pozitif", l:"Pozitif"},
-        {v:"indeterminate", l:"Belirsiz"},
-        {v:"yapilmadi", l:"Yapılmadı"},
-      ]},
-      {key:"tb_igra_tarihi", label:"TB IGRA tarihi", type:"date"},
-      {key:"tb_mikrobiyoloji_pozitif", label:"TB mikrobiyoloji pozitif", type:"bool"},
-      {key:"tb_tedavi_baslangic_tarihi", label:"TB tedavi başlangıç tarihi", type:"date"},
-      {key:"tb_tedavi_suresi_ay", label:"TB tedavi süresi (ay)", type:"num"},
-    ]
-  },
   tedavi: {
     label: "Tedavi", fields: [
       {key:"sistemik_steroid", label:"Sistemik steroid aldı", type:"bool", readonly:true},
@@ -578,23 +537,42 @@ const FIELD_GROUPS = {
       {key:"ivig_aldi", label:"IVIG verildi", type:"bool"},
       {key:"ivig_aliyor", label:"IVIG halen alıyor", type:"bool"},
       {key:"ventolin_aldi", label:"Ventolin", type:"bool"},
-      {key:"o2", label:"O2 desteği", type:"bool"},
-      {key:"bipap", label:"BiPAP", type:"bool"},
-      {key:"imv", label:"İnvaziv MV", type:"bool"},
-      {key:"ecmo", label:"ECMO", type:"bool"},
       {key:"tedavi_suresi_gun", label:"Tedavi süresi (gün)", type:"num"},
     ]
   },
-  antropometri: {
-    label: "Antropometri & Büyüme", fields: [
-      {key:"va_bas", label:"Ağırlık başlangıç (kg)", type:"num"},
-      {key:"va_z_bas", label:"Ağırlık z-skor başlangıç", type:"num"},
-      {key:"va_bit", label:"Ağırlık bitiş (kg)", type:"num"},
-      {key:"va_z_bit", label:"Ağırlık z-skor bitiş", type:"num"},
-      {key:"boy_bas", label:"Boy başlangıç (cm)", type:"num"},
-      {key:"boy_z_bas", label:"Boy z-skor başlangıç", type:"num"},
-      {key:"boy_bit", label:"Boy bitiş (cm)", type:"num"},
-      {key:"boy_z_bit", label:"Boy z-skor bitiş", type:"num"},
+  bal: {
+    label: "BAL", fields: [
+      {key:"bal_ureme", label:"BAL üreme", type:"bool"},
+      {key:"bal_coklu_ureme", label:"BAL çoklu üreme", type:"bool"},
+      {key:"bal_kultur1", label:"BAL kültür 1", type:"text"},
+      {key:"bal_kultur2", label:"BAL kültür 2", type:"text"},
+      {key:"bal_kultur3", label:"BAL kültür 3", type:"text"},
+      {key:"bal_h_influenza", label:"H. influenzae üremesi", type:"bool"},
+      {key:"bal_m_catarrhalis", label:"M. catarrhalis üremesi", type:"bool"},
+      {key:"rpcr", label:"Respiratuvar PCR", type:"bool"},
+      {key:"bal_solunum_pcr", label:"BAL solunum PCR sonucu", type:"text"},
+      {key:"bal_cmv_pcr", label:"BAL CMV PCR", type:"bool"},
+      {key:"bal_pjir", label:"BAL PJİR", type:"bool"},
+      {key:"bal_lipid_ym", label:"BAL lipid yüklü makrofaj", type:"bool"},
+      {key:"bal_hemosiderin_ym", label:"BAL hemosiderin yüklü makrofaj", type:"bool"},
+      {key:"bal_lenfosit_subset", label:"BAL lenfosit subset yapıldı", type:"bool"},
+      {key:"bal_lenfopeni", label:"BAL lenfopeni", type:"bool"},
+      {key:"lokosit", label:"BAL lökosit sayısı", type:"num"},
+      {key:"lenfosit_oran", label:"BAL lenfosit oranı (%)", type:"num"},
+      {key:"notrofil_oran", label:"BAL nötrofil oranı (%)", type:"num"},
+      {key:"eozinofil_oran", label:"BAL eozinofil oranı (%)", type:"num"},
+      {key:"bal_cd3", label:"BAL CD3", type:"num"},
+      {key:"bal_cd4", label:"BAL CD4", type:"num"},
+      {key:"bal_cd8", label:"BAL CD8", type:"num"},
+      {key:"bal_cd4_cd8", label:"BAL CD4/CD8", type:"num"},
+      {key:"bal_cd19", label:"BAL CD19", type:"num"},
+      {key:"bal_cd16_cd56", label:"BAL CD16/CD56", type:"num"},
+      {key:"bal_cd45", label:"BAL CD45", type:"num"},
+      {key:"bal_cd56", label:"BAL CD56", type:"num"},
+      {key:"bal_cd22", label:"BAL CD22", type:"num"},
+      {key:"bal_cd20", label:"BAL CD20", type:"num"},
+      {key:"bal_cd16", label:"BAL CD16", type:"num"},
+      {key:"bal_cd3_hladr", label:"BAL CD3+HLA-DR+", type:"num"},
     ]
   },
   immunoloji: {
@@ -609,15 +587,11 @@ const FIELD_GROUPS = {
       {key:"kisisel_atopi", label:"Kişisel atopi", type:"bool"},
       {key:"aile_atopi", label:"Aile atopi", type:"bool"},
       {key:"spesifik_ige_pozitif", label:"Spesifik IgE pozitif", type:"bool"},
-      {key:"immunology_ig_ref_age_band", label:"Ig referans yaş bandı", type:"text", readonly:true},
       {key:"iga", label:"IgA (g/L)", type:"num"},
-      {key:"iga_alt_limit_mgdl", label:"IgA alt limit (mg/dL)", type:"num", readonly:true},
       {key:"iga_dusuk", label:"IgA düşük", type:"bool", readonly:true},
       {key:"igm", label:"IgM (g/L)", type:"num"},
-      {key:"igm_alt_limit_mgdl", label:"IgM alt limit (mg/dL)", type:"num", readonly:true},
       {key:"igm_dusuk", label:"IgM düşük", type:"bool", readonly:true},
       {key:"igg", label:"IgG (g/L)", type:"num"},
-      {key:"igg_alt_limit_mgdl", label:"IgG alt limit (mg/dL)", type:"num", readonly:true},
       {key:"igg_dusuk", label:"IgG düşük", type:"bool", readonly:true},
       {key:"ige", label:"IgE (IU/mL)", type:"num"},
       {key:"igg1", label:"IgG1", type:"num"},
@@ -628,15 +602,12 @@ const FIELD_GROUPS = {
       {key:"igg3_dusuk", label:"IgG3 düşük", type:"bool", readonly:true},
       {key:"igg4", label:"IgG4", type:"num"},
       {key:"igg4_dusuk", label:"IgG4 düşük", type:"bool", readonly:true},
-      {key:"lymphocyte_ref_age_band", label:"Lenfosit subset referans yaş bandı", type:"text", readonly:true},
-      {key:"lenfosit_subset_dusuk", label:"Lenfosit subset düşük var", type:"bool", readonly:true},
       {key:"cbc_bk", label:"Lökosit (/mm³)", type:"num"},
       {key:"cbc_neu", label:"Nötrofil (/mm³)", type:"num"},
       {key:"cbc_lym", label:"Lenfosit (/mm³)", type:"num"},
-      {key:"lym_abs_alt_limit", label:"Lenfosit alt limit", type:"num", readonly:true},
       {key:"lym_abs_dusuk", label:"Lenfosit düşük", type:"bool", readonly:true},
       {key:"cbc_eos", label:"Eozinofil (/mm³)", type:"num"},
-      {key:"cbc_nlr", label:"NLR", type:"num"},
+      {key:"cbc_nlr", label:"NLR", type:"num", readonly:true},
       {key:"cd3", label:"Kan CD3 (%)", type:"num"},
       {key:"cd3_pct_dusuk", label:"CD3 % düşük", type:"bool", readonly:true},
       {key:"cd4", label:"Kan CD4 (%)", type:"num"},
@@ -664,43 +635,82 @@ const FIELD_GROUPS = {
       {key:"cd19_abs_dusuk", label:"CD19 abs düşük", type:"bool", readonly:true},
       {key:"lscd56", label:"LS CD56", type:"num"},
       {key:"cd16_cd56_abs_dusuk", label:"CD16/56 abs düşük", type:"bool", readonly:true},
+      {key:"lenfosit_subset_dusuk", label:"Lenfosit subset düşük var", type:"bool", readonly:true},
     ]
   },
-  bal_immunoloji: {
-    label: "BAL İmmünoloji", fields: [
-      {key:"bal_lenfosit_subset", label:"BAL lenfosit subset yapıldı", type:"bool"},
-      {key:"bal_lenfopeni", label:"BAL lenfopeni", type:"bool"},
-      {key:"lokosit", label:"BAL lökosit sayısı", type:"num"},
-      {key:"lenfosit_oran", label:"BAL lenfosit oranı (%)", type:"num"},
-      {key:"notrofil_oran", label:"BAL nötrofil oranı (%)", type:"num"},
-      {key:"eozinofil_oran", label:"BAL eozinofil oranı (%)", type:"num"},
-      {key:"bal_cd3", label:"BAL CD3", type:"num"},
-      {key:"bal_cd4", label:"BAL CD4", type:"num"},
-      {key:"bal_cd8", label:"BAL CD8", type:"num"},
-      {key:"bal_cd4_cd8", label:"BAL CD4/CD8", type:"num"},
-      {key:"bal_cd19", label:"BAL CD19", type:"num"},
-      {key:"bal_cd16_cd56", label:"BAL CD16/CD56", type:"num"},
-      {key:"bal_cd45", label:"BAL CD45", type:"num"},
-      {key:"bal_cd56", label:"BAL CD56", type:"num"},
-      {key:"bal_cd22", label:"BAL CD22", type:"num"},
-      {key:"bal_cd20", label:"BAL CD20", type:"num"},
-      {key:"bal_cd16", label:"BAL CD16", type:"num"},
-      {key:"bal_cd3_hladr", label:"BAL CD3+HLA-DR+", type:"num"},
+  sft: {
+    label: "SFT", fields: [
+      {key:"sft_bas_tarihi", label:"Bazal SFT tarihi", type:"date"},
+      {key:"fev1_bas", label:"FEV1 başlangıç (%)", type:"num"},
+      {key:"fvc_bas", label:"FVC başlangıç (%)", type:"num"},
+      {key:"mef2575_bas", label:"MEF25-75 başlangıç (%)", type:"num"},
+      {key:"fev1_bd_bas", label:"Bazal BD FEV1 değişim (%)", type:"num"},
+      {key:"mef2575_bd_bas", label:"Bazal BD MEF25-75 değişim (%)", type:"num"},
+      {key:"dlco_bas", label:"DLCO başlangıç (%)", type:"num"},
+      {key:"rv_bas", label:"RV başlangıç (%)", type:"num"},
+      {key:"tlc_bas", label:"TLC başlangıç (%)", type:"num"},
+      {key:"rv_tlc_bas", label:"RV/TLC başlangıç (%)", type:"num"},
+      {key:"x5_bas", label:"X5 başlangıç", type:"num"},
+      {key:"r5_bas", label:"R5 başlangıç", type:"num"},
+      {key:"ax_bas", label:"AX başlangıç", type:"num"},
+      {key:"sft_bit_tarihi", label:"Son SFT tarihi", type:"date"},
+      {key:"fev1_bit", label:"FEV1 bitiş (%)", type:"num"},
+      {key:"fvc_bit", label:"FVC bitiş (%)", type:"num"},
+      {key:"mef2575_bit", label:"MEF25-75 bitiş (%)", type:"num"},
+      {key:"bd_fev1", label:"BD FEV1 değişim bitiş (%)", type:"num"},
+      {key:"bd_mef2575", label:"BD MEF25-75 değişim bitiş (%)", type:"num"},
+      {key:"dlco_bit", label:"DLCO bitiş (%)", type:"num"},
+      {key:"rv_bit", label:"RV bitiş (%)", type:"num"},
+      {key:"tlc_bit", label:"TLC bitiş (%)", type:"num"},
+      {key:"rv_tlc_bit", label:"RV/TLC bitiş (%)", type:"num"},
+      {key:"x5_bit", label:"X5 bitiş", type:"num"},
+      {key:"r5_bit", label:"R5 bitiş", type:"num"},
+      {key:"ax_bit", label:"AX bitiş", type:"num"},
+      {key:"xu_siddet", label:"Xu klinik şiddet (1-5)", type:"num", note:"kln"},
     ]
   },
-  sonuc: {
+  kardiyak_sonuc: {
     label: "Kardiyak & Sonuç", fields: [
       {key:"eko", label:"EKO yapıldı", type:"bool"},
       {key:"pht", label:"Pulmoner HT", type:"bool"},
       {key:"pap", label:"PAP (mmHg)", type:"num"},
-      {key:"yatis", label:"Hastane yatışı", type:"bool"},
       {key:"tedi_sonrasi_atak", label:"Tedavi sonrası atak sayısı", type:"num"},
       {key:"tedi_sonrasi_pnomoni", label:"Tedavi sonrası pnömoni sayısı", type:"num"},
       {key:"tedavi_sonucu", label:"Tedavi sonucu (1=iyi, 2=orta, 3=kötü)", type:"num"},
       {key:"semptom_devam", label:"Semptom devam ediyor", type:"bool"},
       {key:"ex", label:"Exitus", type:"bool"},
     ]
-  }
+  },
+  ptbo_tb: {
+    label: "PTBO/TB", fields: [
+      {key:"akciger_goruntuleme_yapildi", label:"Akciğer görüntüleme yapıldı", type:"bool"},
+      {key:"akciger_goruntuleme_tarihi", label:"Akciğer görüntüleme tarihi", type:"date"},
+      {key:"akciger_goruntuleme_yontemi", label:"Görüntüleme yöntemi", type:"select", options:[
+        {v:"akciger_grafisi", l:"Akciğer grafisi"},
+        {v:"toraks_bt", l:"Toraks BT"},
+        {v:"hrct", l:"HRCT"},
+        {v:"diger", l:"Diğer"},
+      ]},
+      {key:"akciger_goruntuleme_bulgu", label:"Görüntüleme bulgusu", type:"text"},
+      {key:"ppd_mm", label:"PPD endürasyon (mm)", type:"num"},
+      {key:"ppd_sonuc", label:"PPD sonucu", type:"select", options:[
+        {v:"negatif", l:"Negatif"},
+        {v:"pozitif", l:"Pozitif"},
+        {v:"supheli", l:"Şüpheli"},
+        {v:"yapilmadi", l:"Yapılmadı"},
+      ]},
+      {key:"tb_igra_sonuc", label:"TB IGRA sonucu", type:"select", options:[
+        {v:"negatif", l:"Negatif"},
+        {v:"pozitif", l:"Pozitif"},
+        {v:"indeterminate", l:"Belirsiz"},
+        {v:"yapilmadi", l:"Yapılmadı"},
+      ]},
+      {key:"tb_igra_tarihi", label:"TB IGRA tarihi", type:"date"},
+      {key:"tb_mikrobiyoloji_pozitif", label:"TB mikrobiyoloji pozitif", type:"bool"},
+      {key:"tb_tedavi_baslangic_tarihi", label:"TB tedavi başlangıç tarihi", type:"date"},
+      {key:"tb_tedavi_suresi_ay", label:"TB tedavi süresi (ay)", type:"num"},
+    ]
+  },
 }
 
 // ─── styles ───────────────────────────────────────────────────────────────────
@@ -1184,10 +1194,10 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
   const [saved, setSaved] = useState(false)
   const [saveMessage, setSaveMessage] = useState("")
   const [saveError, setSaveError] = useState("")
-  const [activeGroup, setActiveGroup] = useState("baslangic")
+  const [activeGroup, setActiveGroup] = useState("genel")
 
   useEffect(() => {
-    if (activeGroup === "ptbo_tb" && form.ptbo != 1) setActiveGroup("baslangic")
+    if (activeGroup === "ptbo_tb" && form.ptbo != 1) setActiveGroup("genel")
   }, [activeGroup, form.ptbo])
 
   function set(key, val) { setForm(f => ({...f, [key]: val})) }
