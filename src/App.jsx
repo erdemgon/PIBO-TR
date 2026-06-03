@@ -1595,22 +1595,29 @@ export default function App() {
 
   async function savePatient(p) {
     const record = { ...p, ...calculateDerivedFields(p), merkez: p.hasta_id.split("-")[0], guncelleme_tarihi: new Date().toISOString() }
-    const { error } = await supabase.from("hastalar").upsert(record, { onConflict: "hasta_id" })
     let savedRecord = record
     let warning = ""
+    let currentRecord = { ...record }
 
-    if (error) {
-      console.error("Supabase full save failed:", error)
-      const fallbackRecord = pickRecordColumns(record, LEGACY_COLUMN_KEYS)
-      const fallback = await supabase.from("hastalar").upsert(fallbackRecord, { onConflict: "hasta_id" })
+    // Bilinmeyen kolon hatalarını otomatik çıkararak kaydet
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const { error } = await supabase.from("hastalar").upsert(currentRecord, { onConflict: "hasta_id" })
+      if (!error) break
 
-      if (fallback.error) {
-        console.error("Supabase fallback save failed:", fallback.error)
-        throw new Error(formatSupabaseError(fallback.error) || formatSupabaseError(error) || "Supabase kayıt hatası.")
+      // "Could not find the 'xxx' column" hatasını parse et
+      const colMatch = (error.message || "").match(/Could not find the '(\w+)' column/)
+      if (colMatch) {
+        const badCol = colMatch[1]
+        console.warn(`Supabase: '${badCol}' kolonu yok, çıkarılıyor.`)
+        const { [badCol]: _removed, ...rest } = currentRecord
+        currentRecord = rest
+        savedRecord = currentRecord
+        continue
       }
 
-      savedRecord = fallbackRecord
-      warning = "Mevcut kolonlar kaydedildi; doğum tarihi/tarih-vital yeni alanlarının kalıcı kaydı için Supabase SQL migrasyonu çalışmalı."
+      // Başka bir hata — throw et
+      console.error("Supabase save failed:", error)
+      throw new Error(formatSupabaseError(error) || "Supabase kayıt hatası.")
     }
 
     // Local state güncelle
