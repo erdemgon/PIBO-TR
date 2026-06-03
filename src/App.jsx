@@ -133,6 +133,54 @@ function calculateDerivedFields(patient) {
   return Object.fromEntries(Object.entries(derived).filter(([, value]) => value != null))
 }
 
+function classifyClinicalCourse(visit) {
+  if (visit.exitus == 1) return "exitus"
+  if (visit.imv == 1 || visit.ecmo == 1 || visit.yeni_oksijen_ihtiyaci == 1) return "kotu_progresif"
+  if ((numberOrNull(visit.pnomoni_sayisi) ?? 0) > 0 || (numberOrNull(visit.atak_sayisi) ?? 0) >= 2) return "alevlenmeli"
+  if (visit.semptom_devam == 1 || visit.egzersiz_kisitliligi == 1) return "persistan_semptom"
+  if (visit.semptom_devam == 0 && visit.o2 == 0 && visit.bipap == 0) return "iyi_stabil"
+  return "belirsiz"
+}
+
+function clinicalCourseLabel(value) {
+  return {
+    iyi_stabil: "İyi/stabil",
+    persistan_semptom: "Persistan semptomlu",
+    alevlenmeli: "Alevlenmeli",
+    kotu_progresif: "Kötü/progresif",
+    exitus: "Exitus",
+    belirsiz: "Belirsiz",
+  }[value] || "-"
+}
+
+const FOLLOWUP_FIELDS = [
+  {key:"visit_date", label:"Muayene tarihi", type:"date", required:true},
+  {key:"semptom_devam", label:"Semptom devam", type:"bool"},
+  {key:"egzersiz_kisitliligi", label:"Egzersiz kısıtlılığı", type:"bool"},
+  {key:"atak_sayisi", label:"Son kontrolden beri atak", type:"num"},
+  {key:"pnomoni_sayisi", label:"Son kontrolden beri pnömoni", type:"num"},
+  {key:"o2", label:"O2 ihtiyacı", type:"bool"},
+  {key:"bipap", label:"BiPAP/NIV", type:"bool"},
+  {key:"imv", label:"İnvaziv MV", type:"bool"},
+  {key:"ecmo", label:"ECMO", type:"bool"},
+  {key:"yeni_oksijen_ihtiyaci", label:"Yeni oksijen ihtiyacı", type:"bool"},
+  {key:"va", label:"Ağırlık (kg)", type:"num"},
+  {key:"boy", label:"Boy (cm)", type:"num"},
+  {key:"spo2", label:"SpO2 (%)", type:"num"},
+  {key:"fev1", label:"FEV1 (%)", type:"num"},
+  {key:"fvc", label:"FVC (%)", type:"num"},
+  {key:"mef2575", label:"MEF25-75 (%)", type:"num"},
+  {key:"klinik_gidis", label:"Klinik gidiş", type:"select", options:[
+    {v:"", l:"Otomatik/boş"},
+    {v:"iyi_stabil", l:"İyi/stabil"},
+    {v:"persistan_semptom", l:"Persistan semptomlu"},
+    {v:"alevlenmeli", l:"Alevlenmeli"},
+    {v:"kotu_progresif", l:"Kötü/progresif"},
+    {v:"exitus", l:"Exitus"},
+  ]},
+  {key:"notlar", label:"Not", type:"text"},
+]
+
 const FIELD_GROUPS = {
   baslangic: {
     label: "Başlangıç", fields: [
@@ -169,18 +217,46 @@ const FIELD_GROUPS = {
       {key:"vki_z_bas", label:"VKI z-skor başlangıç", type:"num", readonly:true},
     ]
   },
+  oyku: {
+    label: "Öykü & Akut Dönem", fields: [
+      {key:"premature", label:"Prematüre doğum", type:"bool"},
+      {key:"gestasyon_haftasi", label:"Gestasyon haftası", type:"num"},
+      {key:"dogum_agirligi_g", label:"Doğum ağırlığı (g)", type:"num"},
+      {key:"yenidogan_yogun_bakim", label:"Yenidoğan yoğun bakım", type:"bool"},
+      {key:"neonatal_oksijen", label:"Neonatal oksijen", type:"bool"},
+      {key:"bpd_oykusu", label:"BPD öyküsü", type:"bool"},
+      {key:"akut_asye_tarihi", label:"Akut ASYE/pnömoni tarihi", type:"date"},
+      {key:"ates_suresi_gun", label:"Ateş süresi (gün)", type:"num"},
+      {key:"agir_pnomoni", label:"Ağır pnömoni", type:"bool"},
+      {key:"akut_hipoksemi", label:"Akut hipoksemi", type:"bool"},
+      {key:"akut_yatis", label:"Akut hastane yatışı", type:"bool"},
+      {key:"cocuk_yogun_bakim", label:"Çocuk yoğun bakım", type:"bool"},
+      {key:"akut_oksijen", label:"Akut oksijen", type:"bool"},
+      {key:"akut_hfnc", label:"Akut HFNC", type:"bool"},
+      {key:"akut_niv", label:"Akut NIV/BiPAP", type:"bool"},
+      {key:"akut_imv", label:"Akut invaziv MV", type:"bool"},
+      {key:"akut_ivig", label:"Akut IVIG", type:"bool"},
+      {key:"akut_glukokortikoid", label:"Akut glukokortikoid", type:"bool"},
+    ]
+  },
   etiyoloji: {
     label: "Etiyoloji", fields: [
       {key:"etken_adenovirus", label:"Adenovirüs", type:"bool"},
+      {key:"etken_mycoplasma", label:"Mycoplasma pneumoniae", type:"bool"},
       {key:"etken_rsv", label:"RSV", type:"bool"},
       {key:"etken_rinovirus", label:"Rinovirus", type:"bool"},
+      {key:"etken_pnomokok", label:"Pnömokok", type:"bool"},
       {key:"etken_cmv", label:"CMV", type:"bool"},
       {key:"etken_influenza", label:"İnfluenza", type:"bool"},
+      {key:"etken_parainfluenza", label:"Parainfluenza", type:"bool"},
       {key:"etken_kizamik", label:"Kızamık", type:"bool"},
       {key:"etken_metapneumovirus", label:"Metapneumovirus", type:"bool"},
       {key:"etken_covid", label:"COVID-19", type:"bool"},
       {key:"etken_varicella", label:"Varicella", type:"bool"},
       {key:"etken_ebv", label:"EBV", type:"bool"},
+      {key:"etken_bakteri", label:"Bakteriyel etken", type:"bool"},
+      {key:"koenfeksiyon", label:"Ko-enfeksiyon", type:"bool"},
+      {key:"etken_diger", label:"Diğer etken", type:"text"},
       {key:"hsct", label:"HSCT", type:"bool"},
       {key:"solid_tx", label:"Solid Tx", type:"bool"},
       {key:"gvhd", label:"GVHD", type:"bool"},
@@ -192,6 +268,9 @@ const FIELD_GROUPS = {
   radyoloji: {
     label: "Radyoloji (BT)", fields: [
       {key:"bt_infiltrasyon", label:"İnfiltrasyon", type:"bool"},
+      {key:"bt_mozaik", label:"Mozaik perfüzyon/attenüasyon", type:"bool"},
+      {key:"bt_air_trapping", label:"Air trapping", type:"bool"},
+      {key:"bt_bronduvar_kalinlasma", label:"Bronş duvar kalınlaşması", type:"bool"},
       {key:"bt_atelektazi", label:"Atelektazi", type:"bool"},
       {key:"bt_sag_orta_atelektazi", label:"Sağ orta lob atelektazi", type:"bool"},
       {key:"bt_lingula_atelektazi", label:"Lingula atelektazi", type:"bool"},
@@ -200,6 +279,8 @@ const FIELD_GROUPS = {
       {key:"bt_sag_orta_bronsektazi", label:"Sağ orta lob bronşektazi", type:"bool"},
       {key:"bt_lingula_bronsektazi", label:"Lingula bronşektazi", type:"bool"},
       {key:"bt_diger_bronsektazi", label:"Diğer bronşektazi", type:"bool"},
+      {key:"bt_buyuk_lobar_konsolidasyon", label:"Büyük lobar konsolidasyon", type:"bool"},
+      {key:"bt_diffuz_bronsiolit", label:"Diffüz bronşiolit", type:"bool"},
       {key:"bhalla_skoru", label:"Bhalla skoru", type:"num", note:"rad"},
       {key:"teper_skoru", label:"Teper skoru", type:"num", note:"rad"},
       {key:"webb_skoru", label:"WEBB skoru", type:"num", note:"rad"},
@@ -249,14 +330,71 @@ const FIELD_GROUPS = {
   },
   immunoloji: {
     label: "İmmünoloji & Lab", fields: [
-      {key:"iga", label:"IgA (g/L)", type:"num"},
-      {key:"igm", label:"IgM (g/L)", type:"num"},
-      {key:"igg", label:"IgG (g/L)", type:"num"},
-      {key:"ige", label:"IgE (IU/mL)", type:"num"},
-      {key:"cbc_bk", label:"Lökosit (/mm³)", type:"num"},
+      {key:"imun_yetmezlik", label:"İmmün yetmezlik", type:"bool"},
+      {key:"imdef", label:"İmmün yetmezlik açıklaması", type:"text"},
+      {key:"tani_surecinde_imyetm", label:"Tanı sürecinde immün yetmezlik", type:"bool"},
+      {key:"imdefdr", label:"İmmün yetmezlik tedavisi/notu", type:"text"},
       {key:"astim", label:"Astım", type:"bool"},
       {key:"alerjik_rinit", label:"Alerjik rinit", type:"bool"},
-      {key:"imun_yetmezlik", label:"İmmün yetmezlik", type:"bool"},
+      {key:"atopik_dermatit", label:"Atopik dermatit", type:"bool"},
+      {key:"kisisel_atopi", label:"Kişisel atopi", type:"bool"},
+      {key:"aile_atopi", label:"Aile atopi", type:"bool"},
+      {key:"spesifik_ige_pozitif", label:"Spesifik IgE pozitif", type:"bool"},
+      {key:"iga", label:"IgA (g/L)", type:"num"},
+      {key:"iga_dusuk", label:"IgA düşük", type:"bool"},
+      {key:"igm", label:"IgM (g/L)", type:"num"},
+      {key:"igm_dusuk", label:"IgM düşük", type:"bool"},
+      {key:"igg", label:"IgG (g/L)", type:"num"},
+      {key:"igg_dusuk", label:"IgG düşük", type:"bool"},
+      {key:"ige", label:"IgE (IU/mL)", type:"num"},
+      {key:"igg1", label:"IgG1", type:"num"},
+      {key:"igg2", label:"IgG2", type:"num"},
+      {key:"igg3", label:"IgG3", type:"num"},
+      {key:"igg4", label:"IgG4", type:"num"},
+      {key:"cbc_bk", label:"Lökosit (/mm³)", type:"num"},
+      {key:"cbc_neu", label:"Nötrofil (/mm³)", type:"num"},
+      {key:"cbc_lym", label:"Lenfosit (/mm³)", type:"num"},
+      {key:"cbc_eos", label:"Eozinofil (/mm³)", type:"num"},
+      {key:"cbc_nlr", label:"NLR", type:"num"},
+      {key:"cd3", label:"Kan CD3 (%)", type:"num"},
+      {key:"cd4", label:"Kan CD4 (%)", type:"num"},
+      {key:"cd8", label:"Kan CD8 (%)", type:"num"},
+      {key:"cd4_cd8", label:"Kan CD4/CD8", type:"num"},
+      {key:"cd19", label:"Kan CD19", type:"num"},
+      {key:"cd16_cd56", label:"Kan CD16/CD56", type:"num"},
+      {key:"lswbc", label:"Lenfosit subset WBC", type:"num"},
+      {key:"lslym_pct", label:"LS lenfosit %", type:"num"},
+      {key:"lscd3_pct", label:"LS CD3 %", type:"num"},
+      {key:"lscd3_abs", label:"LS CD3 abs", type:"num"},
+      {key:"lscd4_pct", label:"LS CD4 %", type:"num"},
+      {key:"lscd4_abs", label:"LS CD4 abs", type:"num"},
+      {key:"lscd8_pct", label:"LS CD8 %", type:"num"},
+      {key:"lscd8_abs", label:"LS CD8 abs", type:"num"},
+      {key:"lscd4_cd8", label:"LS CD4/CD8", type:"num"},
+      {key:"lscd19", label:"LS CD19", type:"num"},
+      {key:"lscd56", label:"LS CD56", type:"num"},
+    ]
+  },
+  bal_immunoloji: {
+    label: "BAL İmmünoloji", fields: [
+      {key:"bal_lenfosit_subset", label:"BAL lenfosit subset yapıldı", type:"bool"},
+      {key:"bal_lenfopeni", label:"BAL lenfopeni", type:"bool"},
+      {key:"lokosit", label:"BAL lökosit sayısı", type:"num"},
+      {key:"lenfosit_oran", label:"BAL lenfosit oranı (%)", type:"num"},
+      {key:"notrofil_oran", label:"BAL nötrofil oranı (%)", type:"num"},
+      {key:"eozinofil_oran", label:"BAL eozinofil oranı (%)", type:"num"},
+      {key:"bal_cd3", label:"BAL CD3", type:"num"},
+      {key:"bal_cd4", label:"BAL CD4", type:"num"},
+      {key:"bal_cd8", label:"BAL CD8", type:"num"},
+      {key:"bal_cd4_cd8", label:"BAL CD4/CD8", type:"num"},
+      {key:"bal_cd19", label:"BAL CD19", type:"num"},
+      {key:"bal_cd16_cd56", label:"BAL CD16/CD56", type:"num"},
+      {key:"bal_cd45", label:"BAL CD45", type:"num"},
+      {key:"bal_cd56", label:"BAL CD56", type:"num"},
+      {key:"bal_cd22", label:"BAL CD22", type:"num"},
+      {key:"bal_cd20", label:"BAL CD20", type:"num"},
+      {key:"bal_cd16", label:"BAL CD16", type:"num"},
+      {key:"bal_cd3_hladr", label:"BAL CD3+HLA-DR+", type:"num"},
     ]
   },
   sonuc: {
@@ -411,6 +549,177 @@ function SelectPatient({ patients, centerInfo, onSelect, onBack }) {
 }
 
 // ─── Patient Form ─────────────────────────────────────────────────────────────
+function FollowUpPanel({ patient }) {
+  const [visits, setVisits] = useState([])
+  const [draft, setDraft] = useState({ visit_date: new Date().toISOString().slice(0, 10) })
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (!patient?.hasta_id) return
+    ;(async () => {
+      setLoading(true)
+      setError("")
+      const { data, error } = await supabase
+        .from("follow_up_visits")
+        .select("*")
+        .eq("hasta_id", patient.hasta_id)
+        .order("visit_date", { ascending: false })
+      if (error) setError(formatSupabaseError(error) || "İzlem ziyaretleri yüklenemedi.")
+      else setVisits(data || [])
+      setLoading(false)
+    })()
+  }, [patient?.hasta_id])
+
+  function setDraftField(key, value) {
+    setDraft(prev => ({ ...prev, [key]: value }))
+  }
+
+  async function saveVisit() {
+    setError("")
+    setMessage("")
+    if (!draft.visit_date) {
+      setError("Muayene tarihi gerekli.")
+      return
+    }
+
+    const takipGun = daysBetween(draft.visit_date, patient.tani_tarihi)
+    const otomatikGidis = classifyClinicalCourse(draft)
+    const record = {
+      ...draft,
+      hasta_id: patient.hasta_id,
+      takip_suresi_gun: takipGun,
+      takip_suresi_ay: takipGun == null ? null : round(takipGun / 30.4375, 1),
+      klinik_gidis_otomatik: otomatikGidis,
+      created_at: new Date().toISOString(),
+    }
+
+    const { data, error } = await supabase
+      .from("follow_up_visits")
+      .insert(record)
+      .select("*")
+      .single()
+    if (error) {
+      setError(formatSupabaseError(error) || "İzlem ziyareti kaydedilemedi. SQL tablosu oluşturuldu mu?")
+      return
+    }
+
+    setVisits(prev => [data, ...prev])
+    setDraft({ visit_date: new Date().toISOString().slice(0, 10) })
+    setMessage("İzlem ziyareti kaydedildi.")
+    setTimeout(() => setMessage(""), 2500)
+  }
+
+  async function deleteVisit(id) {
+    const ok = window.confirm("Bu izlem ziyareti silinsin mi?")
+    if (!ok) return
+    const { error } = await supabase.from("follow_up_visits").delete().eq("id", id)
+    if (error) {
+      setError(formatSupabaseError(error) || "İzlem ziyareti silinemedi.")
+      return
+    }
+    setVisits(prev => prev.filter(visit => visit.id !== id))
+  }
+
+  function renderVisitField(field) {
+    const val = draft[field.key]
+    if (field.type === "bool") {
+      return (
+        <select value={val??""} onChange={e => setDraftField(field.key, e.target.value===""?null:Number(e.target.value))} style={s.select}>
+          <option value="">— bilinmiyor</option>
+          <option value="1">Evet</option>
+          <option value="0">Hayır</option>
+        </select>
+      )
+    }
+    if (field.type === "select") {
+      return (
+        <select value={val??""} onChange={e => setDraftField(field.key, e.target.value || null)} style={s.select}>
+          {field.options?.map(option => <option key={option.v} value={option.v}>{option.l}</option>)}
+        </select>
+      )
+    }
+    if (field.type === "date") {
+      return <input type="date" value={dateToInput(val)} onChange={e => setDraftField(field.key, e.target.value || null)} style={s.input} />
+    }
+    return (
+      <input
+        type={field.type==="num" ? "number" : "text"}
+        value={val??""}
+        onChange={e => setDraftField(field.key, e.target.value===""?null:(field.type==="num"?Number(e.target.value):e.target.value))}
+        style={s.input}
+      />
+    )
+  }
+
+  const sortedVisits = [...visits].sort((a, b) => String(b.visit_date).localeCompare(String(a.visit_date)))
+
+  return (
+    <div style={{...s.card, marginTop:16}}>
+      <div style={{display:"flex", alignItems:"center", gap:8, marginBottom:12}}>
+        <div style={{fontSize:14, fontWeight:500}}>İzlem ziyaretleri</div>
+        <span style={{fontSize:12, color:"#6b7280"}}>{visits.length} kayıt</span>
+      </div>
+      {(error || message) && (
+        <div style={{
+          border:"1px solid",
+          borderColor: error ? "#fecaca" : "#bbf7d0",
+          background: error ? "#fef2f2" : "#f0fdf4",
+          color: error ? "#991b1b" : "#166534",
+          borderRadius:8,
+          padding:"8px 10px",
+          fontSize:12,
+          marginBottom:12,
+        }}>
+          {error || message}
+        </div>
+      )}
+      <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))", gap:10, marginBottom:12}}>
+        {FOLLOWUP_FIELDS.map(field => (
+          <div key={field.key}>
+            <label style={s.label}>{field.label}</label>
+            {renderVisitField(field)}
+          </div>
+        ))}
+      </div>
+      <button onClick={saveVisit} disabled={loading} style={{...s.btnPrimary, marginBottom:14}}>
+        İzlem ziyaretini kaydet
+      </button>
+      <div style={{overflowX:"auto"}}>
+        <table style={{width:"100%", borderCollapse:"collapse", fontSize:12}}>
+          <thead>
+            <tr style={{borderBottom:"1px solid #e5e7eb"}}>
+              {["Tarih","Takip","Klinik gidiş","Atak","Pnömoni","SpO2","FEV1",""].map(h => (
+                <th key={h} style={{textAlign:"left", padding:"6px 8px", color:"#6b7280", fontWeight:500}}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sortedVisits.map(visit => (
+              <tr key={visit.id} style={{borderBottom:"1px solid #f3f4f6"}}>
+                <td style={{padding:"5px 8px", fontWeight:500}}>{dateToInput(visit.visit_date)}</td>
+                <td style={{padding:"5px 8px"}}>{visit.takip_suresi_ay != null ? `${visit.takip_suresi_ay} ay` : "-"}</td>
+                <td style={{padding:"5px 8px"}}>{clinicalCourseLabel(visit.klinik_gidis || visit.klinik_gidis_otomatik)}</td>
+                <td style={{padding:"5px 8px"}}>{visit.atak_sayisi ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{visit.pnomoni_sayisi ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{visit.spo2 ?? "-"}</td>
+                <td style={{padding:"5px 8px"}}>{visit.fev1 ?? "-"}</td>
+                <td style={{padding:"5px 8px", textAlign:"right"}}>
+                  <button onClick={() => deleteVisit(visit.id)} style={{...s.btn, fontSize:11, padding:"4px 8px", color:"#b91c1c", borderColor:"#fecaca"}}>Sil</button>
+                </td>
+              </tr>
+            ))}
+            {sortedVisits.length === 0 && (
+              <tr><td colSpan={8} style={{padding:12, textAlign:"center", color:"#9ca3af"}}>Henüz izlem ziyareti yok</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 function PatientForm({ patient, isNew, onSave, onBack }) {
   const [form, setForm] = useState({...patient})
   const [saving, setSaving] = useState(false)
@@ -515,6 +824,7 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
       <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, width:"100%", marginTop:12, padding:10, fontSize:14}}>
         {saving ? "Kaydediliyor..." : saved ? "Kaydedildi ✓" : "Kaydet"}
       </button>
+      {!isNew && <FollowUpPanel patient={displayForm} />}
     </div>
   )
 }
