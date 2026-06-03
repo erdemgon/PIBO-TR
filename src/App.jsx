@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { supabase } from "./supabase.js"
+import { calculateCdcGrowth } from "./growth/cdcGrowth.js"
 
 const CENTERS = {
   "ADMIN": { label: "Koordinatör (Admin)", prefix: null, isAdmin: true },
@@ -45,24 +46,76 @@ function round(value, digits = 1) {
   return Math.round(value * factor) / factor
 }
 
+function numberOrNull(value) {
+  if (value === "" || value == null) return null
+  const number = Number(value)
+  return Number.isFinite(number) ? number : null
+}
+
+function sexForGrowth(value) {
+  if (value === "e" || value === "male") return "male"
+  if (value === "k" || value === "female") return "female"
+  return null
+}
+
+function calculateGrowthFields(patient, ageMonths, vkiBas) {
+  const heightCm = numberOrNull(patient.boy_bas)
+  const weightKg = numberOrNull(patient.va_bas)
+  const sex = sexForGrowth(patient.cinsiyet)
+  const numericAgeMonths = numberOrNull(ageMonths ?? patient.yas_ay)
+
+  if (!sex || !heightCm || !weightKg || numericAgeMonths == null) {
+    return {
+      ...(vkiBas != null ? { vki_bas: vkiBas } : {}),
+      growth_reference_status: "missing_input",
+    }
+  }
+
+  const results = calculateCdcGrowth({
+    ageMonths: numericAgeMonths,
+    heightCm,
+    sex,
+    weightKg,
+  })
+  const byMetric = Object.fromEntries(results.map((result) => [result.metric, result]))
+  const hasCdcScore = results.some((result) => result.zScore != null)
+
+  return {
+    vki_bas: vkiBas ?? round(byMetric.bmi?.value, 2),
+    ...(byMetric.weight?.zScore != null ? { va_z_bas: round(byMetric.weight.zScore, 2) } : {}),
+    ...(byMetric.stature?.zScore != null ? { boy_z_bas: round(byMetric.stature.zScore, 2) } : {}),
+    ...(byMetric.bmi?.zScore != null ? { vki_z_bas: round(byMetric.bmi.zScore, 2) } : {}),
+    growth_reference_status: hasCdcScore
+      ? "cdc_2_20"
+      : numericAgeMonths < 24
+        ? "under_2_needs_who"
+        : "cdc_out_of_range",
+  }
+}
+
 function calculateDerivedFields(patient) {
-  const taniYasGun = daysBetween(patient.tani_tarihi, patient.dogum_tarihi)
+  const calculatedTaniYasGun = daysBetween(patient.tani_tarihi, patient.dogum_tarihi)
+  const taniYasGun = calculatedTaniYasGun ?? numberOrNull(patient.tani_yas_gun)
   const semptomTaniGun = daysBetween(patient.tani_tarihi, patient.semptom_baslangic_tarihi)
   const muayeneTaniGun = daysBetween(patient.tani_tarihi, patient.ilk_muayene_tarihi)
   const muayeneBronkoskopiGun = daysBetween(patient.bronkoskopi_tarihi, patient.ilk_muayene_tarihi)
   const semptomBronkoskopiGun = daysBetween(patient.bronkoskopi_tarihi, patient.semptom_baslangic_tarihi)
-  const vkiBas = patient.va_bas && patient.boy_bas ? round(patient.va_bas / ((patient.boy_bas / 100) ** 2), 2) : null
+  const weightKg = numberOrNull(patient.va_bas)
+  const heightCm = numberOrNull(patient.boy_bas)
+  const vkiBas = weightKg && heightCm ? round(weightKg / ((heightCm / 100) ** 2), 2) : null
+  const ageMonths = taniYasGun == null ? numberOrNull(patient.yas_ay) : round(taniYasGun / 30.4375, 1)
+  const growthFields = calculateGrowthFields(patient, ageMonths, vkiBas)
 
   const derived = {
     tani_yas_gun: taniYasGun,
     tani_yas_ay: taniYasGun == null ? null : round(taniYasGun / 30.4375, 1),
-    yas_ay: taniYasGun == null ? patient.yas_ay ?? null : round(taniYasGun / 30.4375, 1),
+    yas_ay: ageMonths,
     semptom_tani_gun: semptomTaniGun,
     semptom_oncesi_gun: semptomTaniGun,
     muayene_tani_gun: muayeneTaniGun,
     muayene_bronkoskopi_gun: muayeneBronkoskopiGun,
     semptom_bronkoskopi_gun: semptomBronkoskopiGun,
-    vki_bas: vkiBas,
+    ...growthFields,
     dogum_yil: parseDate(patient.dogum_tarihi)?.getFullYear() ?? patient.dogum_yil ?? null,
     dogum_ay: parseDate(patient.dogum_tarihi) ? parseDate(patient.dogum_tarihi).getMonth() + 1 : patient.dogum_ay ?? null,
     tani_yil: parseDate(patient.tani_tarihi)?.getFullYear() ?? patient.tani_yil ?? null,
