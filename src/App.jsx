@@ -880,9 +880,14 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
             </button>
           )
         })}
+        {!isNew && (
+          <button onClick={() => setActiveGroup("izlem")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="izlem"?"#3b82f6":"#e5e7eb", background: activeGroup==="izlem"?"#eff6ff":"#fff", color: activeGroup==="izlem"?"#1d4ed8":"#6b7280", cursor:"pointer", fontWeight: activeGroup==="izlem"?500:400}}>
+            İzlem ziyaretleri
+          </button>
+        )}
       </div>
 
-      <div style={s.card}>
+      {activeGroup === "izlem" ? <FollowUpPanel patient={displayForm} /> : <div style={s.card}>
         <div style={{fontSize:14, fontWeight:500, marginBottom:14}}>{FIELD_GROUPS[activeGroup].label}</div>
         <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12}}>
           {FIELD_GROUPS[activeGroup].fields.map(f => {
@@ -916,11 +921,12 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
             )
           })}
         </div>
-      </div>
-      <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, width:"100%", marginTop:12, padding:10, fontSize:14}}>
-        {saving ? "Kaydediliyor..." : saved ? "Kaydedildi ✓" : "Kaydet"}
-      </button>
-      {!isNew && <FollowUpPanel patient={displayForm} />}
+      </div>}
+      {activeGroup !== "izlem" && (
+        <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, width:"100%", marginTop:12, padding:10, fontSize:14}}>
+          {saving ? "Kaydediliyor..." : saved ? "Kaydedildi ✓" : "Kaydet"}
+        </button>
+      )}
     </div>
   )
 }
