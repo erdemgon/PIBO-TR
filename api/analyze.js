@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       yas_ay_mean: mean(vals(pibo, "yas_ay")),
       // Tanı zamanlaması
       tani_yas_gun_median: median(vals(pibo, "tani_yas_gun")),
-      semptom_tani_gun_median: median(vals(pibo, "muayene_tani_gun")),
+      semptom_tani_gun_median: median(vals(pibo, "semptom_tani_gun")),
       // Etkenler
       etken_adenovirus_pct: pct(pibo, p => p.etken_adenovirus == 1),
       etken_rinovirus_pct: pct(pibo, p => p.etken_rinovirus == 1),

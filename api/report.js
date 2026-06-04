@@ -44,7 +44,7 @@ export default async function handler(req, res) {
       yabanci: pct(pibo, p => p.yabanci == 1),
       yas_ay_median: median(vals(pibo, "yas_ay")),
       tani_yas_gun_median: median(vals(pibo, "tani_yas_gun")),
-      semptom_tani_gun_median: median(vals(pibo, "muayene_tani_gun")),
+      semptom_tani_gun_median: median(vals(pibo, "semptom_tani_gun")),
       adenovirus: pct(pibo, p => p.etken_adenovirus == 1),
       rinovirus: pct(pibo, p => p.etken_rinovirus == 1),
       rsv: pct(pibo, p => p.etken_rsv == 1),
