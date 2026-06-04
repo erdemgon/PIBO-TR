@@ -23,4 +23,6 @@ alter table public.hastalar
   add column if not exists dogum_yil numeric,
   add column if not exists tani_ay numeric,
   add column if not exists tani_yil numeric,
-  add column if not exists semptom_oncesi_gun numeric;
+  add column if not exists azitro_bitis_tarihi date,
+  add column if not exists semptom_oncesi_gun numeric,
+  add column if not exists azitro_bitis_tani_gun numeric;

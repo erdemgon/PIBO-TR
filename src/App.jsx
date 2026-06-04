@@ -631,6 +631,8 @@ const FIELD_GROUPS = {
       {key:"seretide_toplam_flutikazon_mcg", label:"Seretide flutikazon toplam (mcg)", type:"num", readonly:true},
       {key:"toplam_inhale_steroid_mcg", label:"Toplam inhale steroid (mcg)", type:"num", readonly:true},
       {key:"azitromisin_aldi", label:"Azitromisin", type:"bool"},
+      {key:"azitro_bitis_tarihi", label:"Azitromisin bitiş tarihi", type:"date"},
+      {key:"azitro_bitis_tani_gun", label:"Tanı -> azitromisin bitişi (gün)", type:"num", readonly:true},
       {key:"montelukast_aldi", label:"Montelukast", type:"bool"},
       {key:"fam_aldi", label:"FAM aldı", type:"bool", readonly:true},
       {key:"bronchomunal", label:"Bronchomunal", type:"bool"},
