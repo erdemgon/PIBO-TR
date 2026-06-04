@@ -22,6 +22,12 @@ const THEME = {
   page: "#f7f8fb",
 }
 
+const BRAND = {
+  name: "PIBO-TR Registry",
+  subtitle: "Pediatrik ve post-transplant bronşiyolitis obliterans veri ağı",
+  logo: "/pibo-logo.png",
+}
+
 const SEED_DATA = [
 {"hasta_id":"KOC-001","pibo":1,"ptbo":0,"cinsiyet":"e","yabanci":0,"dogum_tarihi":"2021-06-01","tani_tarihi":"2023-12-06","semptom_baslangic_tarihi":"2023-01-06","bronkoskopi_tarihi":"2023-05-03","ilk_muayene_tarihi":"2023-02-15","bt_tarihi":"2023-10-23","yas_ay":58.133333,"semptom_tani_gun":290,"muayene_tani_gun":250,"muayene_bronkoskopi_gun":77.0,"tani_yas_gun":918,"semptom_bronkoskopi_gun":117.0,"steroid_suresi_gun":140,"tedavi_suresi_gun":183.0,"hsct":null,"solid_tx":null,"gvhd":null,"gvhd_yeri":null,"tx1_tani_gun":null,"tx2_tani_gun":null,"gvhd_tani_gun":null,"azitro_bitis_tarihi":null,"bt_infiltrasyon":0,"bt_atelektazi":0,"bt_sag_orta_atelektazi":0,"bt_lingula_atelektazi":1,"bt_diger_atelektazi":1,"bt_bronsektazi":1,"bt_sag_orta_bronsektazi":0,"bt_lingula_bronsektazi":1,"bt_diger_bronsektazi":0,"sistemik_steroid":1,"pulse_steroid":0,"azitromisin_aldi":1,"inhale_steroid_aldi":1,"montelukast_aldi":1,"bronchomunal":1,"ivig_aldi":0,"o2":0,"bipap":0,"imv":0,"ecmo":0,"ex":0,"sistemik_steroid_mgkg_gun":2.0,"sistemik_steroid_gun":7.0,"kumulatif_sistemik_steroid_mgkg":58.0,"tedi_sonrasi_atak":2.0,"tedi_sonrasi_pnomoni":0.0,"tedavi_sonucu":1.0,"semptom_devam":0,"akut_hfnc":1,"yatis":1,"etken_pnomokok":0,"etken_adenovirus":0,"etken_rinovirus":1,"etken_rsv":0,"etken_cmv":0,"etken_influenza":0,"etken_kizamik":0,"etken_metapneumovirus":0,"etken_covid":0,"etken_varicella":0,"etken_ebv":1,"bal_ureme":1,"bal_coklu_ureme":1,"bal_kultur1":"H influenzae","bal_kultur2":"M catarrhalis","bal_kultur3":null,"bal_h_influenza":1,"bal_m_catarrhalis":1,"rpcr":0,"bal_solunum_pcr":null,"bal_cmv_pcr":null,"bal_pjir":null,"bal_lipid_ym":0,"bal_hemosiderin_ym":0,"bal_lenfosit_subset":0,"bal_lenfopeni":null,"lokosit":null,"lenfosit_oran":null,"notrofil_oran":null,"eozinofil_oran":null,"bal_cd3":null,"bal_cd4":null,"bal_cd8":null,"bal_cd4_cd8":null,"bal_cd19":null,"bal_cd16_cd56":null,"bal_cd45":null,"bal_cd56":null,"bal_cd22":null,"bal_cd20":null,"bal_cd16":null,"bal_cd3_hladr":null,"eko":1,"pht":0,"pap":0.0,"imun_yetmezlik":0,"imdef":0,"imdefdr":"Bactrim","tani_surecinde_imyetm":0,"astim":1,"alerjik_rinit":1,"iga":0.48,"iga_dusuk":0,"igm":1.49,"igm_dusuk":null,"igg":7.91,"igg_dusuk":0,"ige":55.4,"igg1":null,"igg2":null,"igg3":null,"igg4":null,"cbc_bk":8960.0,"cbc_neu":2900.0,"cbc_lym":5200.0,"cbc_eos":200.0,"cbc_nlr":0.557692,"lswbc":null,"lslym_pct":null,"lscd3_pct":null,"lscd3_abs":null,"lscd4_pct":null,"lscd4_abs":null,"lscd8_pct":null,"lscd8_abs":null,"lscd4_cd8":null,"lscd19":null,"lscd56":null,"cd3":null,"cd4":null,"cd8":null,"cd4_cd8":null,"va_bas":14.7,"va_z_bas":0.49,"va_bit":15.85,"va_z_bit":0.52,"va_z_fark":0.03,"boy_bas":90.1,"boy_z_bas":-0.67,"boy_bit":95.0,"boy_z_bit":-0.44,"vki_bas":18.11,"vki_z_bas":1.25,"vki_bit":17.56,"vki_z_bit":1.03,"vki_fark":-0.22,"fev1_bas":null,"fvc_bas":null,"mef2575_bas":null,"fev1_bd_bas":null,"mef2575_bd_bas":null,"x5_bas":null,"r5_bas":null,"ax_bas":null,"dlco_bas":null,"rv_bas":null,"tlc_bas":null,"rv_tlc_bas":null,"fev1_bit":null,"fvc_bit":null,"mef2575_bit":null,"bd_fev1":null,"bd_mef2575":null,"x5_bit":null,"r5_bit":null,"ax_bit":null,"dlco_bit":null,"rv_bit":null,"tlc_bit":null,"rv_tlc_bit":null,"tani_u12ay":0,"tani_u18ay":0,"tani_u36ay":1,"sx_u12ay":0,"sx_u18ay":1,"sx_u36ay":1,"bhalla_skoru":null,"teper_skoru":null,"webb_skoru":null,"merkez":"KOC","spo2_bas":null,"ates_bas":null,"solunum_sayisi_bas":null,"kalp_tepe_atimi_bas":null},
 {"hasta_id":"KOC-002","pibo":1,"ptbo":0,"cinsiyet":"e","yabanci":0,"dogum_tarihi":"2022-02-19","tani_tarihi":"2023-09-07","semptom_baslangic_tarihi":"2022-03-01","bronkoskopi_tarihi":"2023-09-20","ilk_muayene_tarihi":"2022-11-02","bt_tarihi":"2023-08-31","yas_ay":49.366667,"semptom_tani_gun":548,"muayene_tani_gun":302,"muayene_bronkoskopi_gun":322.0,"tani_yas_gun":565,"semptom_bronkoskopi_gun":568.0,"steroid_suresi_gun":150,"tedavi_suresi_gun":186.0,"hsct":null,"solid_tx":null,"gvhd":null,"gvhd_yeri":null,"tx1_tani_gun":null,"tx2_tani_gun":null,"gvhd_tani_gun":null,"azitro_bitis_tarihi":null,"bt_infiltrasyon":0,"bt_atelektazi":1,"bt_sag_orta_atelektazi":1,"bt_lingula_atelektazi":0,"bt_diger_atelektazi":0,"bt_bronsektazi":0,"bt_sag_orta_bronsektazi":0,"bt_lingula_bronsektazi":0,"bt_diger_bronsektazi":0,"sistemik_steroid":1,"pulse_steroid":0,"azitromisin_aldi":1,"inhale_steroid_aldi":1,"montelukast_aldi":1,"bronchomunal":0,"ivig_aldi":0,"o2":0,"bipap":0,"imv":0,"ecmo":0,"ex":0,"sistemik_steroid_mgkg_gun":1.0,"sistemik_steroid_gun":0.0,"kumulatif_sistemik_steroid_mgkg":45.0,"tedi_sonrasi_atak":2.0,"tedi_sonrasi_pnomoni":0.0,"tedavi_sonucu":2.0,"semptom_devam":0,"akut_hfnc":1,"yatis":1,"etken_pnomokok":0,"etken_adenovirus":0,"etken_rinovirus":1,"etken_rsv":1,"etken_cmv":0,"etken_influenza":0,"etken_kizamik":0,"etken_metapneumovirus":0,"etken_covid":1,"etken_varicella":0,"etken_ebv":0,"bal_ureme":1,"bal_coklu_ureme":1,"bal_kultur1":"H influenzae","bal_kultur2":"S pneumonia","bal_kultur3":null,"bal_h_influenza":1,"bal_m_catarrhalis":0,"rpcr":1,"bal_solunum_pcr":"Rhinovirus","bal_cmv_pcr":null,"bal_pjir":null,"bal_lipid_ym":1,"bal_hemosiderin_ym":0,"bal_lenfosit_subset":0,"bal_lenfopeni":null,"lokosit":null,"lenfosit_oran":null,"notrofil_oran":null,"eozinofil_oran":null,"bal_cd3":null,"bal_cd4":null,"bal_cd8":null,"bal_cd4_cd8":null,"bal_cd19":null,"bal_cd16_cd56":null,"bal_cd45":null,"bal_cd56":null,"bal_cd22":null,"bal_cd20":null,"bal_cd16":null,"bal_cd3_hladr":null,"eko":1,"pht":0,"pap":0.0,"imun_yetmezlik":1,"imdef":"IGG eksik CD4 CD8 düşük","imdefdr":null,"tani_surecinde_imyetm":1,"astim":0,"alerjik_rinit":0,"iga":0.27,"iga_dusuk":0,"igm":0.6,"igm_dusuk":null,"igg":0.35,"igg_dusuk":1,"ige":41.0,"igg1":null,"igg2":null,"igg3":null,"igg4":null,"cbc_bk":10980.0,"cbc_neu":3700.0,"cbc_lym":6200.0,"cbc_eos":0.0,"cbc_nlr":0.596774,"lswbc":14.95,"lslym_pct":56.2,"lscd3_pct":54.2,"lscd3_abs":4553.82,"lscd4_pct":35.9,"lscd4_abs":3016.28,"lscd8_pct":17.5,"lscd8_abs":1470.33,"lscd4_cd8":2.05,"lscd19":44.9,"lscd56":1.9,"cd3":54.2,"cd4":35.9,"cd8":17.5,"cd4_cd8":2.05,"va_bas":9.35,"va_z_bas":-2.05,"va_bit":10.9,"va_z_bit":-1.46,"va_z_fark":0.59,"boy_bas":81.5,"boy_z_bas":-0.96,"boy_bit":89.0,"boy_z_bit":-0.08,"vki_bas":14.08,"vki_z_bas":-2.12,"vki_bit":13.76,"vki_z_bit":-2.11,"vki_fark":0.01,"fev1_bas":null,"fvc_bas":null,"mef2575_bas":null,"fev1_bd_bas":null,"mef2575_bd_bas":null,"x5_bas":null,"r5_bas":null,"ax_bas":null,"dlco_bas":null,"rv_bas":null,"tlc_bas":null,"rv_tlc_bas":null,"fev1_bit":null,"fvc_bit":null,"mef2575_bit":null,"bd_fev1":null,"bd_mef2575":null,"x5_bit":null,"r5_bit":null,"ax_bit":null,"dlco_bit":null,"rv_bit":null,"tlc_bit":null,"rv_tlc_bit":null,"tani_u12ay":0,"tani_u18ay":1,"tani_u36ay":1,"sx_u12ay":1,"sx_u18ay":1,"sx_u36ay":1,"bhalla_skoru":null,"teper_skoru":null,"webb_skoru":null,"merkez":"KOC","spo2_bas":null,"ates_bas":null,"solunum_sayisi_bas":null,"kalp_tepe_atimi_bas":null},
@@ -795,6 +801,40 @@ const s = {
   badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?THEME.redSoft:color==="amber"?"#fef3c7":"#f3f4f6", color: color==="blue"?THEME.red:color==="amber"?"#92400e":"#374151" }),
 }
 
+function BrandLockup({ align = "center", compact = false }) {
+  const horizontal = align === "left"
+  return (
+    <div style={{
+      display:"flex",
+      alignItems:"center",
+      justifyContent: horizontal ? "flex-start" : "center",
+      gap: compact ? 10 : 14,
+      textAlign: horizontal ? "left" : "center",
+    }}>
+      <img
+        src={BRAND.logo}
+        alt=""
+        aria-hidden="true"
+        style={{
+          width: compact ? 44 : 78,
+          height: compact ? 46 : 82,
+          objectFit:"contain",
+          flex:"0 0 auto",
+          filter:"drop-shadow(0 8px 18px rgba(11,31,58,.08))",
+        }}
+      />
+      <div>
+        <div style={{fontSize: compact ? 18 : 25, fontWeight:700, color:THEME.navy, lineHeight:1.1}}>
+          {BRAND.name}
+        </div>
+        <div style={{fontSize: compact ? 11 : 13, color:THEME.muted, marginTop: compact ? 3 : 5, maxWidth: compact ? 320 : 360}}>
+          {BRAND.subtitle}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Login ───────────────────────────────────────────────────────────────────
 function Login({ onLogin }) {
   const [code, setCode] = useState("")
@@ -810,8 +850,7 @@ function Login({ onLogin }) {
     <div style={{minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:THEME.page}}>
       <div style={{width:380}}>
         <div style={{textAlign:"center", marginBottom:28}}>
-          <div style={{fontSize:22, fontWeight:600, color:THEME.navy}}>PIBO / PTBO Registry</div>
-          <div style={{fontSize:13, color:"#6b7280", marginTop:4}}>Pediatrik Bronşiyolitis Obliterans · Çok Merkezli Veri Sistemi</div>
+          <BrandLockup />
         </div>
         <div style={{...s.card, padding:"24px 28px"}}>
           <label style={s.label}>Merkez kodunuzu girin</label>
@@ -845,7 +884,8 @@ function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
 
   return (
     <div style={{maxWidth:600, margin:"0 auto", padding:"32px 20px"}}>
-      <div style={{display:"flex", alignItems:"center", marginBottom:24}}>
+      <div style={{display:"flex", alignItems:"center", flexWrap:"wrap", marginBottom:24, gap:14}}>
+        <BrandLockup align="left" compact />
         <div>
           <div style={{fontSize:17, fontWeight:600}}>{centerInfo.label}</div>
           <div style={{fontSize:12, color:"#6b7280", marginTop:2}}>
