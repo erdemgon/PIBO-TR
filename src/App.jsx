@@ -47,6 +47,79 @@ const SEED_DATA = [
 {"hasta_id":"KOC-022","pibo":0,"ptbo":1,"cinsiyet":"e","yabanci":0,"dogum_tarihi":"2010-11-25","tani_tarihi":"2024-09-23","semptom_baslangic_tarihi":"2024-09-16","bronkoskopi_tarihi":"2024-10-02","ilk_muayene_tarihi":"2024-09-16","bt_tarihi":"2024-09-23","yas_ay":186.166667,"semptom_tani_gun":7,"muayene_tani_gun":7,"muayene_bronkoskopi_gun":16.0,"tani_yas_gun":5051,"semptom_bronkoskopi_gun":16.0,"steroid_suresi_gun":188,"tedavi_suresi_gun":0.0,"hsct":1,"solid_tx":0,"gvhd":1,"gvhd_yeri":"tükrükbezi","tx1_tani_gun":"2024-02-24","tx2_tani_gun":null,"gvhd_tani_gun":null,"azitro_bitis_tarihi":null,"bt_infiltrasyon":1,"bt_atelektazi":0,"bt_sag_orta_atelektazi":0,"bt_lingula_atelektazi":0,"bt_diger_atelektazi":0,"bt_bronsektazi":0,"bt_sag_orta_bronsektazi":0,"bt_lingula_bronsektazi":0,"bt_diger_bronsektazi":0,"sistemik_steroid":1,"pulse_steroid":0,"azitromisin_aldi":1,"inhale_steroid_aldi":1,"montelukast_aldi":1,"bronchomunal":0,"ivig_aldi":0,"o2":0,"bipap":0,"imv":0,"ecmo":0,"ex":0,"sistemik_steroid_mgkg_gun":2.0,"sistemik_steroid_gun":21.0,"kumulatif_sistemik_steroid_mgkg":180.0,"tedi_sonrasi_atak":0.0,"tedi_sonrasi_pnomoni":0.0,"tedavi_sonucu":1.0,"semptom_devam":1,"akut_hfnc":0,"yatis":1,"etken_pnomokok":null,"etken_adenovirus":null,"etken_rinovirus":null,"etken_rsv":null,"etken_cmv":null,"etken_influenza":null,"etken_kizamik":null,"etken_metapneumovirus":null,"etken_covid":null,"etken_varicella":null,"etken_ebv":1,"bal_ureme":0,"bal_coklu_ureme":0,"bal_kultur1":null,"bal_kultur2":null,"bal_kultur3":null,"bal_h_influenza":0,"bal_m_catarrhalis":0,"rpcr":0,"bal_solunum_pcr":"SARSCOV2","bal_cmv_pcr":0,"bal_pjir":0,"bal_lipid_ym":0,"bal_hemosiderin_ym":0,"bal_lenfosit_subset":1,"bal_lenfopeni":1,"lokosit":0.14,"lenfosit_oran":3.2,"notrofil_oran":39.4,"eozinofil_oran":10.2,"bal_cd3":77.8,"bal_cd4":7.7,"bal_cd8":67.6,"bal_cd4_cd8":0.12,"bal_cd19":0.6,"bal_cd16_cd56":0.59,"bal_cd45":58.0,"bal_cd56":4.6,"bal_cd22":null,"bal_cd20":null,"bal_cd16":2.7,"bal_cd3_hladr":73.7,"eko":0,"pht":null,"pap":null,"imun_yetmezlik":null,"imdef":null,"imdefdr":null,"tani_surecinde_imyetm":null,"astim":null,"alerjik_rinit":null,"iga":null,"iga_dusuk":null,"igm":null,"igm_dusuk":null,"igg":15.3,"igg_dusuk":null,"ige":null,"igg1":null,"igg2":null,"igg3":null,"igg4":null,"cbc_bk":null,"cbc_neu":null,"cbc_lym":null,"cbc_eos":null,"cbc_nlr":null,"lswbc":null,"lslym_pct":null,"lscd3_pct":null,"lscd3_abs":null,"lscd4_pct":null,"lscd4_abs":null,"lscd8_pct":null,"lscd8_abs":null,"lscd4_cd8":null,"lscd19":null,"lscd56":null,"cd3":null,"cd4":null,"cd8":null,"cd4_cd8":null,"va_bas":38.5,"va_z_bas":null,"va_bit":58.0,"va_z_bit":null,"va_z_fark":null,"boy_bas":151.0,"boy_z_bas":null,"boy_bit":156.0,"boy_z_bit":null,"vki_bas":null,"vki_z_bas":null,"vki_bit":null,"vki_z_bit":null,"vki_fark":null,"fev1_bas":73.0,"fvc_bas":null,"mef2575_bas":null,"fev1_bd_bas":null,"mef2575_bd_bas":null,"x5_bas":null,"r5_bas":null,"ax_bas":null,"dlco_bas":56.0,"rv_bas":82.0,"tlc_bas":86.0,"rv_tlc_bas":null,"fev1_bit":92.0,"fvc_bit":null,"mef2575_bit":null,"bd_fev1":null,"bd_mef2575":null,"x5_bit":null,"r5_bit":null,"ax_bit":null,"dlco_bit":73.0,"rv_bit":61.0,"tlc_bit":85.0,"rv_tlc_bit":67.0,"tani_u12ay":null,"tani_u18ay":null,"tani_u36ay":null,"sx_u12ay":null,"sx_u18ay":null,"sx_u36ay":null,"bhalla_skoru":null,"teper_skoru":null,"webb_skoru":null,"merkez":"KOC","spo2_bas":null,"ates_bas":null,"solunum_sayisi_bas":null,"kalp_tepe_atimi_bas":null},
 {"hasta_id":"KOC-023","pibo":0,"ptbo":1,"cinsiyet":"e","yabanci":0,"dogum_tarihi":"2022-06-17","tani_tarihi":"2025-10-14","semptom_baslangic_tarihi":"2025-09-23","bronkoskopi_tarihi":"2025-10-17","ilk_muayene_tarihi":"2025-10-14","bt_tarihi":"2025-10-14","yas_ay":45.433333,"semptom_tani_gun":21,"muayene_tani_gun":0,"muayene_bronkoskopi_gun":3.0,"tani_yas_gun":1215,"semptom_bronkoskopi_gun":24.0,"steroid_suresi_gun":150,"tedavi_suresi_gun":150.0,"hsct":1,"solid_tx":0,"gvhd":1,"gvhd_yeri":"deri","tx1_tani_gun":"2023-03-01","tx2_tani_gun":"2025-05-01","gvhd_tani_gun":"2025-07-20","azitro_bitis_tarihi":null,"bt_infiltrasyon":1,"bt_atelektazi":0,"bt_sag_orta_atelektazi":0,"bt_lingula_atelektazi":0,"bt_diger_atelektazi":0,"bt_bronsektazi":0,"bt_sag_orta_bronsektazi":0,"bt_lingula_bronsektazi":0,"bt_diger_bronsektazi":0,"sistemik_steroid":1,"pulse_steroid":0,"azitromisin_aldi":1,"inhale_steroid_aldi":1,"montelukast_aldi":1,"bronchomunal":0,"ivig_aldi":0,"o2":1,"bipap":1,"imv":1,"ecmo":1,"ex":0,"sistemik_steroid_mgkg_gun":1.0,"sistemik_steroid_gun":0.0,"kumulatif_sistemik_steroid_mgkg":164.0,"tedi_sonrasi_atak":2.0,"tedi_sonrasi_pnomoni":1.0,"tedavi_sonucu":3.0,"semptom_devam":1,"akut_hfnc":1,"yatis":1,"etken_pnomokok":0,"etken_adenovirus":0,"etken_rinovirus":1,"etken_rsv":0,"etken_cmv":1,"etken_influenza":0,"etken_kizamik":0,"etken_metapneumovirus":0,"etken_covid":1,"etken_varicella":0,"etken_ebv":0,"bal_ureme":1,"bal_coklu_ureme":1,"bal_kultur1":"P Jirovecii","bal_kultur2":"RSV","bal_kultur3":"CMV","bal_h_influenza":0,"bal_m_catarrhalis":0,"rpcr":1,"bal_solunum_pcr":"CMV","bal_cmv_pcr":1,"bal_pjir":1,"bal_lipid_ym":0,"bal_hemosiderin_ym":0,"bal_lenfosit_subset":0,"bal_lenfopeni":0,"lokosit":null,"lenfosit_oran":null,"notrofil_oran":null,"eozinofil_oran":null,"bal_cd3":null,"bal_cd4":null,"bal_cd8":null,"bal_cd4_cd8":null,"bal_cd19":null,"bal_cd16_cd56":null,"bal_cd45":null,"bal_cd56":null,"bal_cd22":null,"bal_cd20":null,"bal_cd16":null,"bal_cd3_hladr":null,"eko":1,"pht":0,"pap":0.0,"imun_yetmezlik":null,"imdef":null,"imdefdr":null,"tani_surecinde_imyetm":null,"astim":null,"alerjik_rinit":null,"iga":null,"iga_dusuk":null,"igm":null,"igm_dusuk":null,"igg":null,"igg_dusuk":null,"ige":null,"igg1":null,"igg2":null,"igg3":null,"igg4":null,"cbc_bk":null,"cbc_neu":null,"cbc_lym":null,"cbc_eos":null,"cbc_nlr":null,"lswbc":null,"lslym_pct":null,"lscd3_pct":null,"lscd3_abs":null,"lscd4_pct":null,"lscd4_abs":null,"lscd8_pct":null,"lscd8_abs":null,"lscd4_cd8":null,"lscd19":null,"lscd56":null,"cd3":null,"cd4":null,"cd8":null,"cd4_cd8":null,"va_bas":14.9,"va_z_bas":null,"va_bit":19.5,"va_z_bit":null,"va_z_fark":null,"boy_bas":98.0,"boy_z_bas":null,"boy_bit":101.0,"boy_z_bit":null,"vki_bas":null,"vki_z_bas":null,"vki_bit":null,"vki_z_bit":null,"vki_fark":null,"fev1_bas":null,"fvc_bas":null,"mef2575_bas":null,"fev1_bd_bas":null,"mef2575_bd_bas":null,"x5_bas":null,"r5_bas":null,"ax_bas":null,"dlco_bas":null,"rv_bas":null,"tlc_bas":null,"rv_tlc_bas":null,"fev1_bit":null,"fvc_bit":null,"mef2575_bit":null,"bd_fev1":null,"bd_mef2575":null,"x5_bit":null,"r5_bit":null,"ax_bit":null,"dlco_bit":null,"rv_bit":null,"tlc_bit":null,"rv_tlc_bit":null,"tani_u12ay":0,"tani_u18ay":0,"tani_u36ay":1,"sx_u12ay":0,"sx_u18ay":0,"sx_u36ay":1,"bhalla_skoru":null,"teper_skoru":null,"webb_skoru":null,"merkez":"KOC","spo2_bas":null,"ates_bas":null,"solunum_sayisi_bas":null,"kalp_tepe_atimi_bas":null}
 ]
+// Supabase hastalar tablosunda tanımlı tüm kolonlar
+// UI-only alanlar (dogum_ay, dogum_yil, tani_ay, tani_yil) kasıtlı olarak DIŞARIDA — bunlar sadece form hesaplamalarında kullanılır
+const DB_COLUMN_KEYS = new Set([
+  // SEED_DATA kolonları (orijinal tablo şeması)
+  ...Object.keys(SEED_DATA[0] ?? {}),
+  // supabase_phase1_columns.sql
+  "dogum_tarihi", "semptom_baslangic_tarihi", "ilk_muayene_tarihi", "tani_tarihi",
+  "bt_tarihi", "bronkoskopi_tarihi", "spo2_bas", "ates_bas", "solunum_sayisi_bas",
+  "kalp_tepe_atimi_bas", "tani_yas_ay", "semptom_tani_gun", "vki_bas", "va_z_bas",
+  "boy_z_bas", "vki_z_bas", "growth_reference_status", "guncelleme_tarihi", "raw_excel_payload",
+  // supabase_registry_expansion.sql — ilaç alanları
+  "flutikazon_neb_2mg_adet_gun", "flutikazon_neb_2mg_gun",
+  "flutikazon_neb_05mg_adet_gun", "flutikazon_neb_05mg_gun",
+  "flutikazon_neb_toplam_mcg",
+  "flutikazon_inhaler_125_puff_gun", "flutikazon_inhaler_125_gun",
+  "flutikazon_inhaler_50_puff_gun", "flutikazon_inhaler_50_gun",
+  "flutikazon_inhaler_toplam_mcg",
+  "seretide_125_puff_gun", "seretide_125_gun",
+  "seretide_250_puff_gun", "seretide_250_gun",
+  "seretide_aldi", "seretide_toplam_flutikazon_mcg", "toplam_inhale_steroid_mcg",
+  "inhale_steroid_aldi", "fam_aldi", "azitromisin_aldi", "montelukast_aldi",
+  "ivig_aldi", "ivig_aliyor", "ventolin_aldi",
+  "sistemik_steroid_mgkg_gun", "sistemik_steroid_gun", "sistemik_steroid_plan_gun",
+  "kumulatif_sistemik_steroid_mgkg", "pulse_steroid_mgkg", "tanidan_once_antibiyotik",
+  // supabase_registry_expansion.sql — immunoloji / lenfosit
+  "cd19", "cd16_cd56", "lswbc", "lslym_pct",
+  "lscd3_pct", "lscd3_abs", "lscd4_pct", "lscd4_abs",
+  "lscd8_pct", "lscd8_abs", "lscd4_cd8", "lscd19", "lscd56",
+  "bal_lenfosit_subset", "bal_lenfopeni",
+  "bal_cd3", "bal_cd4", "bal_cd8", "bal_cd4_cd8", "bal_cd19",
+  "bal_cd16_cd56", "bal_cd45", "bal_cd56", "bal_cd22", "bal_cd20", "bal_cd16", "bal_cd3_hladr",
+  "immunology_reference_source", "immunology_ig_ref_age_band", "lymphocyte_ref_age_band",
+  "iga_alt_limit_mgdl", "iga_dusuk", "igm_alt_limit_mgdl", "igm_dusuk",
+  "igg_alt_limit_mgdl", "igg_dusuk", "igg1_alt_limit_mgdl", "igg1_dusuk",
+  "igg2_alt_limit_mgdl", "igg2_dusuk", "igg3_alt_limit_mgdl", "igg3_dusuk",
+  "igg4_alt_limit_mgdl", "igg4_dusuk",
+  "lenfosit_subset_dusuk", "lym_abs_alt_limit", "lym_abs_dusuk",
+  "cd3_pct_alt_limit", "cd3_pct_dusuk", "cd3_abs_alt_limit", "cd3_abs_dusuk",
+  "cd4_pct_alt_limit", "cd4_pct_dusuk", "cd4_abs_alt_limit", "cd4_abs_dusuk",
+  "cd8_pct_alt_limit", "cd8_pct_dusuk", "cd8_abs_alt_limit", "cd8_abs_dusuk",
+  "cd19_pct_alt_limit", "cd19_pct_dusuk", "cd19_abs_alt_limit", "cd19_abs_dusuk",
+  "cd16_cd56_pct_alt_limit", "cd16_cd56_pct_dusuk", "cd16_cd56_abs_alt_limit", "cd16_cd56_abs_dusuk",
+  // supabase_registry_expansion.sql — anamnez / akut
+  "premature", "gestasyon_haftasi", "dogum_agirligi_g", "yenidogan_yogun_bakim",
+  "neonatal_oksijen", "bpd_oykusu", "akut_asye_tarihi", "ates_suresi_gun", "agir_pnomoni",
+  "ilk_akut_asye_yatis_gun", "tekrarlayan_pnomoni", "pnomoni_atak_sayisi",
+  "toplam_pnomoni_yatis_gun", "akut_hipoksemi", "akut_yatis", "cocuk_yogun_bakim",
+  "akut_oksijen", "akut_hfnc", "akut_niv", "akut_imv", "akut_ivig", "akut_glukokortikoid",
+  "etken_mycoplasma", "etken_pnomokok", "etken_parainfluenza", "etken_bakteri",
+  "koenfeksiyon", "etken_diger",
+  "bt_mozaik", "bt_air_trapping", "bt_bronduvar_kalinlasma",
+  "bt_buyuk_lobar_konsolidasyon", "bt_diffuz_bronsiolit",
+  "imdef", "tani_surecinde_imyetm", "imdefdr",
+  "atopik_dermatit", "kisisel_atopi", "aile_atopi", "spesifik_ige_pozitif",
+  // supabase_registry_expansion.sql — SFT / görüntüleme / TB
+  "sft_bas_tarihi", "sft_bit_tarihi",
+  "akciger_goruntuleme_yapildi", "akciger_goruntuleme_tarihi",
+  "akciger_goruntuleme_yontemi", "akciger_goruntuleme_bulgu",
+  "ppd_mm", "ppd_sonuc", "tb_igra_sonuc", "tb_igra_tarihi",
+  "tb_mikrobiyoloji_pozitif", "tb_tedavi_baslangic_tarihi", "tb_tedavi_suresi_ay",
+  // supabase_missing_columns.sql
+  "azitromisin", "flutikazon", "montelukast", "ivig",
+  "seretide_25_50_puff_gun", "seretide_25_50_gun",
+  "steroid_baslangic_dozu", "steroid_suresi_gun", "kumulatif_steroid", "pulse_steroid",
+  "semptom_oncesi_gun",
+  // Hesaplanan tarih alanları
+  "tani_yas_gun", "muayene_tani_gun", "muayene_bronkoskopi_gun", "semptom_bronkoskopi_gun",
+])
+
+function pickRecordColumns(record, allowedColumns) {
+  return Object.fromEntries(Object.entries(record).filter(([key]) => allowedColumns.has(key)))
+}
+
 function formatSupabaseError(error) {
   return [error?.message, error?.details, error?.hint].filter(Boolean).join(" ")
 }
@@ -1597,9 +1670,11 @@ export default function App() {
   }, [])
 
   async function savePatient(p) {
-    const record = { ...p, ...calculateDerivedFields(p), merkez: p.hasta_id.split("-")[0], guncelleme_tarihi: new Date().toISOString() }
-    const { error } = await supabase.from("hastalar").upsert(record, { onConflict: "hasta_id" })
+    const full = { ...p, ...calculateDerivedFields(p), merkez: p.hasta_id.split("-")[0], guncelleme_tarihi: new Date().toISOString() }
+    // UI-only alanları (dogum_ay, dogum_yil, tani_ay, tani_yil vb.) Supabase'e gönderme
+    const record = pickRecordColumns(full, DB_COLUMN_KEYS)
 
+    const { error } = await supabase.from("hastalar").upsert(record, { onConflict: "hasta_id" })
     if (error) {
       console.error("Supabase save failed:", error)
       const details = formatSupabaseError(error)
@@ -1608,7 +1683,7 @@ export default function App() {
 
     setPatients(prev => {
       const idx = prev.findIndex(x => x.hasta_id === p.hasta_id)
-      return idx >= 0 ? prev.map((x,i) => i===idx ? record : x) : [...prev, record]
+      return idx >= 0 ? prev.map((x,i) => i===idx ? full : x) : [...prev, full]
     })
     return {}
   }
