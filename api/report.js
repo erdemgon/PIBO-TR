@@ -158,16 +158,16 @@ Eksik veri oranı yüksek değişkenler için not ekle.`
 <title>PIBO Registry - Descriptive Rapor ${today}</title>
 <style>
   body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #1a1a1a; line-height: 1.6; }
-  h1 { color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 8px; }
-  h2 { color: #1e40af; border-bottom: 1px solid #93c5fd; padding-bottom: 4px; margin-top: 32px; }
+  h1 { color: #c8102e; border-bottom: 2px solid #c8102e; padding-bottom: 8px; }
+  h2 { color: #0b1f3a; border-bottom: 1px solid #fecdd3; padding-bottom: 4px; margin-top: 32px; }
   h3 { color: #374151; margin-top: 20px; }
   table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 14px; }
   td, th { border: 1px solid #d1d5db; padding: 8px 12px; text-align: left; }
-  tr:first-child td { background: #eff6ff; font-weight: bold; }
+  tr:first-child td { background: #fff1f2; font-weight: bold; }
   tr:nth-child(even) { background: #f9fafb; }
   ul { margin: 8px 0; padding-left: 24px; }
   li { margin: 4px 0; }
-  .header { background: #1e40af; color: white; padding: 20px; border-radius: 8px; margin-bottom: 24px; }
+  .header { background: #0b1f3a; color: white; padding: 20px; border-radius: 8px; margin-bottom: 24px; border-top: 4px solid #c8102e; }
   .header h1 { color: white; border: none; margin: 0; }
   .header p { margin: 4px 0; opacity: 0.85; font-size: 14px; }
   @media print { body { margin: 20px; } }

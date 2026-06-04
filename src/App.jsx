@@ -14,6 +14,9 @@ const THEME = {
   red: "#c8102e",
   redSoft: "#fff1f2",
   redBorder: "#fecdd3",
+  redHover: "#9f1239",
+  navySoft: "#eef2f7",
+  surface: "#ffffff",
   ink: "#111827",
   muted: "#6b7280",
   page: "#f7f8fb",
@@ -44,37 +47,6 @@ const SEED_DATA = [
 {"hasta_id":"KOC-022","pibo":0,"ptbo":1,"cinsiyet":"e","yabanci":0,"dogum_tarihi":"2010-11-25","tani_tarihi":"2024-09-23","semptom_baslangic_tarihi":"2024-09-16","bronkoskopi_tarihi":"2024-10-02","ilk_muayene_tarihi":"2024-09-16","bt_tarihi":"2024-09-23","yas_ay":186.166667,"semptom_tani_gun":7,"muayene_tani_gun":7,"muayene_bronkoskopi_gun":16.0,"tani_yas_gun":5051,"semptom_bronkoskopi_gun":16.0,"steroid_suresi_gun":188,"tedavi_suresi_gun":0.0,"hsct":1,"solid_tx":0,"gvhd":1,"gvhd_yeri":"tükrükbezi","tx1_tani_gun":"2024-02-24","tx2_tani_gun":null,"gvhd_tani_gun":null,"azitro_bitis_tarihi":null,"bt_infiltrasyon":1,"bt_atelektazi":0,"bt_sag_orta_atelektazi":0,"bt_lingula_atelektazi":0,"bt_diger_atelektazi":0,"bt_bronsektazi":0,"bt_sag_orta_bronsektazi":0,"bt_lingula_bronsektazi":0,"bt_diger_bronsektazi":0,"sistemik_steroid":1,"pulse_steroid":0,"azitromisin_aldi":1,"inhale_steroid_aldi":1,"montelukast_aldi":1,"bronchomunal":0,"ivig_aldi":0,"o2":0,"bipap":0,"imv":0,"ecmo":0,"ex":0,"sistemik_steroid_mgkg_gun":2.0,"sistemik_steroid_gun":21.0,"kumulatif_sistemik_steroid_mgkg":180.0,"tedi_sonrasi_atak":0.0,"tedi_sonrasi_pnomoni":0.0,"tedavi_sonucu":1.0,"semptom_devam":1,"akut_hfnc":0,"yatis":1,"etken_pnomokok":null,"etken_adenovirus":null,"etken_rinovirus":null,"etken_rsv":null,"etken_cmv":null,"etken_influenza":null,"etken_kizamik":null,"etken_metapneumovirus":null,"etken_covid":null,"etken_varicella":null,"etken_ebv":1,"bal_ureme":0,"bal_coklu_ureme":0,"bal_kultur1":null,"bal_kultur2":null,"bal_kultur3":null,"bal_h_influenza":0,"bal_m_catarrhalis":0,"rpcr":0,"bal_solunum_pcr":"SARSCOV2","bal_cmv_pcr":0,"bal_pjir":0,"bal_lipid_ym":0,"bal_hemosiderin_ym":0,"bal_lenfosit_subset":1,"bal_lenfopeni":1,"lokosit":0.14,"lenfosit_oran":3.2,"notrofil_oran":39.4,"eozinofil_oran":10.2,"bal_cd3":77.8,"bal_cd4":7.7,"bal_cd8":67.6,"bal_cd4_cd8":0.12,"bal_cd19":0.6,"bal_cd16_cd56":0.59,"bal_cd45":58.0,"bal_cd56":4.6,"bal_cd22":null,"bal_cd20":null,"bal_cd16":2.7,"bal_cd3_hladr":73.7,"eko":0,"pht":null,"pap":null,"imun_yetmezlik":null,"imdef":null,"imdefdr":null,"tani_surecinde_imyetm":null,"astim":null,"alerjik_rinit":null,"iga":null,"iga_dusuk":null,"igm":null,"igm_dusuk":null,"igg":15.3,"igg_dusuk":null,"ige":null,"igg1":null,"igg2":null,"igg3":null,"igg4":null,"cbc_bk":null,"cbc_neu":null,"cbc_lym":null,"cbc_eos":null,"cbc_nlr":null,"lswbc":null,"lslym_pct":null,"lscd3_pct":null,"lscd3_abs":null,"lscd4_pct":null,"lscd4_abs":null,"lscd8_pct":null,"lscd8_abs":null,"lscd4_cd8":null,"lscd19":null,"lscd56":null,"cd3":null,"cd4":null,"cd8":null,"cd4_cd8":null,"va_bas":38.5,"va_z_bas":null,"va_bit":58.0,"va_z_bit":null,"va_z_fark":null,"boy_bas":151.0,"boy_z_bas":null,"boy_bit":156.0,"boy_z_bit":null,"vki_bas":null,"vki_z_bas":null,"vki_bit":null,"vki_z_bit":null,"vki_fark":null,"fev1_bas":73.0,"fvc_bas":null,"mef2575_bas":null,"fev1_bd_bas":null,"mef2575_bd_bas":null,"x5_bas":null,"r5_bas":null,"ax_bas":null,"dlco_bas":56.0,"rv_bas":82.0,"tlc_bas":86.0,"rv_tlc_bas":null,"fev1_bit":92.0,"fvc_bit":null,"mef2575_bit":null,"bd_fev1":null,"bd_mef2575":null,"x5_bit":null,"r5_bit":null,"ax_bit":null,"dlco_bit":73.0,"rv_bit":61.0,"tlc_bit":85.0,"rv_tlc_bit":67.0,"tani_u12ay":null,"tani_u18ay":null,"tani_u36ay":null,"sx_u12ay":null,"sx_u18ay":null,"sx_u36ay":null,"bhalla_skoru":null,"teper_skoru":null,"webb_skoru":null,"merkez":"KOC","spo2_bas":null,"ates_bas":null,"solunum_sayisi_bas":null,"kalp_tepe_atimi_bas":null},
 {"hasta_id":"KOC-023","pibo":0,"ptbo":1,"cinsiyet":"e","yabanci":0,"dogum_tarihi":"2022-06-17","tani_tarihi":"2025-10-14","semptom_baslangic_tarihi":"2025-09-23","bronkoskopi_tarihi":"2025-10-17","ilk_muayene_tarihi":"2025-10-14","bt_tarihi":"2025-10-14","yas_ay":45.433333,"semptom_tani_gun":21,"muayene_tani_gun":0,"muayene_bronkoskopi_gun":3.0,"tani_yas_gun":1215,"semptom_bronkoskopi_gun":24.0,"steroid_suresi_gun":150,"tedavi_suresi_gun":150.0,"hsct":1,"solid_tx":0,"gvhd":1,"gvhd_yeri":"deri","tx1_tani_gun":"2023-03-01","tx2_tani_gun":"2025-05-01","gvhd_tani_gun":"2025-07-20","azitro_bitis_tarihi":null,"bt_infiltrasyon":1,"bt_atelektazi":0,"bt_sag_orta_atelektazi":0,"bt_lingula_atelektazi":0,"bt_diger_atelektazi":0,"bt_bronsektazi":0,"bt_sag_orta_bronsektazi":0,"bt_lingula_bronsektazi":0,"bt_diger_bronsektazi":0,"sistemik_steroid":1,"pulse_steroid":0,"azitromisin_aldi":1,"inhale_steroid_aldi":1,"montelukast_aldi":1,"bronchomunal":0,"ivig_aldi":0,"o2":1,"bipap":1,"imv":1,"ecmo":1,"ex":0,"sistemik_steroid_mgkg_gun":1.0,"sistemik_steroid_gun":0.0,"kumulatif_sistemik_steroid_mgkg":164.0,"tedi_sonrasi_atak":2.0,"tedi_sonrasi_pnomoni":1.0,"tedavi_sonucu":3.0,"semptom_devam":1,"akut_hfnc":1,"yatis":1,"etken_pnomokok":0,"etken_adenovirus":0,"etken_rinovirus":1,"etken_rsv":0,"etken_cmv":1,"etken_influenza":0,"etken_kizamik":0,"etken_metapneumovirus":0,"etken_covid":1,"etken_varicella":0,"etken_ebv":0,"bal_ureme":1,"bal_coklu_ureme":1,"bal_kultur1":"P Jirovecii","bal_kultur2":"RSV","bal_kultur3":"CMV","bal_h_influenza":0,"bal_m_catarrhalis":0,"rpcr":1,"bal_solunum_pcr":"CMV","bal_cmv_pcr":1,"bal_pjir":1,"bal_lipid_ym":0,"bal_hemosiderin_ym":0,"bal_lenfosit_subset":0,"bal_lenfopeni":0,"lokosit":null,"lenfosit_oran":null,"notrofil_oran":null,"eozinofil_oran":null,"bal_cd3":null,"bal_cd4":null,"bal_cd8":null,"bal_cd4_cd8":null,"bal_cd19":null,"bal_cd16_cd56":null,"bal_cd45":null,"bal_cd56":null,"bal_cd22":null,"bal_cd20":null,"bal_cd16":null,"bal_cd3_hladr":null,"eko":1,"pht":0,"pap":0.0,"imun_yetmezlik":null,"imdef":null,"imdefdr":null,"tani_surecinde_imyetm":null,"astim":null,"alerjik_rinit":null,"iga":null,"iga_dusuk":null,"igm":null,"igm_dusuk":null,"igg":null,"igg_dusuk":null,"ige":null,"igg1":null,"igg2":null,"igg3":null,"igg4":null,"cbc_bk":null,"cbc_neu":null,"cbc_lym":null,"cbc_eos":null,"cbc_nlr":null,"lswbc":null,"lslym_pct":null,"lscd3_pct":null,"lscd3_abs":null,"lscd4_pct":null,"lscd4_abs":null,"lscd8_pct":null,"lscd8_abs":null,"lscd4_cd8":null,"lscd19":null,"lscd56":null,"cd3":null,"cd4":null,"cd8":null,"cd4_cd8":null,"va_bas":14.9,"va_z_bas":null,"va_bit":19.5,"va_z_bit":null,"va_z_fark":null,"boy_bas":98.0,"boy_z_bas":null,"boy_bit":101.0,"boy_z_bit":null,"vki_bas":null,"vki_z_bas":null,"vki_bit":null,"vki_z_bit":null,"vki_fark":null,"fev1_bas":null,"fvc_bas":null,"mef2575_bas":null,"fev1_bd_bas":null,"mef2575_bd_bas":null,"x5_bas":null,"r5_bas":null,"ax_bas":null,"dlco_bas":null,"rv_bas":null,"tlc_bas":null,"rv_tlc_bas":null,"fev1_bit":null,"fvc_bit":null,"mef2575_bit":null,"bd_fev1":null,"bd_mef2575":null,"x5_bit":null,"r5_bit":null,"ax_bit":null,"dlco_bit":null,"rv_bit":null,"tlc_bit":null,"rv_tlc_bit":null,"tani_u12ay":0,"tani_u18ay":0,"tani_u36ay":1,"sx_u12ay":0,"sx_u18ay":0,"sx_u36ay":1,"bhalla_skoru":null,"teper_skoru":null,"webb_skoru":null,"merkez":"KOC","spo2_bas":null,"ates_bas":null,"solunum_sayisi_bas":null,"kalp_tepe_atimi_bas":null}
 ]
-const LEGACY_COLUMN_KEYS = new Set([
-  ...Object.keys(SEED_DATA[0] ?? {}),
-  // İlaç detay alanları (flutikazon nebülizatör/inhaler dozları)
-  "flutikazon_neb_2mg_adet_gun", "flutikazon_neb_2mg_gun",
-  "flutikazon_neb_05mg_adet_gun", "flutikazon_neb_05mg_gun",
-  "flutikazon_inhaler_125_puff_gun", "flutikazon_inhaler_125_gun",
-  "flutikazon_inhaler_50_puff_gun", "flutikazon_inhaler_50_gun",
-  "seretide_25_50_puff_gun", "seretide_25_50_gun",
-  // Hesaplanan ilaç özet alanları
-  "flutikazon_neb_toplam_mcg", "flutikazon_inhaler_toplam_mcg",
-  "seretide_toplam_flutikazon_mcg", "toplam_inhale_steroid_mcg",
-  // İlaç bayrakları
-  "flutikazon", "azitromisin", "montelukast", "fam_aldi",
-  // Steroid detayları
-  "sistemik_steroid_plan_gun", "pulse_steroid_mgkg", "steroid_baslangic_dozu",
-  // Seretide dozları
-  "seretide_125_puff_gun", "seretide_125_gun",
-  "seretide_250_puff_gun", "seretide_250_gun",
-  "seretide_aldi",
-  // Diğer ilaçlar
-  "ventolin_aldi", "ivig", "ivig_aliyor",
-  // Lenfosit subsetleri (alternatif isimler)
-  "cd19", "cd16_cd56",
-  // Meta
-  "guncelleme_tarihi",
-])
-
-function pickRecordColumns(record, allowedColumns) {
-  return Object.fromEntries(Object.entries(record).filter(([key]) => allowedColumns.has(key)))
-}
-
 function formatSupabaseError(error) {
   return [error?.message, error?.details, error?.hint].filter(Boolean).join(" ")
 }
@@ -743,10 +715,11 @@ const s = {
   card: { background:"#fff", border:"1px solid #e5e7eb", borderRadius:12, padding:"16px 20px" },
   btn: { padding:"7px 16px", borderRadius:8, border:"1px solid #d1d5db", background:"#fff", cursor:"pointer", fontSize:13 },
   btnPrimary: { padding:"8px 20px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.redSoft, color:THEME.red, cursor:"pointer", fontSize:13, fontWeight:500 },
+  btnDanger: { padding:"7px 16px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.red, color:"#fff", cursor:"pointer", fontSize:13, fontWeight:600 },
   input: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:"1px solid #d1d5db", background:"#f9fafb", boxSizing:"border-box" },
   select: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:"1px solid #d1d5db", background:"#f9fafb" },
   label: { display:"block", fontSize:11, color:"#6b7280", marginBottom:3 },
-  badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?"#eef2ff":color==="amber"?"#fef3c7":"#f3f4f6", color: color==="blue"?THEME.navy:color==="amber"?"#92400e":"#374151" }),
+  badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?THEME.redSoft:color==="amber"?"#fef3c7":"#f3f4f6", color: color==="blue"?THEME.red:color==="amber"?"#92400e":"#374151" }),
 }
 
 // ─── Login ───────────────────────────────────────────────────────────────────
@@ -1253,7 +1226,7 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
         <button onClick={onBack} style={s.btn}>← Geri</button>
         <span style={{fontSize:16, fontWeight:500}}>{isNew ? "Yeni hasta" : form.hasta_id}</span>
         {!isNew && <span style={s.badge(form.pibo ? "blue" : "amber")}>{form.pibo ? "PIBO" : "PTBO"}</span>}
-        <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, marginLeft:"auto", background: saved?"#d1fae5":"#eff6ff", borderColor: saved?"#6ee7b7":"#3b82f6", color: saved?"#065f46":"#1d4ed8"}}>
+        <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, marginLeft:"auto", background: saved?"#d1fae5":THEME.redSoft, borderColor: saved?"#6ee7b7":THEME.red, color: saved?"#065f46":THEME.red}}>
           {saving ? "Kaydediliyor..." : saved ? "Kaydedildi ✓" : "Kaydet"}
         </button>
       </div>
@@ -1276,17 +1249,17 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
         {groups.map(([k, g]) => {
           const missing = g.fields.filter(f => f.note && form[f.key] == null).length
           return (
-            <button key={k} onClick={() => setActiveGroup(k)} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup===k?"#3b82f6":"#e5e7eb", background: activeGroup===k?"#eff6ff":"#fff", color: activeGroup===k?"#1d4ed8":"#6b7280", cursor:"pointer", fontWeight: activeGroup===k?500:400}}>
+            <button key={k} onClick={() => setActiveGroup(k)} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup===k?THEME.red:"#e5e7eb", background: activeGroup===k?THEME.redSoft:"#fff", color: activeGroup===k?THEME.red:"#6b7280", cursor:"pointer", fontWeight: activeGroup===k?500:400}}>
               {g.label}{missing > 0 ? ` ⚠${missing}` : ""}
             </button>
           )
         })}
         {!isNew && (
           <>
-            <button onClick={() => setActiveGroup("izlem")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="izlem"?"#3b82f6":"#e5e7eb", background: activeGroup==="izlem"?"#eff6ff":"#fff", color: activeGroup==="izlem"?"#1d4ed8":"#6b7280", cursor:"pointer", fontWeight: activeGroup==="izlem"?500:400}}>
+            <button onClick={() => setActiveGroup("izlem")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="izlem"?THEME.red:"#e5e7eb", background: activeGroup==="izlem"?THEME.redSoft:"#fff", color: activeGroup==="izlem"?THEME.red:"#6b7280", cursor:"pointer", fontWeight: activeGroup==="izlem"?500:400}}>
               İzlem ziyaretleri
             </button>
-            <button onClick={() => setActiveGroup("sft_kayitlari")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="sft_kayitlari"?"#3b82f6":"#e5e7eb", background: activeGroup==="sft_kayitlari"?"#eff6ff":"#fff", color: activeGroup==="sft_kayitlari"?"#1d4ed8":"#6b7280", cursor:"pointer", fontWeight: activeGroup==="sft_kayitlari"?500:400}}>
+            <button onClick={() => setActiveGroup("sft_kayitlari")} style={{fontSize:12, padding:"4px 12px", borderRadius:20, border:"1px solid", borderColor: activeGroup==="sft_kayitlari"?THEME.red:"#e5e7eb", background: activeGroup==="sft_kayitlari"?THEME.redSoft:"#fff", color: activeGroup==="sft_kayitlari"?THEME.red:"#6b7280", cursor:"pointer", fontWeight: activeGroup==="sft_kayitlari"?500:400}}>
               SFT kayıtları
             </button>
           </>
@@ -1342,6 +1315,7 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
   const [filterGroup, setFilterGroup] = useState("all")
   const [query, setQuery] = useState("")
   const [result, setResult] = useState("")
+  const [deleteTarget, setDeleteTarget] = useState("")
   const [loading, setLoading] = useState(false)
   const [reportLoading, setReportLoading] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState("")
@@ -1398,6 +1372,10 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
   }
 
   async function handleDelete(patient) {
+    if (!patient?.hasta_id) {
+      setDeleteError("Silmek için hasta seçin.")
+      return
+    }
     const ok = window.confirm(`${patient.hasta_id} kaydı tümüyle silinsin mi? Bu işlem geri alınamaz.`)
     if (!ok) return
 
@@ -1406,6 +1384,7 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
     try {
       await onDelete(patient.hasta_id)
       setDeleteMessage(`${patient.hasta_id} silindi.`)
+      setDeleteTarget("")
       setTimeout(() => setDeleteMessage(""), 2500)
     } catch (error) {
       setDeleteError(error.message || "Silme işlemi başarısız.")
@@ -1502,6 +1481,30 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
         </div>
       </div>
 
+      <div style={{...s.card, marginBottom:14, borderColor:THEME.redBorder, background:"#fffafa"}}>
+        <div style={{fontSize:13, fontWeight:600, color:THEME.red, marginBottom:8}}>Hasta kaydı silme</div>
+        <div style={{display:"grid", gridTemplateColumns:"minmax(220px,1fr) auto", gap:8, alignItems:"center"}}>
+          <select value={deleteTarget} onChange={e => setDeleteTarget(e.target.value)} style={s.select}>
+            <option value="">Silinecek hastayı seçin</option>
+            {patients.map(patient => (
+              <option key={patient.hasta_id} value={patient.hasta_id}>
+                {patient.hasta_id} - {patient.pibo ? "PIBO" : "PTBO"}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => handleDelete(patients.find(patient => patient.hasta_id === deleteTarget))}
+            disabled={!deleteTarget}
+            style={{...s.btnDanger, opacity: deleteTarget ? 1 : 0.55}}
+          >
+            Seçili hastayı sil
+          </button>
+        </div>
+        <div style={{fontSize:12, color:"#7f1d1d", marginTop:8}}>
+          Bu işlem hastanın ana kaydını ve ilişkili izlem/SFT kayıtlarını kalıcı olarak siler.
+        </div>
+      </div>
+
       <div style={{...s.card, marginBottom:14}}>
         <div style={{fontSize:13, fontWeight:500, marginBottom:8}}>Yapay zeka destekli analiz</div>
         <div style={{display:"flex", flexWrap:"wrap", gap:6, marginBottom:8}}>
@@ -1523,14 +1526,14 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
 
       <div style={{display:"flex", gap:6, marginBottom:10}}>
         {[["all","Tümü"],["pibo","PIBO"],["ptbo","PTBO"]].map(([v,l]) => (
-          <button key={v} onClick={() => setFilterGroup(v)} style={{...s.btn, fontWeight: filterGroup===v?500:400, background: filterGroup===v?"#eff6ff":"#fff", borderColor: filterGroup===v?"#3b82f6":"#e5e7eb", color: filterGroup===v?"#1d4ed8":"#374151"}}>{l}</button>
+          <button key={v} onClick={() => setFilterGroup(v)} style={{...s.btn, fontWeight: filterGroup===v?500:400, background: filterGroup===v?THEME.redSoft:"#fff", borderColor: filterGroup===v?THEME.red:"#e5e7eb", color: filterGroup===v?THEME.red:"#374151"}}>{l}</button>
         ))}
       </div>
       <div style={{overflowX:"auto"}}>
         <table style={{width:"100%", borderCollapse:"collapse", fontSize:12}}>
           <thead>
             <tr style={{borderBottom:"1px solid #e5e7eb"}}>
-              {["ID","Grup","Merkez","Cinsiyet","Yaş (ay)","FEV1 bas","FEV1 bit","Sonuç",""].map(h => (
+              {["ID","Grup","Merkez","Cinsiyet","Yaş (ay)","FEV1 bas","FEV1 bit","Sonuç","İşlem"].map(h => (
                 <th key={h} style={{textAlign:"left", padding:"6px 8px", color:"#6b7280", fontWeight:500}}>{h}</th>
               ))}
             </tr>
@@ -1549,9 +1552,9 @@ function AdminPanel({ patients, onBack, onDelete, onRecalculateAll }) {
                 <td style={{padding:"5px 8px", textAlign:"right"}}>
                   <button
                     onClick={() => handleDelete(p)}
-                    style={{...s.btn, color:"#b91c1c", borderColor:"#fecaca", background:"#fff", fontSize:11, padding:"4px 8px"}}
+                    style={{...s.btnDanger, fontSize:11, padding:"4px 8px"}}
                   >
-                    Sil
+                    Kaydı sil
                   </button>
                 </td>
               </tr>
@@ -1596,29 +1599,18 @@ export default function App() {
   async function savePatient(p) {
     const record = { ...p, ...calculateDerivedFields(p), merkez: p.hasta_id.split("-")[0], guncelleme_tarihi: new Date().toISOString() }
     const { error } = await supabase.from("hastalar").upsert(record, { onConflict: "hasta_id" })
-    let savedRecord = record
-    let warning = ""
 
     if (error) {
-      console.error("Supabase full save failed:", error)
-      const fallbackRecord = pickRecordColumns(record, LEGACY_COLUMN_KEYS)
-      const fallback = await supabase.from("hastalar").upsert(fallbackRecord, { onConflict: "hasta_id" })
-
-      if (fallback.error) {
-        console.error("Supabase fallback save failed:", fallback.error)
-        throw new Error(formatSupabaseError(fallback.error) || formatSupabaseError(error) || "Supabase kayıt hatası.")
-      }
-
-      savedRecord = fallbackRecord
-      warning = "Mevcut kolonlar kaydedildi; doğum tarihi/tarih-vital yeni alanlarının kalıcı kaydı için Supabase SQL migrasyonu çalışmalı."
+      console.error("Supabase save failed:", error)
+      const details = formatSupabaseError(error)
+      throw new Error(details ? `${details} Supabase SQL migrasyonu eksik olabilir.` : "Supabase kayıt hatası. SQL migrasyonunu kontrol edin.")
     }
 
-    // Local state güncelle
     setPatients(prev => {
       const idx = prev.findIndex(x => x.hasta_id === p.hasta_id)
-      return idx >= 0 ? prev.map((x,i) => i===idx ? savedRecord : x) : [...prev, savedRecord]
+      return idx >= 0 ? prev.map((x,i) => i===idx ? record : x) : [...prev, record]
     })
-    return { warning }
+    return {}
   }
 
   async function deletePatient(hastaId) {
