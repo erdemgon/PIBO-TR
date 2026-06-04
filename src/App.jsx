@@ -11,15 +11,17 @@ const CENTERS = {
 
 const THEME = {
   navy: "#0b1f3a",
-  red: "#c8102e",
-  redSoft: "#fff1f2",
-  redBorder: "#fecdd3",
-  redHover: "#9f1239",
+  red: "#b51233",
+  burgundy: "#7f1734",
+  redSoft: "#fff5f7",
+  redField: "#fff8f9",
+  redBorder: "#e8b4bf",
+  redHover: "#8a1538",
   navySoft: "#eef2f7",
   surface: "#ffffff",
   ink: "#111827",
   muted: "#6b7280",
-  page: "#f7f8fb",
+  page: "#eef0f3",
 }
 
 const BRAND = {
@@ -689,20 +691,20 @@ const FIELD_GROUPS = {
       {key:"kisisel_atopi", label:"Kişisel atopi", type:"bool"},
       {key:"aile_atopi", label:"Aile atopi", type:"bool"},
       {key:"spesifik_ige_pozitif", label:"Spesifik IgE pozitif", type:"bool"},
-      {key:"iga", label:"IgA (g/L)", type:"num"},
+      {key:"iga", label:"IgA (g/L)", type:"num", hint:"g/L olarak girin; örn 0.48. Ondalık için nokta kullanın."},
       {key:"iga_dusuk", label:"IgA düşük", type:"bool", readonly:true},
-      {key:"igm", label:"IgM (g/L)", type:"num"},
+      {key:"igm", label:"IgM (g/L)", type:"num", hint:"g/L olarak girin; örn 1.49. Ondalık için nokta kullanın."},
       {key:"igm_dusuk", label:"IgM düşük", type:"bool", readonly:true},
-      {key:"igg", label:"IgG (g/L)", type:"num"},
+      {key:"igg", label:"IgG (g/L)", type:"num", hint:"g/L olarak girin; örn 7.91. Yaşa göre düşük hesabı otomatik yapılır."},
       {key:"igg_dusuk", label:"IgG düşük", type:"bool", readonly:true},
-      {key:"ige", label:"IgE (IU/mL)", type:"num"},
-      {key:"igg1", label:"IgG1", type:"num"},
+      {key:"ige", label:"IgE (IU/mL)", type:"num", hint:"IU/mL olarak girin; örn 55.4."},
+      {key:"igg1", label:"IgG1 (g/L)", type:"num", hint:"g/L olarak girin; örn 9.89. Sistem mg/dL referansa çevirir."},
       {key:"igg1_dusuk", label:"IgG1 düşük", type:"bool", readonly:true},
-      {key:"igg2", label:"IgG2", type:"num"},
+      {key:"igg2", label:"IgG2 (g/L)", type:"num", hint:"g/L olarak girin; örn 0.95. Ondalık için nokta kullanın."},
       {key:"igg2_dusuk", label:"IgG2 düşük", type:"bool", readonly:true},
-      {key:"igg3", label:"IgG3", type:"num"},
+      {key:"igg3", label:"IgG3 (g/L)", type:"num", hint:"g/L olarak girin; örn 0.77. Ondalık için nokta kullanın."},
       {key:"igg3_dusuk", label:"IgG3 düşük", type:"bool", readonly:true},
-      {key:"igg4", label:"IgG4", type:"num"},
+      {key:"igg4", label:"IgG4 (g/L)", type:"num", hint:"g/L olarak girin; örn 0.57. Ondalık için nokta kullanın."},
       {key:"igg4_dusuk", label:"IgG4 düşük", type:"bool", readonly:true},
       {key:"cbc_bk", label:"Lökosit (/mm³)", type:"num"},
       {key:"cbc_neu", label:"Nötrofil (/mm³)", type:"num"},
@@ -817,13 +819,14 @@ const FIELD_GROUPS = {
 
 // ─── styles ───────────────────────────────────────────────────────────────────
 const s = {
-  card: { background:"#fff", border:"1px solid #e5e7eb", borderRadius:12, padding:"16px 20px" },
-  btn: { padding:"7px 16px", borderRadius:8, border:"1px solid #d1d5db", background:"#fff", cursor:"pointer", fontSize:13 },
-  btnPrimary: { padding:"8px 20px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.redSoft, color:THEME.red, cursor:"pointer", fontSize:13, fontWeight:500 },
+  card: { background:"#fff", border:`1px solid ${THEME.redBorder}`, borderRadius:12, padding:"16px 20px", boxShadow:"0 14px 35px rgba(127,23,52,.06)" },
+  btn: { padding:"7px 16px", borderRadius:8, border:`1px solid ${THEME.redBorder}`, background:"#fff", color:THEME.burgundy, cursor:"pointer", fontSize:13 },
+  btnPrimary: { padding:"8px 20px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.redSoft, color:THEME.burgundy, cursor:"pointer", fontSize:13, fontWeight:500 },
   btnDanger: { padding:"7px 16px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.red, color:"#fff", cursor:"pointer", fontSize:13, fontWeight:600 },
-  input: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:"1px solid #d1d5db", background:"#f9fafb", boxSizing:"border-box" },
-  select: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:"1px solid #d1d5db", background:"#f9fafb" },
-  label: { display:"block", fontSize:11, color:"#6b7280", marginBottom:3 },
+  input: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:`1px solid ${THEME.redBorder}`, background:THEME.redField, color:THEME.ink, boxSizing:"border-box", caretColor:THEME.red },
+  select: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:`1px solid ${THEME.redBorder}`, background:THEME.redField, color:THEME.ink, boxSizing:"border-box" },
+  label: { display:"block", fontSize:11, color:THEME.burgundy, marginBottom:3 },
+  hint: { fontSize:10.5, color:THEME.burgundy, opacity:.76, marginTop:3, lineHeight:1.3 },
   badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?THEME.redSoft:color==="amber"?"#fef3c7":"#f3f4f6", color: color==="blue"?THEME.red:color==="amber"?"#92400e":"#374151" }),
 }
 
@@ -1089,6 +1092,7 @@ function FollowUpPanel({ patient }) {
     return (
       <input
         type={field.type==="num" ? "number" : "text"}
+        step={field.type==="num" ? "any" : undefined}
         value={val??""}
         onChange={e => setDraftField(field.key, e.target.value===""?null:(field.type==="num"?Number(e.target.value):e.target.value))}
         style={s.input}
@@ -1250,6 +1254,7 @@ function PftPanel({ patient }) {
     return (
       <input
         type={field.type==="num" ? "number" : "text"}
+        step={field.type==="num" ? "any" : undefined}
         value={val??""}
         onChange={e => setDraftField(field.key, e.target.value===""?null:(field.type==="num"?Number(e.target.value):e.target.value))}
         style={s.input}
@@ -1431,10 +1436,11 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
                     {f.options?.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
                   </select>
                 ) : f.type==="date" ? (
-                  <input type="date" value={dateToInput(val)} onChange={e => set(f.key, e.target.value||null)} style={{...s.input, borderColor: f.required&&val==null?"#fca5a5":"#d1d5db"}} />
+                  <input type="date" value={dateToInput(val)} onChange={e => set(f.key, e.target.value||null)} style={{...s.input, borderColor: f.required&&val==null?"#fca5a5":THEME.redBorder}} />
                 ) : (
-                  <input type={f.type==="num"?"number":"text"} value={val??""} onChange={e => set(f.key, e.target.value===""?null:(f.type==="num"?Number(e.target.value):e.target.value))} style={{...s.input, borderColor: f.note&&val==null?"#fbbf24":f.required&&val==null?"#fca5a5":"#d1d5db"}} />
+                  <input type={f.type==="num"?"number":"text"} step={f.type==="num"?"any":undefined} value={val??""} onChange={e => set(f.key, e.target.value===""?null:(f.type==="num"?Number(e.target.value):e.target.value))} style={{...s.input, borderColor: f.note&&val==null?"#fbbf24":f.required&&val==null?"#fca5a5":THEME.redBorder}} />
                 )}
+                {f.hint && <div style={s.hint}>{f.hint}</div>}
               </div>
             )
           })}

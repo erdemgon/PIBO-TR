@@ -84,7 +84,7 @@ export function calculateImmunologyReferenceFields(patient, ageMonths) {
   if (subclassBand) {
     const index = IGG_SUBCLASS_BANDS.indexOf(subclassBand)
     for (const key of ["igg1", "igg2", "igg3", "igg4"]) {
-      const value = patient[key] == null ? null : Number(patient[key])
+      const value = patient[key] == null ? null : Number(patient[key]) * 100
       const lower = IGG_SUBCLASS_RANGES[key][index]
       fields[`${key}_alt_limit_mgdl`] = lower
       fields[`${key}_dusuk`] = lowFlag(value, lower)

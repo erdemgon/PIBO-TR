@@ -5,7 +5,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: #1a1a1a;
-  background: #f5f5f5;
+  background: #eef0f3;
 }
 
 input, select, textarea, button {
@@ -14,8 +14,8 @@ input, select, textarea, button {
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #c8102e !important;
-  outline: 2px solid #fecdd3;
+  border-color: #8a1538 !important;
+  outline: 2px solid #e8b4bf;
   outline-offset: 1px;
 }
 
