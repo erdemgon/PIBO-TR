@@ -205,6 +205,11 @@ function dateToInput(value) {
   return date.toISOString().slice(0, 10)
 }
 
+function formatDateDisplay(value) {
+  const date = dateToInput(value)
+  return date || "-"
+}
+
 function daysBetween(later, earlier) {
   const a = parseDate(later)
   const b = parseDate(earlier)
@@ -860,7 +865,7 @@ function Login({ onLogin }) {
             onKeyDown={e => e.key==="Enter" && tryLogin()}
             placeholder="KOC veya MED"
             autoFocus
-            style={{...s.input, fontSize:20, letterSpacing:3, fontWeight:600, marginBottom:4}}
+            style={{...s.input, fontSize:20, letterSpacing:3, fontWeight:600, marginBottom:4, color:THEME.red, borderColor:THEME.redBorder, caretColor:THEME.red}}
           />
           {err && <div style={{fontSize:12, color:"#dc2626", marginBottom:8}}>{err}</div>}
           <button onClick={tryLogin} style={{...s.btnPrimary, width:"100%", marginTop:10, padding:10}}>
@@ -923,8 +928,8 @@ function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
             <span style={{fontSize:13, fontWeight:500, minWidth:90}}>{p.hasta_id}</span>
             <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
             <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"E":"K"} · {p.yas_ay?.toFixed(0)} ay</span>
-            <span style={{fontSize:12, color:"#9ca3af"}}>D: {p.dogum_yil}/{String(p.dogum_ay).padStart(2,"0")}</span>
-            <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>{p.tani_yil}/{p.tani_ay}</span>
+            <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
+            <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
           </div>
         ))}
         {my.length === 0 && <div style={{fontSize:13, color:"#9ca3af", textAlign:"center", padding:12}}>Henüz hasta yok</div>}
@@ -951,8 +956,8 @@ function SelectPatient({ patients, centerInfo, onSelect, onBack }) {
           <span style={{fontSize:14, fontWeight:500, minWidth:90}}>{p.hasta_id}</span>
           <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
           <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"Erkek":"Kız"} · {p.yas_ay?.toFixed(1)} ay</span>
-          <span style={{fontSize:12, color:"#9ca3af"}}>D: {p.dogum_yil}/{String(p.dogum_ay).padStart(2,"0")}</span>
-          <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {p.tani_yil}/{p.tani_ay}</span>
+          <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
+          <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
         </button>
       ))}
       {filtered.length === 0 && <div style={{fontSize:13, color:"#9ca3af", textAlign:"center", padding:20}}>Hasta bulunamadı</div>}
