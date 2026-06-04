@@ -117,7 +117,7 @@ const DB_COLUMN_KEYS = new Set([
   "azitromisin", "flutikazon", "montelukast", "ivig",
   "seretide_25_50_puff_gun", "seretide_25_50_gun",
   "steroid_baslangic_dozu", "steroid_suresi_gun", "kumulatif_steroid", "pulse_steroid",
-  "semptom_oncesi_gun",
+  "semptom_oncesi_gun", "azitro_bitis_tani_gun",
   // Hesaplanan tarih alanları
   "tani_yas_gun", "muayene_tani_gun", "muayene_bronkoskopi_gun", "semptom_bronkoskopi_gun",
 ])
@@ -163,7 +163,7 @@ function downloadCsv(filename, rows) {
   URL.revokeObjectURL(url)
 }
 
-function htmlEscape(value) {
+function xmlEscape(value) {
   if (value == null) return ""
   return String(value)
     .replaceAll("&", "&amp;")
@@ -172,17 +172,34 @@ function htmlEscape(value) {
     .replaceAll('"', "&quot;")
 }
 
+function excelCell(value) {
+  if (value == null) return "<Cell><Data ss:Type=\"String\"></Data></Cell>"
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return `<Cell><Data ss:Type="Number">${value}</Data></Cell>`
+  }
+  return `<Cell><Data ss:Type="String">${xmlEscape(value)}</Data></Cell>`
+}
+
 function downloadExcel(filename, rows) {
   if (!rows.length) return
   const columns = exportColumns(rows)
-  const table = [
-    "<table>",
-    `<thead><tr>${columns.map(column => `<th>${htmlEscape(column)}</th>`).join("")}</tr></thead>`,
-    `<tbody>${rows.map(row => `<tr>${columns.map(column => `<td>${htmlEscape(row[column])}</td>`).join("")}</tr>`).join("")}</tbody>`,
-    "</table>",
-  ].join("")
-  const html = `<!doctype html><html><head><meta charset="utf-8"></head><body>${table}</body></html>`
-  const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel;charset=utf-8" })
+  const header = `<Row>${columns.map(column => `<Cell><Data ss:Type="String">${xmlEscape(column)}</Data></Cell>`).join("")}</Row>`
+  const body = rows.map(row => `<Row>${columns.map(column => excelCell(row[column])).join("")}</Row>`).join("")
+  const workbook = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Worksheet ss:Name="Hastalar">
+  <Table>
+   ${header}
+   ${body}
+  </Table>
+ </Worksheet>
+</Workbook>`
+  const blob = new Blob(["\ufeff", workbook], { type: "application/vnd.ms-excel;charset=utf-8" })
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
@@ -345,6 +362,7 @@ function calculateDerivedFields(patient) {
   const muayeneTaniGun = daysBetween(patient.tani_tarihi, patient.ilk_muayene_tarihi)
   const muayeneBronkoskopiGun = daysBetween(patient.bronkoskopi_tarihi, patient.ilk_muayene_tarihi)
   const semptomBronkoskopiGun = daysBetween(patient.bronkoskopi_tarihi, patient.semptom_baslangic_tarihi)
+  const azitroBitisTaniGun = daysBetween(patient.azitro_bitis_tarihi, patient.tani_tarihi)
   const weightKg = numberOrNull(patient.va_bas)
   const heightCm = numberOrNull(patient.boy_bas)
   const vkiBas = weightKg && heightCm ? round(weightKg / ((heightCm / 100) ** 2), 2) : null
@@ -362,6 +380,7 @@ function calculateDerivedFields(patient) {
     muayene_tani_gun: muayeneTaniGun,
     muayene_bronkoskopi_gun: muayeneBronkoskopiGun,
     semptom_bronkoskopi_gun: semptomBronkoskopiGun,
+    azitro_bitis_tani_gun: azitroBitisTaniGun,
     ...growthFields,
     ...treatmentFields,
     ...immunologyFields,
