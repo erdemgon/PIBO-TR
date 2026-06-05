@@ -10,18 +10,23 @@ const CENTERS = {
 }
 
 const THEME = {
-  navy: "#0b1f3a",
-  red: "#b51233",
-  burgundy: "#7f1734",
-  redSoft: "#fff5f7",
-  redField: "#fff8f9",
-  redBorder: "#e8b4bf",
-  redHover: "#8a1538",
-  navySoft: "#eef2f7",
+  navy: "#211f1f",
+  red: "#8f1d2c",
+  burgundy: "#8f1d2c",
+  redSoft: "#f9e9ec",
+  redField: "#f5f5f6",
+  redBorder: "#efcbd2",
+  redHover: "#751725",
+  navySoft: "#f5f5f6",
   surface: "#ffffff",
-  ink: "#111827",
-  muted: "#6b7280",
-  page: "#eef0f3",
+  ink: "#211f1f",
+  muted: "#6f6a6c",
+  page: "#ffffff",
+  card: "#f5f5f6",
+  border: "#ececef",
+  amberSoft: "#fff7e6",
+  amberBorder: "#f0c36a",
+  amberText: "#8a5a00",
 }
 
 const BRAND = {
@@ -988,13 +993,13 @@ const FIELD_GROUPS = {
 
 // ─── styles ───────────────────────────────────────────────────────────────────
 const s = {
-  card: { background:"#fff", border:`1px solid ${THEME.redBorder}`, borderRadius:12, padding:"16px 20px", boxShadow:"0 14px 35px rgba(127,23,52,.06)" },
+  card: { background:"#fff", border:`1px solid ${THEME.border}`, borderRadius:8, padding:"16px 20px", boxShadow:"none" },
   btn: { padding:"7px 16px", borderRadius:8, border:`1px solid ${THEME.redBorder}`, background:"#fff", color:THEME.burgundy, cursor:"pointer", fontSize:13 },
-  btnPrimary: { padding:"8px 20px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.redSoft, color:THEME.burgundy, cursor:"pointer", fontSize:13, fontWeight:500 },
+  btnPrimary: { padding:"8px 20px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.red, color:"#fff", cursor:"pointer", fontSize:13, fontWeight:800 },
   btnDanger: { padding:"7px 16px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.red, color:"#fff", cursor:"pointer", fontSize:13, fontWeight:600 },
   input: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:`1px solid ${THEME.redBorder}`, background:THEME.redField, color:THEME.ink, boxSizing:"border-box", caretColor:THEME.red },
   select: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:`1px solid ${THEME.redBorder}`, background:THEME.redField, color:THEME.ink, boxSizing:"border-box" },
-  label: { display:"block", fontSize:11, color:THEME.burgundy, marginBottom:3 },
+  label: { display:"block", fontSize:11, color:THEME.burgundy, marginBottom:3, fontWeight:800, textTransform:"uppercase" },
   hint: { fontSize:10.5, color:THEME.burgundy, opacity:.76, marginTop:3, lineHeight:1.3 },
   badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?THEME.redSoft:color==="amber"?"#fef3c7":"#f3f4f6", color: color==="blue"?THEME.red:color==="amber"?"#92400e":"#374151" }),
 }
@@ -1006,28 +1011,41 @@ function BrandLockup({ align = "center", compact = false }) {
       display:"flex",
       alignItems:"center",
       justifyContent: horizontal ? "flex-start" : "center",
-      gap: compact ? 10 : 14,
+      gap: compact ? 10 : 12,
       textAlign: horizontal ? "left" : "center",
     }}>
-      <img
-        src={BRAND.logo}
-        alt=""
-        aria-hidden="true"
-        style={{
-          width: compact ? 44 : 78,
-          height: compact ? 46 : 82,
-          objectFit:"contain",
-          flex:"0 0 auto",
-          filter:"drop-shadow(0 8px 18px rgba(11,31,58,.08))",
-        }}
-      />
+      <div style={{width: compact ? 42 : 52, height: compact ? 42 : 52, borderRadius:8, border:`1px solid ${THEME.border}`, background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden", flex:"0 0 auto"}}>
+        <img
+          src={BRAND.logo}
+          alt=""
+          aria-hidden="true"
+          style={{
+            width: compact ? 38 : 48,
+            height: compact ? 38 : 48,
+            objectFit:"contain",
+            flex:"0 0 auto",
+          }}
+        />
+      </div>
       <div>
-        <div style={{fontSize: compact ? 18 : 25, fontWeight:700, color:THEME.navy, lineHeight:1.1}}>
+        <div style={{fontSize: compact ? 19 : 22, fontWeight:800, color:THEME.ink, lineHeight:1.1}}>
           {BRAND.name}
         </div>
         <div style={{fontSize: compact ? 11 : 13, color:THEME.muted, marginTop: compact ? 3 : 5, maxWidth: compact ? 320 : 360}}>
           {BRAND.subtitle}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function AppHeader({ children, right }) {
+  return (
+    <div style={{borderBottom:`1px solid ${THEME.border}`, background:"#fff"}}>
+      <div style={{maxWidth:920, margin:"0 auto", padding:"14px 18px", display:"flex", alignItems:"center", gap:12}}>
+        <BrandLockup align="left" compact />
+        {children}
+        {right && <div style={{marginLeft:"auto"}}>{right}</div>}
       </div>
     </div>
   )
@@ -1045,30 +1063,43 @@ function Login({ onLogin }) {
   }
 
   return (
-    <div style={{minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", background:THEME.page}}>
-      <div style={{width:380}}>
-        <div style={{textAlign:"center", marginBottom:28}}>
-          <BrandLockup />
-        </div>
-        <div style={{...s.card, padding:"24px 28px"}}>
-          <label style={s.label}>Merkez kodunuzu girin</label>
+    <div style={{minHeight:"100vh", background:THEME.page}}>
+      <AppHeader />
+      <main style={{maxWidth:620, margin:"0 auto", padding:"18px"}}>
+        <section style={{...s.card, textAlign:"center", marginBottom:14, padding:"18px"}}>
+          <img src={BRAND.logo} alt="" aria-hidden="true" style={{width:"100%", maxWidth:190, height:150, objectFit:"contain", margin:"0 auto 8px", display:"block"}} />
+          <div style={{fontSize:13, color:THEME.red, fontWeight:800, marginBottom:8}}>Registry veri ağı</div>
+          <h1 style={{fontSize:26, lineHeight:1.2, color:THEME.ink, margin:0, fontWeight:900}}>PIBO-TR Registry</h1>
+          <p style={{fontSize:15, color:THEME.muted, lineHeight:1.5, margin:"10px auto 0", maxWidth:430}}>
+            Pediatrik ve post-transplant bronşiyolitis obliterans için merkezler arası klinik veri girişi.
+          </p>
+        </section>
+
+        <section style={{...s.card, padding:14}}>
+          <div style={{background:THEME.amberSoft, border:`1px solid ${THEME.amberBorder}`, borderRadius:8, padding:"8px 10px", marginBottom:12}}>
+            <div style={{fontSize:11, lineHeight:1.4, color:THEME.amberText, fontWeight:800}}>
+              Kontrollü merkez girişi · KOC / MED / ADMIN
+            </div>
+          </div>
+          <label style={s.label}>Merkez kodu</label>
           <input
             value={code}
             onChange={e => { setCode(e.target.value.toUpperCase()); setErr("") }}
             onKeyDown={e => e.key==="Enter" && tryLogin()}
             placeholder="KOC veya MED"
             autoFocus
-            style={{...s.input, fontSize:20, letterSpacing:3, fontWeight:600, marginBottom:4, color:THEME.red, borderColor:THEME.redBorder, caretColor:THEME.red}}
+            style={{...s.input, minHeight:46, fontSize:16, letterSpacing:3, fontWeight:800, marginBottom:4, color:THEME.ink, borderColor:"#dfdfe3", caretColor:THEME.red}}
           />
           {err && <div style={{fontSize:12, color:"#dc2626", marginBottom:8}}>{err}</div>}
-          <button onClick={tryLogin} style={{...s.btnPrimary, width:"100%", marginTop:10, padding:10}}>
-            Giriş yap →
+          <button onClick={tryLogin} style={{...s.btnPrimary, width:"100%", marginTop:10, minHeight:44, padding:11}}>
+            PIBO-TR’ye gir
           </button>
-        </div>
-        <div style={{textAlign:"center", marginTop:14, fontSize:11, color:"#9ca3af"}}>
+        </section>
+
+        <div style={{textAlign:"center", marginTop:12, fontSize:11, lineHeight:1.5, color:THEME.muted, fontWeight:700}}>
           Merkez kodunuz için koordinatör merkez ile iletişime geçin
         </div>
-      </div>
+      </main>
     </div>
   )
 }
@@ -1081,61 +1112,77 @@ function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
   const nextId = centerInfo.isAdmin ? "" : `${centerInfo.prefix}-${String(my.length + 1).padStart(3, "0")}`
 
   return (
-    <div style={{maxWidth:600, margin:"0 auto", padding:"32px 20px"}}>
-      <div style={{display:"flex", alignItems:"center", flexWrap:"wrap", marginBottom:24, gap:14}}>
-        <BrandLockup align="left" compact />
-        <div>
-          <div style={{fontSize:17, fontWeight:600}}>{centerInfo.label}</div>
-          <div style={{fontSize:12, color:"#6b7280", marginTop:2}}>
-            {my.length} hasta · PIBO: {pibo.length} · PTBO: {ptbo.length}
+    <div style={{minHeight:"100vh", background:THEME.page}}>
+      <AppHeader right={<button onClick={onLogout} style={{...s.btn, fontSize:12}}>Çıkış</button>} />
+
+      <main style={{maxWidth:920, margin:"0 auto", padding:"18px"}}>
+        <section style={{...s.card, textAlign:"center", marginBottom:14, padding:"18px"}}>
+          <img src={BRAND.logo} alt="" aria-hidden="true" style={{width:"100%", maxWidth:150, height:118, objectFit:"contain", margin:"0 auto 8px", display:"block"}} />
+          <div style={{fontSize:13, color:THEME.red, fontWeight:800, marginBottom:8}}>Registry çalışma alanı</div>
+          <h1 style={{fontSize:26, lineHeight:1.2, color:THEME.ink, margin:0, fontWeight:900}}>{centerInfo.label}</h1>
+          <p style={{fontSize:15, color:THEME.muted, lineHeight:1.5, margin:"10px auto 0", maxWidth:520}}>
+            Başlangıç kaydı, klinik takip ve merkez verilerini aynı sakin akış içinde yönetin.
+          </p>
+        </section>
+
+        <section style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))", gap:10, marginBottom:14}}>
+          {[
+            ["Toplam", my.length],
+            ["PIBO", pibo.length],
+            ["PTBO", ptbo.length],
+          ].map(([label, value]) => (
+            <div key={label} style={{...s.card, background:THEME.card, padding:"12px 14px"}}>
+              <div style={{fontSize:12, color:THEME.red, fontWeight:900, textTransform:"uppercase"}}>{label}</div>
+              <div style={{fontSize:24, color:THEME.ink, fontWeight:900, marginTop:4}}>{value}</div>
+            </div>
+          ))}
+        </section>
+
+        <section style={{...s.card, marginBottom:14, padding:14}}>
+          <div style={{fontSize:13, fontWeight:900, color:THEME.red, textTransform:"uppercase", marginBottom:10}}>Pratik işlem</div>
+          <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap:10}}>
+            <button onClick={() => onAction("new")} style={{background:THEME.card, border:"1px solid #e9e9eb", borderRadius:8, padding:14, textAlign:"left", cursor:"pointer"}}>
+              <div style={{width:34, height:34, borderRadius:8, background:THEME.red, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, fontWeight:800, marginBottom:10}}>+</div>
+              <div style={{fontSize:15, fontWeight:900, color:THEME.ink}}>Yeni hasta ekle</div>
+              <div style={{fontSize:12, color:THEME.muted, marginTop:5}}>
+                {centerInfo.isAdmin ? "Herhangi bir merkez için" : `Önerilen ID: ${nextId}`}
+              </div>
+            </button>
+
+            <button onClick={() => onAction("update")} style={{background:THEME.card, border:"1px solid #e9e9eb", borderRadius:8, padding:14, textAlign:"left", cursor:"pointer"}}>
+              <div style={{width:34, height:34, borderRadius:8, background:"#fff", border:`1px solid ${THEME.redBorder}`, color:THEME.red, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:800, marginBottom:10}}>✎</div>
+              <div style={{fontSize:15, fontWeight:900, color:THEME.ink}}>Mevcut kaydı güncelle</div>
+              <div style={{fontSize:12, color:THEME.muted, marginTop:5}}>{my.length} hasta listesinden seç</div>
+            </button>
+
+            <button onClick={() => onAction("followup")} style={{background:THEME.redSoft, border:`1px solid ${THEME.redBorder}`, borderRadius:8, padding:14, textAlign:"left", cursor:"pointer"}}>
+              <div style={{width:34, height:34, borderRadius:8, background:THEME.red, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, fontWeight:900, marginBottom:10}}>K</div>
+              <div style={{fontSize:15, fontWeight:900, color:THEME.red}}>Klinik takip</div>
+              <div style={{fontSize:12, color:THEME.muted, marginTop:5}}>Başlangıç kaydı yapılmış hastaya izlem ziyareti ekle</div>
+            </button>
           </div>
+        </section>
+
+        {centerInfo.isAdmin && (
+          <button onClick={() => onAction("admin")} style={{...s.card, width:"100%", textAlign:"left", cursor:"pointer", border:`1px solid ${THEME.amberBorder}`, background:THEME.amberSoft, marginBottom:14}}>
+            <div style={{fontSize:13, fontWeight:900, color:THEME.amberText}}>Admin paneli — tüm merkezler, analiz, istatistik →</div>
+          </button>
+        )}
+
+        <div style={s.card}>
+          <div style={{fontSize:13, fontWeight:900, color:THEME.red, textTransform:"uppercase", marginBottom:10}}>Son eklenen hastalar</div>
+          {my.slice(-5).reverse().map(p => (
+            <div key={p.hasta_id} style={{display:"flex", width:"100%", alignItems:"center", gap:8, padding:"8px 0", borderBottom:"1px solid #f3f4f6", textAlign:"left"}}>
+              <span style={{fontSize:13, fontWeight:800, minWidth:90, color:THEME.ink}}>{p.hasta_id}</span>
+              <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
+              <span style={{fontSize:12, color:THEME.muted}}>{p.cinsiyet==="e"?"E":"K"} · {p.yas_ay?.toFixed(0)} ay</span>
+              <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
+              <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
+            </div>
+          ))}
+          {my.length === 0 && <div style={{fontSize:13, color:"#9ca3af", textAlign:"center", padding:12}}>Henüz hasta yok</div>}
         </div>
-        <button onClick={onLogout} style={{...s.btn, marginLeft:"auto", fontSize:12}}>Çıkış</button>
-      </div>
-
-      <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:14}}>
-        <button onClick={() => onAction("new")} style={{...s.card, textAlign:"left", cursor:"pointer", border:"1px solid #e5e7eb"}}>
-          <div style={{fontSize:28, marginBottom:8}}>+</div>
-          <div style={{fontSize:15, fontWeight:500}}>Yeni hasta ekle</div>
-          <div style={{fontSize:12, color:"#6b7280", marginTop:4}}>
-            {centerInfo.isAdmin ? "Herhangi bir merkez için" : `Önerilen ID: ${nextId}`}
-          </div>
-        </button>
-        <button onClick={() => onAction("update")} style={{...s.card, textAlign:"left", cursor:"pointer", border:"1px solid #e5e7eb"}}>
-          <div style={{fontSize:28, marginBottom:8}}>✎</div>
-          <div style={{fontSize:15, fontWeight:500}}>Mevcut kaydı güncelle</div>
-          <div style={{fontSize:12, color:"#6b7280", marginTop:4}}>{my.length} hasta listesinden seç</div>
-        </button>
-      </div>
-
-      <button onClick={() => onAction("followup")} style={{...s.card, width:"100%", textAlign:"left", cursor:"pointer", border:`1px solid ${THEME.red}`, background:`linear-gradient(135deg, ${THEME.redSoft}, #fff)`, marginBottom:14, display:"flex", alignItems:"center", gap:14}}>
-        <div style={{width:42, height:42, borderRadius:8, background:THEME.red, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:700}}>K</div>
-        <div>
-          <div style={{fontSize:16, fontWeight:700, color:THEME.burgundy}}>Klinik takip</div>
-          <div style={{fontSize:12, color:THEME.muted, marginTop:4}}>Başlangıç kaydı yapılmış hastaya izlem ziyareti ekle</div>
-        </div>
-        <div style={{marginLeft:"auto", color:THEME.red, fontSize:18}}>→</div>
-      </button>
-
-      {centerInfo.isAdmin && (
-        <button onClick={() => onAction("admin")} style={{...s.card, width:"100%", textAlign:"left", cursor:"pointer", border:`1px solid ${THEME.redBorder}`, background:THEME.redSoft, marginBottom:14}}>
-          <div style={{fontSize:14, fontWeight:500, color:THEME.red}}>Admin paneli — tüm merkezler, analiz, istatistik →</div>
-        </button>
-      )}
-
-      <div style={s.card}>
-        <div style={{fontSize:12, fontWeight:500, color:"#6b7280", marginBottom:10}}>Son eklenen hastalar</div>
-        {my.slice(-5).reverse().map(p => (
-          <div key={p.hasta_id} style={{display:"flex", alignItems:"center", gap:8, padding:"5px 0", borderBottom:"1px solid #f3f4f6"}}>
-            <span style={{fontSize:13, fontWeight:500, minWidth:90}}>{p.hasta_id}</span>
-            <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
-            <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"E":"K"} · {p.yas_ay?.toFixed(0)} ay</span>
-            <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
-            <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
-          </div>
-        ))}
-        {my.length === 0 && <div style={{fontSize:13, color:"#9ca3af", textAlign:"center", padding:12}}>Henüz hasta yok</div>}
-      </div>
+      </main>
     </div>
   )
 }
