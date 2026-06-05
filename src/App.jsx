@@ -1108,6 +1108,15 @@ function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
         </button>
       </div>
 
+      <button onClick={() => onAction("followup")} style={{...s.card, width:"100%", textAlign:"left", cursor:"pointer", border:`1px solid ${THEME.red}`, background:`linear-gradient(135deg, ${THEME.redSoft}, #fff)`, marginBottom:14, display:"flex", alignItems:"center", gap:14}}>
+        <div style={{width:42, height:42, borderRadius:8, background:THEME.red, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:700}}>K</div>
+        <div>
+          <div style={{fontSize:16, fontWeight:700, color:THEME.burgundy}}>Klinik takip</div>
+          <div style={{fontSize:12, color:THEME.muted, marginTop:4}}>Başlangıç kaydı yapılmış hastaya izlem ziyareti ekle</div>
+        </div>
+        <div style={{marginLeft:"auto", color:THEME.red, fontSize:18}}>→</div>
+      </button>
+
       {centerInfo.isAdmin && (
         <button onClick={() => onAction("admin")} style={{...s.card, width:"100%", textAlign:"left", cursor:"pointer", border:`1px solid ${THEME.redBorder}`, background:THEME.redSoft, marginBottom:14}}>
           <div style={{fontSize:14, fontWeight:500, color:THEME.red}}>Admin paneli — tüm merkezler, analiz, istatistik →</div>
@@ -1132,7 +1141,7 @@ function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
 }
 
 // ─── Patient Select ───────────────────────────────────────────────────────────
-function SelectPatient({ patients, centerInfo, onSelect, onBack }) {
+function SelectPatient({ patients, centerInfo, onSelect, onBack, title = "Hasta seç", subtitle = "" }) {
   const [search, setSearch] = useState("")
   const my = centerInfo.isAdmin ? patients : patients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
   const filtered = my.filter(p => p.hasta_id.toLowerCase().includes(search.toLowerCase()))
@@ -1141,7 +1150,10 @@ function SelectPatient({ patients, centerInfo, onSelect, onBack }) {
     <div style={{maxWidth:600, margin:"0 auto", padding:"20px"}}>
       <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:16}}>
         <button onClick={onBack} style={s.btn}>← Geri</button>
-        <span style={{fontSize:16, fontWeight:500}}>Hasta seç</span>
+        <div>
+          <div style={{fontSize:16, fontWeight:500, color:THEME.ink}}>{title}</div>
+          {subtitle && <div style={{fontSize:12, color:THEME.muted, marginTop:2}}>{subtitle}</div>}
+        </div>
       </div>
       <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Hasta ID ile ara..." autoFocus style={{...s.input, marginBottom:10}} />
       {filtered.map(p => (
@@ -1495,6 +1507,31 @@ function PftPanel({ patient }) {
           </tbody>
         </table>
       </div>
+    </div>
+  )
+}
+
+function ClinicalFollowUpScreen({ patient, onBack, onEdit }) {
+  const displayPatient = {...patient, ...calculateDerivedFields(patient)}
+  const diagnosis = patient?.pibo == 1 ? "PIBO" : patient?.ptbo == 1 ? "PTBO" : "Tanı grubu seçilmemiş"
+
+  return (
+    <div style={{maxWidth:720, margin:"0 auto", padding:"20px"}}>
+      <div style={{...s.card, marginBottom:14, border:`1px solid ${THEME.redBorder}`, background:`linear-gradient(135deg, ${THEME.redSoft}, #fff)`}}>
+        <div style={{display:"flex", alignItems:"center", gap:12, flexWrap:"wrap"}}>
+          <button onClick={onBack} style={s.btn}>← Geri</button>
+          <div>
+            <div style={{fontSize:18, fontWeight:700, color:THEME.burgundy}}>Klinik takip</div>
+            <div style={{fontSize:12, color:THEME.muted, marginTop:3}}>
+              {patient?.hasta_id} · {diagnosis} · D: {formatDateDisplay(patient?.dogum_tarihi)} · Tanı: {formatDateDisplay(patient?.tani_tarihi)}
+            </div>
+          </div>
+          <button onClick={onEdit} style={{...s.btn, marginLeft:"auto", borderColor:THEME.redBorder, color:THEME.red}}>
+            Klinik kaydı düzenle
+          </button>
+        </div>
+      </div>
+      <FollowUpPanel patient={displayPatient} />
     </div>
   )
 }
@@ -1991,6 +2028,8 @@ export default function App() {
           setScreen("new")
         } else if (a==="update") {
           setScreen("select")
+        } else if (a==="followup") {
+          setScreen("followup_select")
         } else if (a==="admin") {
           setScreen("admin")
         }
@@ -2005,6 +2044,25 @@ export default function App() {
       centerInfo={session.info}
       onSelect={p => { setEditing({...p}); setScreen("edit") }}
       onBack={() => setScreen("action")}
+    />
+  )
+
+  if (screen==="followup_select") return (
+    <SelectPatient
+      patients={patients}
+      centerInfo={session.info}
+      title="Klinik takip için hasta seç"
+      subtitle="Başlangıç kaydı yapılmış hastaya yeni izlem ziyareti eklenecek."
+      onSelect={p => { setEditing({...p}); setScreen("followup") }}
+      onBack={() => setScreen("action")}
+    />
+  )
+
+  if (screen==="followup") return (
+    <ClinicalFollowUpScreen
+      patient={editing}
+      onBack={() => setScreen("action")}
+      onEdit={() => setScreen("edit")}
     />
   )
 
