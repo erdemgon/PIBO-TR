@@ -464,6 +464,7 @@ export default function App() {
       onSelect={p => { setEditing({...p}); setScreen("edit") }}
       onBack={() => setScreen("action")}
       s={s}
+      THEME={THEME}
     />
   )
 
@@ -477,6 +478,7 @@ export default function App() {
       onSelect={p => { setEditing({...p}); setScreen("followup") }}
       onBack={() => setScreen("action")}
       s={s}
+      THEME={THEME}
     />
   )
 

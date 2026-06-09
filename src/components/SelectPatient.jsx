@@ -2,7 +2,7 @@ import { useState } from "react"
 import { filterByRegistryType } from "../config/registryBranches.js"
 import { formatDateDisplay } from "../utils/patientCalculations.js"
 
-export function SelectPatient({ patients, centerInfo, registryType, onSelect, onBack, s, title = "Hasta seç", subtitle = "" }) {
+export function SelectPatient({ patients, centerInfo, registryType, onSelect, onBack, s, THEME, title = "Hasta seç", subtitle = "" }) {
   const [search, setSearch] = useState("")
   const branchPatients = registryType ? filterByRegistryType(patients, registryType) : patients
   const my = centerInfo.isAdmin ? branchPatients : branchPatients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
