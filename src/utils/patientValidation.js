@@ -10,18 +10,20 @@ function yes(value) {
 
 export function validatePatientBeforeSave(patient = {}) {
   const errors = []
+  const warnings = []
   const registryType = normalizeRegistryType(patient)
 
   if (!present(patient.hasta_id)) errors.push("Hasta ID gerekli.")
   if (!present(patient.registry_type)) errors.push("Registry kolu gerekli.")
-  if (!yes(patient.aydinlatilmis_onam_alindi)) errors.push("Aydınlatılmış onam alınmadan kayıt kaydedilemez.")
-  if (!present(patient.dogum_tarihi)) errors.push("Doğum tarihi gerekli.")
+  if (!yes(patient.aydinlatilmis_onam_alindi)) warnings.push("Aydınlatılmış onam alanı eksik/hayır.")
+  if (!present(patient.dogum_tarihi)) warnings.push("Doğum tarihi eksik; yaş ve z-skor hesapları tamamlanamaz.")
   if (registryType === REGISTRY_TYPES.PTBO && !present(patient.ptbo_hsct_tarihi)) {
-    errors.push("HSCT kohortu için allojenik HSCT tarihi gerekli.")
+    warnings.push("HSCT kohortu için allojenik HSCT tarihi eksik; longitüdinal zaman hesapları tamamlanamaz.")
   }
 
   return {
     valid: errors.length === 0,
     errors,
+    warnings,
   }
 }

@@ -347,7 +347,7 @@ export default function App() {
       const idx = prev.findIndex(x => x.hasta_id === p.hasta_id)
       return idx >= 0 ? prev.map((x,i) => i===idx ? full : x) : [...prev, full]
     })
-    return {}
+    return validation.warnings.length ? { warning: `Kaydedildi. Eksik alan uyarısı: ${validation.warnings.join(" ")}` } : {}
   }
 
   async function deletePatient(hastaId) {
