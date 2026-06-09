@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { REPORT_MODES, normalizeRegistryType } from "../config/registryBranches.js"
+import { formatFixed } from "../utils/formatters.js"
 import { summarizeRegistryPatients } from "../utils/reporting.js"
 
 function csvEscape(value) {
@@ -365,7 +366,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
                 </td>
                 <td style={{padding:"5px 8px", color:"#6b7280"}}>{p.hasta_id.split("-")[0]}</td>
                 <td style={{padding:"5px 8px"}}>{p.cinsiyet==="e"?"E":"K"}</td>
-                <td style={{padding:"5px 8px"}}>{p.yas_ay?.toFixed(1)??"-"}</td>
+                <td style={{padding:"5px 8px"}}>{formatFixed(p.yas_ay, 1)}</td>
                 <td style={{padding:"5px 8px", color: p.fev1_bas==null?"#9ca3af":p.fev1_bas<70?"#dc2626":"#16a34a"}}>{p.fev1_bas!=null?p.fev1_bas+"%":"-"}</td>
                 <td style={{padding:"5px 8px", color: p.fev1_bit==null?"#9ca3af":p.fev1_bit<70?"#dc2626":"#16a34a"}}>{p.fev1_bit!=null?p.fev1_bit+"%":"-"}</td>
                 <td style={{padding:"5px 8px"}}>{p.tedavi_sonucu?["","İyi","Orta","Kötü"][p.tedavi_sonucu]:"-"}</td>

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { filterByRegistryType } from "../config/registryBranches.js"
+import { formatFixed } from "../utils/formatters.js"
 import { formatDateDisplay } from "../utils/patientCalculations.js"
 
 export function SelectPatient({ patients, centerInfo, registryType, onSelect, onBack, s, THEME, title = "Hasta seç", subtitle = "" }) {
@@ -23,7 +24,7 @@ export function SelectPatient({ patients, centerInfo, registryType, onSelect, on
           <span style={{fontSize:14, fontWeight:500, minWidth:90}}>{p.hasta_id}</span>
           <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "HSCT"}</span>
           {p.ptbo == 1 && (p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status)) && <span style={s.badge("red")}>BOS+</span>}
-          <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"Erkek":"Kız"} · {p.yas_ay?.toFixed(1)} ay</span>
+          <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"Erkek":"Kız"} · {formatFixed(p.yas_ay, 1)} ay</span>
           <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
           <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
         </button>

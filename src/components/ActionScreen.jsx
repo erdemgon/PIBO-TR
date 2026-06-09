@@ -1,4 +1,5 @@
 import { REGISTRY_BRANCHES, REGISTRY_TYPES, filterByRegistryType } from "../config/registryBranches.js"
+import { formatFixed } from "../utils/formatters.js"
 import { formatDateDisplay } from "../utils/patientCalculations.js"
 import { AppHeader } from "./AppLayout.jsx"
 
@@ -76,7 +77,7 @@ export function ActionScreen({ centerInfo, patients, registryType, onAction, onL
               <span style={{fontSize:13, fontWeight:800, minWidth:90, color:THEME.ink}}>{p.hasta_id}</span>
               <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "HSCT"}</span>
               {p.ptbo == 1 && (p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status)) && <span style={s.badge("red")}>BOS+</span>}
-              <span style={{fontSize:12, color:THEME.muted}}>{p.cinsiyet==="e"?"E":"K"} · {p.yas_ay?.toFixed(0)} ay</span>
+              <span style={{fontSize:12, color:THEME.muted}}>{p.cinsiyet==="e"?"E":"K"} · {formatFixed(p.yas_ay, 0)} ay</span>
               <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
               <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
             </div>
