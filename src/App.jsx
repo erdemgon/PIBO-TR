@@ -229,77 +229,6 @@ const ORIGINAL_HASTALAR_COLUMNS = [
   "kalp_tepe_atimi_bas",
 ]
 
-// Supabase hastalar tablosunda tanımlı tüm kolonlar
-// UI-only alanlar (dogum_ay, dogum_yil, tani_ay, tani_yil) kasıtlı olarak DIŞARIDA — bunlar sadece form hesaplamalarında kullanılır
-const DB_COLUMN_KEYS = new Set([
-  // Orijinal hastalar tablo şeması
-  ...ORIGINAL_HASTALAR_COLUMNS,
-  // Registry yönetişim alanları
-  "aydinlatilmis_onam_alindi",
-  // supabase_phase1_columns.sql
-  "dogum_tarihi", "semptom_baslangic_tarihi", "ilk_muayene_tarihi", "tani_tarihi",
-  "bt_tarihi", "bronkoskopi_tarihi", "spo2_bas", "ates_bas", "solunum_sayisi_bas",
-  "kalp_tepe_atimi_bas", "tani_yas_ay", "semptom_tani_gun", "vki_bas", "va_z_bas",
-  "boy_z_bas", "vki_z_bas", "growth_reference_status", "guncelleme_tarihi", "raw_excel_payload",
-  // supabase_registry_expansion.sql — ilaç alanları
-  "flutikazon_neb_2mg_adet_gun", "flutikazon_neb_2mg_gun",
-  "flutikazon_neb_05mg_adet_gun", "flutikazon_neb_05mg_gun",
-  "flutikazon_neb_toplam_mcg",
-  "flutikazon_inhaler_125_puff_gun", "flutikazon_inhaler_125_gun",
-  "flutikazon_inhaler_50_puff_gun", "flutikazon_inhaler_50_gun",
-  "flutikazon_inhaler_toplam_mcg",
-  "seretide_125_puff_gun", "seretide_125_gun",
-  "seretide_250_puff_gun", "seretide_250_gun",
-  "seretide_aldi", "seretide_toplam_flutikazon_mcg", "toplam_inhale_steroid_mcg",
-  "inhale_steroid_aldi", "fam_aldi", "azitromisin_aldi", "montelukast_aldi",
-  "ivig_aldi", "ivig_aliyor", "ventolin_aldi",
-  "sistemik_steroid_mgkg_gun", "sistemik_steroid_gun", "sistemik_steroid_plan_gun",
-  "kumulatif_sistemik_steroid_mgkg", "pulse_steroid_mgkg", "tanidan_once_antibiyotik",
-  // supabase_registry_expansion.sql — immunoloji / lenfosit
-  "cd19", "cd16_cd56", "lswbc", "lslym_pct",
-  "lscd3_pct", "lscd3_abs", "lscd4_pct", "lscd4_abs",
-  "lscd8_pct", "lscd8_abs", "lscd4_cd8", "lscd19", "lscd56",
-  "bal_lenfosit_subset", "bal_lenfopeni",
-  "bal_cd3", "bal_cd4", "bal_cd8", "bal_cd4_cd8", "bal_cd19",
-  "bal_cd16_cd56", "bal_cd45", "bal_cd56", "bal_cd22", "bal_cd20", "bal_cd16", "bal_cd3_hladr",
-  "immunology_reference_source", "immunology_ig_ref_age_band", "lymphocyte_ref_age_band",
-  "iga_alt_limit_mgdl", "iga_dusuk", "igm_alt_limit_mgdl", "igm_dusuk",
-  "igg_alt_limit_mgdl", "igg_dusuk", "igg1_alt_limit_mgdl", "igg1_dusuk",
-  "igg2_alt_limit_mgdl", "igg2_dusuk", "igg3_alt_limit_mgdl", "igg3_dusuk",
-  "igg4_alt_limit_mgdl", "igg4_dusuk",
-  "lenfosit_subset_dusuk", "lym_abs_alt_limit", "lym_abs_dusuk",
-  "cd3_pct_alt_limit", "cd3_pct_dusuk", "cd3_abs_alt_limit", "cd3_abs_dusuk",
-  "cd4_pct_alt_limit", "cd4_pct_dusuk", "cd4_abs_alt_limit", "cd4_abs_dusuk",
-  "cd8_pct_alt_limit", "cd8_pct_dusuk", "cd8_abs_alt_limit", "cd8_abs_dusuk",
-  "cd19_pct_alt_limit", "cd19_pct_dusuk", "cd19_abs_alt_limit", "cd19_abs_dusuk",
-  "cd16_cd56_pct_alt_limit", "cd16_cd56_pct_dusuk", "cd16_cd56_abs_alt_limit", "cd16_cd56_abs_dusuk",
-  // supabase_registry_expansion.sql — anamnez / akut
-  "premature", "gestasyon_haftasi", "dogum_agirligi_g", "yenidogan_yogun_bakim",
-  "neonatal_oksijen", "bpd_oykusu", "akut_asye_tarihi", "ates_suresi_gun", "agir_pnomoni",
-  "ilk_akut_asye_yatis_gun", "tekrarlayan_pnomoni", "pnomoni_atak_sayisi",
-  "toplam_pnomoni_yatis_gun", "akut_hipoksemi", "akut_yatis", "cocuk_yogun_bakim",
-  "akut_oksijen", "akut_hfnc", "akut_niv", "akut_imv", "akut_ivig", "akut_glukokortikoid",
-  "etken_mycoplasma", "etken_pnomokok", "etken_parainfluenza", "etken_bakteri",
-  "koenfeksiyon", "etken_diger",
-  "bt_mozaik", "bt_air_trapping", "bt_bronduvar_kalinlasma",
-  "bt_buyuk_lobar_konsolidasyon", "bt_diffuz_bronsiolit",
-  "imdef", "tani_surecinde_imyetm", "imdefdr",
-  "atopik_dermatit", "kisisel_atopi", "aile_atopi", "spesifik_ige_pozitif",
-  // supabase_registry_expansion.sql — SFT / görüntüleme / TB
-  "sft_bas_tarihi", "sft_bit_tarihi",
-  "akciger_goruntuleme_yapildi", "akciger_goruntuleme_tarihi",
-  "akciger_goruntuleme_yontemi", "akciger_goruntuleme_bulgu",
-  "ppd_mm", "ppd_sonuc", "tb_igra_sonuc", "tb_igra_tarihi",
-  "tb_mikrobiyoloji_pozitif", "tb_tedavi_baslangic_tarihi", "tb_tedavi_suresi_ay",
-  // supabase_missing_columns.sql
-  "azitromisin", "flutikazon", "montelukast", "ivig",
-  "seretide_25_50_puff_gun", "seretide_25_50_gun",
-  "steroid_baslangic_dozu", "steroid_suresi_gun", "kumulatif_steroid", "pulse_steroid",
-  "semptom_oncesi_gun", "azitro_bitis_tani_gun",
-  // Hesaplanan tarih alanları
-  "tani_yas_gun", "muayene_tani_gun", "muayene_bronkoskopi_gun", "semptom_bronkoskopi_gun",
-])
-
 function pickRecordColumns(record, allowedColumns) {
   return Object.fromEntries(Object.entries(record).filter(([key]) => allowedColumns.has(key)))
 }
@@ -993,6 +922,78 @@ const FIELD_GROUPS = {
     ]
   },
 }
+
+const DERIVED_PATIENT_COLUMNS = [
+  "tani_yas_ay",
+  "growth_reference_status",
+  "guncelleme_tarihi",
+  "raw_excel_payload",
+  "flutikazon_neb_toplam_mcg",
+  "flutikazon_inhaler_toplam_mcg",
+  "seretide_aldi",
+  "seretide_toplam_flutikazon_mcg",
+  "toplam_inhale_steroid_mcg",
+  "inhale_steroid_aldi",
+  "fam_aldi",
+  "flutikazon",
+  "azitromisin",
+  "azitromisin_aldi",
+  "montelukast",
+  "montelukast_aldi",
+  "ivig",
+  "ivig_aldi",
+  "sistemik_steroid",
+  "steroid_baslangic_dozu",
+  "kumulatif_sistemik_steroid_mgkg",
+  "kumulatif_steroid",
+  "pulse_steroid",
+  "semptom_oncesi_gun",
+  "azitro_bitis_tani_gun",
+  "immunology_reference_source",
+  "immunology_ig_ref_age_band",
+  "lymphocyte_ref_age_band",
+  "iga_alt_limit_mgdl",
+  "igm_alt_limit_mgdl",
+  "igg_alt_limit_mgdl",
+  "igg1_alt_limit_mgdl",
+  "igg2_alt_limit_mgdl",
+  "igg3_alt_limit_mgdl",
+  "igg4_alt_limit_mgdl",
+  "lenfosit_subset_dusuk",
+  "lym_abs_alt_limit",
+  "lym_abs_dusuk",
+  "cd3_pct_alt_limit",
+  "cd3_pct_dusuk",
+  "cd3_abs_alt_limit",
+  "cd3_abs_dusuk",
+  "cd4_pct_alt_limit",
+  "cd4_pct_dusuk",
+  "cd4_abs_alt_limit",
+  "cd4_abs_dusuk",
+  "cd8_pct_alt_limit",
+  "cd8_pct_dusuk",
+  "cd8_abs_alt_limit",
+  "cd8_abs_dusuk",
+  "cd19_pct_alt_limit",
+  "cd19_pct_dusuk",
+  "cd19_abs_alt_limit",
+  "cd19_abs_dusuk",
+  "cd16_cd56_pct_alt_limit",
+  "cd16_cd56_pct_dusuk",
+  "cd16_cd56_abs_alt_limit",
+  "cd16_cd56_abs_dusuk",
+]
+
+function formFieldKeys(fieldGroups) {
+  return Object.values(fieldGroups).flatMap(group => group.fields.map(field => field.key))
+}
+
+// UI-only alanlar (dogum_ay, dogum_yil, tani_ay, tani_yil) kasıtlı olarak dışarıda kalır.
+const DB_COLUMN_KEYS = new Set([
+  ...ORIGINAL_HASTALAR_COLUMNS,
+  ...formFieldKeys(FIELD_GROUPS),
+  ...DERIVED_PATIENT_COLUMNS,
+])
 
 // ─── styles ───────────────────────────────────────────────────────────────────
 const s = {

@@ -139,6 +139,7 @@ alter table public.hastalar
   add column if not exists ventolin_aldi numeric,
   add column if not exists sft_bas_tarihi date,
   add column if not exists sft_bit_tarihi date,
+  add column if not exists xu_siddet numeric,
   add column if not exists akciger_goruntuleme_yapildi numeric,
   add column if not exists akciger_goruntuleme_tarihi date,
   add column if not exists akciger_goruntuleme_yontemi text,
