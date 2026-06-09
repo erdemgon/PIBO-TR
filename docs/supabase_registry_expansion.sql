@@ -1,4 +1,5 @@
 alter table public.hastalar
+  add column if not exists aydinlatilmis_onam_alindi numeric,
   add column if not exists premature numeric,
   add column if not exists gestasyon_haftasi numeric,
   add column if not exists dogum_agirligi_g numeric,

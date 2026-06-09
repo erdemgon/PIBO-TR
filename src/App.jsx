@@ -234,6 +234,8 @@ const ORIGINAL_HASTALAR_COLUMNS = [
 const DB_COLUMN_KEYS = new Set([
   // Orijinal hastalar tablo şeması
   ...ORIGINAL_HASTALAR_COLUMNS,
+  // Registry yönetişim alanları
+  "aydinlatilmis_onam_alindi",
   // supabase_phase1_columns.sql
   "dogum_tarihi", "semptom_baslangic_tarihi", "ilk_muayene_tarihi", "tani_tarihi",
   "bt_tarihi", "bronkoskopi_tarihi", "spo2_bas", "ates_bas", "solunum_sayisi_bas",
@@ -659,6 +661,7 @@ const FIELD_GROUPS = {
       {key:"hasta_id", label:"Hasta ID", type:"text", required:true},
       {key:"pibo", label:"PIBO", type:"bool", required:true},
       {key:"ptbo", label:"PTBO", type:"bool", required:true},
+      {key:"aydinlatilmis_onam_alindi", label:"Aydınlatılmış onam alındı", type:"bool", required:true},
       {key:"cinsiyet", label:"Cinsiyet", type:"select", options:[{v:"e",l:"Erkek"},{v:"k",l:"Kız"}]},
       {key:"yabanci", label:"Yabancı uyruklu", type:"bool"},
       {key:"dogum_tarihi", label:"Doğum tarihi", type:"date", required:true},
