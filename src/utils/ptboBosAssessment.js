@@ -8,6 +8,33 @@ function yes(value) {
   return value == 1 || value === true || value === "1"
 }
 
+function hasValue(value) {
+  return value !== "" && value != null
+}
+
+function normalizeBosStatus(value) {
+  return ["no_bos", "suspected", "probable", "confirmed", "confirmed_biopsy", "uncertain"].includes(value) ? value : null
+}
+
+function statusFromCategory(category) {
+  if (category === "confirmed BO by biopsy") return "confirmed"
+  if (category === "probable PTBO/BOS") return "probable"
+  if (category?.startsWith("suspected PTBO/BOS")) return "suspected"
+  return "uncertain"
+}
+
+function bosStatusFields(patient, category) {
+  const explicitStatus = normalizeBosStatus(patient.ptbo_bos_status || patient.ptbo_klinisyen_son_tani)
+  const status = explicitStatus === "confirmed_biopsy" ? "confirmed" : explicitStatus || statusFromCategory(category)
+  const positive = hasValue(patient.ptbo_bos_pozitif)
+    ? (yes(patient.ptbo_bos_pozitif) ? 1 : 0)
+    : ["suspected", "probable", "confirmed"].includes(status) ? 1 : 0
+  return {
+    ptbo_bos_pozitif: positive,
+    ptbo_bos_status: status,
+  }
+}
+
 export function calculatePtboBosAssessment(patient = {}) {
   const spirometryFeasible = patient.ptbo_spirometri_yapabilir != null ? yes(patient.ptbo_spirometri_yapabilir) : null
   const baselineFev1 = num(patient.ptbo_pre_hsct_fev1_pct)
@@ -44,6 +71,7 @@ export function calculatePtboBosAssessment(patient = {}) {
     ].filter(Boolean).length
     const category = alternateSupport >= 2 ? "suspected PTBO/BOS – spirometry not feasible" : "insufficient data"
     return {
+      ...bosStatusFields(patient, category),
       ptbo_suspicion_flag: alternateSupport >= 2 ? 1 : 0,
       ptbo_supporting_features_count: alternateSupport,
       ptbo_criteria_summary: `Spirometri yapılamıyor; alternatif destekleyici bulgu sayısı ${alternateSupport}.`,
@@ -65,6 +93,7 @@ export function calculatePtboBosAssessment(patient = {}) {
         : "insufficient data"
 
   return {
+    ...bosStatusFields(patient, category),
     ptbo_suspicion_flag: suspicionFlag,
     ptbo_supporting_features_count: supportingFeatures.length,
     ptbo_criteria_summary: [

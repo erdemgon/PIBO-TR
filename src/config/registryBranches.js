@@ -1,5 +1,6 @@
 export const REGISTRY_TYPES = {
   PIBO: "PIBO",
+  // Kept as PTBO for database/backward compatibility; clinically this is the HSCT cohort branch.
   PTBO: "PTBO",
 }
 
@@ -10,9 +11,9 @@ export const REGISTRY_BRANCHES = {
     description: "Post-infeksiyöz bronşiyolitis obliterans kayıt kolu",
   },
   [REGISTRY_TYPES.PTBO]: {
-    label: "PTBO / post-HSCT BOS Registry",
-    shortLabel: "PTBO / BOS",
-    description: "Post-HSCT bronşiyolitis obliterans sendromu kayıt kolu",
+    label: "HSCT / PTBO-BOS Registry",
+    shortLabel: "HSCT / BOS",
+    description: "Tüm HSCT hastaları; PTBO/BOS pozitifliği longitüdinal izlemde ayrıca işaretlenir.",
   },
 }
 

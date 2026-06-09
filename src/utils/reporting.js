@@ -19,6 +19,10 @@ function median(values) {
   return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2 * 10) / 10
 }
 
+function bosPositive(patient) {
+  return patient.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(patient.ptbo_bos_status)
+}
+
 export function summarizeRegistryPatients(patients) {
   const byBranchCenter = patients.reduce((acc, patient) => {
     const branch = normalizeRegistryType(patient)
@@ -29,11 +33,14 @@ export function summarizeRegistryPatients(patients) {
   }, {})
 
   const ptbo = patients.filter(patient => normalizeRegistryType(patient) === "PTBO")
+  const ptboBosPositive = ptbo.filter(bosPositive)
   return {
     byBranchCenter: Object.values(byBranchCenter).sort((a, b) => a.branch.localeCompare(b.branch) || a.center.localeCompare(b.center)),
     medianAgeAtDiagnosis: median(patients.map(patient => patient.yas_ay)),
     medianDiagnosticDelay: median(patients.map(patient => patient.semptom_tani_gun)),
     ptboMedianHsctToBosDays: median(ptbo.map(patient => daysBetween(patient.ptbo_bos_tani_tarihi || patient.ptbo_bos_suphe_tarihi, patient.ptbo_hsct_tarihi))),
     ptboSurveillanceCompletionRate: ptbo.length ? Math.round(ptbo.filter(patient => patient.ptbo_survey_uyumlu == 1).length / ptbo.length * 100) : null,
+    ptboBosPositiveCount: ptboBosPositive.length,
+    ptboBosPositiveRate: ptbo.length ? Math.round(ptboBosPositive.length / ptbo.length * 100) : null,
   }
 }

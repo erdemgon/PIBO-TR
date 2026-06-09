@@ -96,6 +96,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
 
   const pibo = patients.filter(p => p.pibo == 1)
   const ptbo = patients.filter(p => p.ptbo == 1)
+  const hsctBosPositive = ptbo.filter(p => p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status))
   const display = filterGroup==="pibo" ? pibo : filterGroup==="ptbo" ? ptbo : patients
   const reportPatients = reportMode === REPORT_MODES.PIBO
     ? patients.filter(patient => normalizeRegistryType(patient) === REPORT_MODES.PIBO)
@@ -229,7 +230,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
       </div>
 
       <div style={{display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:10, marginBottom:16}}>
-        {[["Toplam",patients.length],["PIBO",pibo.length],["PTBO",ptbo.length],["Bhalla eksik",patients.filter(p=>p.bhalla_skoru==null).length]].map(([l,v]) => (
+        {[["Toplam",patients.length],["PIBO",pibo.length],["HSCT",ptbo.length],["BOS+",hsctBosPositive.length]].map(([l,v]) => (
           <div key={l} style={{background:"#f9fafb", borderRadius:8, padding:"10px 14px"}}>
             <div style={{fontSize:11, color:"#6b7280", marginBottom:3}}>{l}</div>
             <div style={{fontSize:24, fontWeight:600}}>{v}</div>
@@ -240,7 +241,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
       <div style={{...s.card, marginBottom:14}}>
         <div style={{fontSize:13, fontWeight:500, marginBottom:8}}>Rapor modu</div>
         <div style={{display:"flex", flexWrap:"wrap", gap:8, alignItems:"center"}}>
-          {[[REPORT_MODES.PIBO,"PIBO"],[REPORT_MODES.PTBO,"PTBO"],[REPORT_MODES.ALL,"PIBO + PTBO"]].map(([mode,label]) => (
+          {[[REPORT_MODES.PIBO,"PIBO"],[REPORT_MODES.PTBO,"HSCT / PTBO-BOS"],[REPORT_MODES.ALL,"PIBO + HSCT"]].map(([mode,label]) => (
             <button key={mode} onClick={() => setReportMode(mode)} style={{...s.btn, background: reportMode===mode ? THEME.redSoft : "#fff", borderColor: reportMode===mode ? THEME.red : "#e5e7eb", color: reportMode===mode ? THEME.red : "#374151"}}>
               {label}
             </button>
@@ -250,8 +251,9 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
         <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:8, marginTop:10}}>
           <div style={{fontSize:12, color:"#6b7280"}}>Medyan tanı yaşı: {reportSummary.medianAgeAtDiagnosis ?? "-"} ay</div>
           <div style={{fontSize:12, color:"#6b7280"}}>Medyan tanı gecikmesi: {reportSummary.medianDiagnosticDelay ?? "-"} gün</div>
-          <div style={{fontSize:12, color:"#6b7280"}}>PTBO HSCT→BOS: {reportSummary.ptboMedianHsctToBosDays ?? "-"} gün</div>
-          <div style={{fontSize:12, color:"#6b7280"}}>PTBO PFT uyumu: {reportSummary.ptboSurveillanceCompletionRate ?? "-"}%</div>
+          <div style={{fontSize:12, color:"#6b7280"}}>HSCT→BOS: {reportSummary.ptboMedianHsctToBosDays ?? "-"} gün</div>
+          <div style={{fontSize:12, color:"#6b7280"}}>HSCT PFT uyumu: {reportSummary.ptboSurveillanceCompletionRate ?? "-"}%</div>
+          <div style={{fontSize:12, color:"#6b7280"}}>BOS pozitif/şüpheli: {reportSummary.ptboBosPositiveCount ?? 0} ({reportSummary.ptboBosPositiveRate ?? "-"}%)</div>
         </div>
         <div style={{display:"flex", flexWrap:"wrap", gap:6, marginTop:10}}>
           {reportSummary.byBranchCenter.map(item => (
@@ -303,7 +305,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
             <option value="">Silinecek hastayı seçin</option>
             {patients.map(patient => (
               <option key={patient.hasta_id} value={patient.hasta_id}>
-                {patient.hasta_id} - {patient.pibo ? "PIBO" : "PTBO"}
+                {patient.hasta_id} - {patient.pibo ? "PIBO" : "HSCT"}
               </option>
             ))}
           </select>
@@ -340,7 +342,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
       </div>
 
       <div style={{display:"flex", gap:6, marginBottom:10}}>
-        {[["all","Tümü"],["pibo","PIBO"],["ptbo","PTBO"]].map(([v,l]) => (
+        {[["all","Tümü"],["pibo","PIBO"],["ptbo","HSCT"]].map(([v,l]) => (
           <button key={v} onClick={() => setFilterGroup(v)} style={{...s.btn, fontWeight: filterGroup===v?500:400, background: filterGroup===v?THEME.redSoft:"#fff", borderColor: filterGroup===v?THEME.red:"#e5e7eb", color: filterGroup===v?THEME.red:"#374151"}}>{l}</button>
         ))}
       </div>
@@ -357,7 +359,10 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
             {display.map(p => (
               <tr key={p.hasta_id} style={{borderBottom:"1px solid #f3f4f6"}}>
                 <td style={{padding:"5px 8px", fontWeight:500}}>{p.hasta_id}</td>
-                <td style={{padding:"5px 8px"}}><span style={s.badge(p.pibo?"blue":"amber")}>{p.pibo?"PIBO":"PTBO"}</span></td>
+                <td style={{padding:"5px 8px"}}>
+                  <span style={s.badge(p.pibo?"blue":"amber")}>{p.pibo?"PIBO":"HSCT"}</span>
+                  {p.ptbo == 1 && (p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status)) && <span style={{...s.badge("red"), marginLeft:4}}>BOS+</span>}
+                </td>
                 <td style={{padding:"5px 8px", color:"#6b7280"}}>{p.hasta_id.split("-")[0]}</td>
                 <td style={{padding:"5px 8px"}}>{p.cinsiyet==="e"?"E":"K"}</td>
                 <td style={{padding:"5px 8px"}}>{p.yas_ay?.toFixed(1)??"-"}</td>

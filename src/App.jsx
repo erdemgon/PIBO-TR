@@ -531,16 +531,16 @@ const FIELD_GROUPS = {
   genel: {
     label: "Genel", fields: [
       {key:"hasta_id", label:"Hasta ID", type:"text", required:true},
-      {key:"registry_type", label:"Registry kolu", type:"select", required:true, options:[{v:"PIBO",l:"PIBO Registry"},{v:"PTBO",l:"PTBO / post-HSCT BOS Registry"}]},
+      {key:"registry_type", label:"Registry kolu", type:"select", required:true, options:[{v:"PIBO",l:"PIBO Registry"},{v:"PTBO",l:"HSCT / PTBO-BOS Registry"}]},
       {key:"pibo", label:"PIBO", type:"bool", required:true, readonly:true},
-      {key:"ptbo", label:"PTBO", type:"bool", required:true, readonly:true},
+      {key:"ptbo", label:"HSCT kohortu", type:"bool", required:true, readonly:true},
       {key:"aydinlatilmis_onam_alindi", label:"Aydınlatılmış onam alındı", type:"bool", required:true},
       {key:"cinsiyet", label:"Cinsiyet", type:"select", options:[{v:"e",l:"Erkek"},{v:"k",l:"Kız"}]},
       {key:"yabanci", label:"Yabancı uyruklu", type:"bool"},
       {key:"dogum_tarihi", label:"Doğum tarihi", type:"date", required:true},
       {key:"semptom_baslangic_tarihi", label:"Yakınmaların başladığı tarih", type:"date"},
       {key:"ilk_muayene_tarihi", label:"İlk çocuk göğüs muayene tarihi", type:"date"},
-      {key:"tani_tarihi", label:"PIBO/PTBO tanı tarihi", type:"date"},
+      {key:"tani_tarihi", label:"PIBO veya BOS/PTBO tanı tarihi", type:"date"},
       {key:"bt_tarihi", label:"BT inceleme tarihi", type:"date"},
       {key:"bronkoskopi_tarihi", label:"Bronkoskopi tarihi", type:"date"},
       {key:"yas_ay", label:"Tanı yaşı (ay)", type:"num", readonly:true},
@@ -836,7 +836,7 @@ const FIELD_GROUPS = {
     ]
   },
   ptbo_tb: {
-    label: "PTBO/TB", registry:"PTBO", fields: [
+    label: "HSCT kohortu - TB", registry:"PTBO", fields: [
       {key:"akciger_goruntuleme_yapildi", label:"Akciğer görüntüleme yapıldı", type:"bool"},
       {key:"akciger_goruntuleme_tarihi", label:"Akciğer görüntüleme tarihi", type:"date"},
       {key:"akciger_goruntuleme_yontemi", label:"Görüntüleme yöntemi", type:"select", options:[
@@ -866,10 +866,10 @@ const FIELD_GROUPS = {
     ]
   },
   ptbo_hsct: {
-    label: "PTBO - HSCT", registry:"PTBO", fields: [
+    label: "HSCT kohortu - Temel", registry:"PTBO", fields: [
       {key:"ptbo_altta_yatan_hastalik", label:"Altta yatan hastalık", type:"text"},
       {key:"ptbo_malignite_endikasyonu", label:"Malign endikasyon", type:"bool"},
-      {key:"ptbo_hsct_tarihi", label:"Allojenik HSCT tarihi", type:"date"},
+      {key:"ptbo_hsct_tarihi", label:"Allojenik HSCT tarihi", type:"date", required:true},
       {key:"ptbo_donor_tipi", label:"Donör tipi", type:"select", options:[{v:"akraba",l:"Akraba"},{v:"akraba_disi",l:"Akraba dışı"},{v:"haplo",l:"Haploidentik"},{v:"kordon",l:"Kordon kanı"},{v:"diger",l:"Diğer"}]},
       {key:"ptbo_kok_hucre_kaynagi", label:"Kök hücre kaynağı", type:"select", options:[{v:"kemik_iligi",l:"Kemik iliği"},{v:"periferik_kan",l:"Periferik kan"},{v:"kordon",l:"Kordon kanı"},{v:"diger",l:"Diğer"}]},
       {key:"ptbo_kosullandirma_yogunlugu", label:"Koşullandırma yoğunluğu", type:"select", options:[{v:"myeloablatif",l:"Myeloablatif"},{v:"azaltilmis",l:"Azaltılmış yoğunluk"},{v:"bilinmiyor",l:"Bilinmiyor"}]},
@@ -885,7 +885,7 @@ const FIELD_GROUPS = {
     ]
   },
   ptbo_pre_hsct: {
-    label: "PTBO - Pre-HSCT akciğer", registry:"PTBO", fields: [
+    label: "HSCT kohortu - Pre-HSCT akciğer", registry:"PTBO", fields: [
       {key:"ptbo_pre_hsct_sft_var", label:"Pre-HSCT spirometri var", type:"bool"},
       {key:"ptbo_pre_hsct_fev1_pct", label:"Pre-HSCT FEV1 %", type:"num"},
       {key:"ptbo_pre_hsct_fev1_z", label:"Pre-HSCT FEV1 z", type:"num"},
@@ -903,7 +903,7 @@ const FIELD_GROUPS = {
     ]
   },
   ptbo_surveillance: {
-    label: "PTBO - İzlem/PFT", registry:"PTBO", fields: [
+    label: "HSCT kohortu - İzlem/PFT", registry:"PTBO", fields: [
       {key:"ptbo_survey_3ay_tarihi", label:"3. ay planlanan PFT", type:"date"},
       {key:"ptbo_survey_6ay_tarihi", label:"6. ay planlanan PFT", type:"date"},
       {key:"ptbo_survey_9ay_tarihi", label:"9. ay planlanan PFT", type:"date"},
@@ -917,7 +917,9 @@ const FIELD_GROUPS = {
     ]
   },
   ptbo_bos_eval: {
-    label: "PTBO - BOS değerlendirme", registry:"PTBO", fields: [
+    label: "HSCT kohortu - BOS değerlendirme", registry:"PTBO", fields: [
+      {key:"ptbo_bos_pozitif", label:"PTBO/BOS pozitif", type:"bool"},
+      {key:"ptbo_bos_status", label:"PTBO/BOS durumu", type:"select", options:[{v:"no_bos",l:"BOS yok"},{v:"suspected",l:"Şüpheli PTBO/BOS"},{v:"probable",l:"Olası PTBO/BOS"},{v:"confirmed",l:"Doğrulanmış PTBO/BOS"},{v:"uncertain",l:"Belirsiz/alternatif tanı"}]},
       {key:"ptbo_bos_suphe_tarihi", label:"BOS şüphe tarihi", type:"date"},
       {key:"ptbo_bos_tani_tarihi", label:"BOS/PTBO tanı tarihi", type:"date"},
       {key:"ptbo_yeni_solunum_semptomu", label:"Yeni solunum semptomu", type:"bool"},
@@ -951,16 +953,16 @@ const FIELD_GROUPS = {
       {key:"ptbo_biyopsi_sonuc", label:"Biyopsi sonucu", type:"text"},
       {key:"ptbo_biyopsi_bo", label:"Biyopsi ile BO doğrulandı", type:"bool"},
       {key:"ptbo_klinisyen_son_tani", label:"Klinisyen final tanı", type:"select", options:[{v:"no_bos",l:"BOS yok"},{v:"suspected",l:"Şüpheli PTBO/BOS"},{v:"probable",l:"Olası PTBO/BOS"},{v:"confirmed_biopsy",l:"Biyopsi ile doğrulanmış BO"},{v:"uncertain",l:"Belirsiz/alternatif tanı"}]},
-      {key:"ptbo_suspicion_flag", label:"PTBO şüphe bayrağı", type:"bool", readonly:true},
+      {key:"ptbo_suspicion_flag", label:"PTBO/BOS şüphe bayrağı", type:"bool", readonly:true},
       {key:"ptbo_criteria_summary", label:"PTBO kriter özeti", type:"text", readonly:true},
       {key:"ptbo_diagnostic_category", label:"PTBO yardımcı kategori", type:"text", readonly:true},
       {key:"ptbo_supporting_features_count", label:"Destekleyici bulgu sayısı", type:"num", readonly:true},
-      {key:"ptbo_missing_required_fields", label:"Eksik PTBO alanları", type:"text", readonly:true},
+      {key:"ptbo_missing_required_fields", label:"Eksik HSCT/BOS alanları", type:"text", readonly:true},
       {key:"ptbo_recommended_next_step", label:"Önerilen sonraki adım", type:"text", readonly:true},
     ]
   },
   ptbo_tedavi: {
-    label: "PTBO - Tedavi", registry:"PTBO", fields: [
+    label: "HSCT kohortu - PTBO/BOS tedavi", registry:"PTBO", fields: [
       {key:"ptbo_ics", label:"İnhale kortikosteroid", type:"bool"},
       {key:"ptbo_bronkodilator_laba", label:"Bronkodilatör/LABA", type:"bool"},
       {key:"ptbo_azitromisin", label:"Azitromisin", type:"bool"},
@@ -1073,7 +1075,7 @@ const s = {
   select: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:`1px solid ${THEME.redBorder}`, background:THEME.redField, color:THEME.ink, boxSizing:"border-box" },
   label: { display:"block", fontSize:11, color:THEME.burgundy, marginBottom:3, fontWeight:800, textTransform:"uppercase" },
   hint: { fontSize:10.5, color:THEME.burgundy, opacity:.76, marginTop:3, lineHeight:1.3 },
-  badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?THEME.redSoft:color==="amber"?"#fef3c7":"#f3f4f6", color: color==="blue"?THEME.red:color==="amber"?"#92400e":"#374151" }),
+  badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?THEME.redSoft:color==="amber"?"#fef3c7":color==="red"?"#fee2e2":"#f3f4f6", color: color==="blue"?THEME.red:color==="amber"?"#92400e":color==="red"?"#991b1b":"#374151" }),
 }
 
 function BrandLockup({ align = "center", compact = false }) {
@@ -1183,6 +1185,10 @@ function ActionScreen({ center, centerInfo, patients, registryType, onAction, on
   const my = centerInfo.isAdmin ? branchPatients : branchPatients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
   const pibo = my.filter(p => p.pibo == 1)
   const ptbo = my.filter(p => p.ptbo == 1)
+  const bosPositive = my.filter(p => p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status)).length
+  const stats = registryType === REGISTRY_TYPES.PTBO
+    ? [["HSCT kohortu", my.length], ["BOS pozitif/şüpheli", bosPositive], ["BOS yok/belirsiz", Math.max(my.length - bosPositive, 0)]]
+    : [["Toplam", my.length], ["PIBO", pibo.length], ["PTBO", ptbo.length]]
   const allCenterPatients = centerInfo.isAdmin ? patients : patients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
   const nextId = centerInfo.isAdmin ? "" : `${centerInfo.prefix}-${String(allCenterPatients.length + 1).padStart(3, "0")}`
 
@@ -1201,11 +1207,7 @@ function ActionScreen({ center, centerInfo, patients, registryType, onAction, on
         </section>
 
         <section style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))", gap:10, marginBottom:14}}>
-          {[
-            ["Toplam", my.length],
-            ["PIBO", pibo.length],
-            ["PTBO", ptbo.length],
-          ].map(([label, value]) => (
+          {stats.map(([label, value]) => (
             <div key={label} style={{...s.card, background:THEME.card, padding:"12px 14px"}}>
               <div style={{fontSize:12, color:THEME.red, fontWeight:900, textTransform:"uppercase"}}>{label}</div>
               <div style={{fontSize:24, color:THEME.ink, fontWeight:900, marginTop:4}}>{value}</div>
@@ -1249,7 +1251,8 @@ function ActionScreen({ center, centerInfo, patients, registryType, onAction, on
           {my.slice(-5).reverse().map(p => (
             <div key={p.hasta_id} style={{display:"flex", width:"100%", alignItems:"center", gap:8, padding:"8px 0", borderBottom:"1px solid #f3f4f6", textAlign:"left"}}>
               <span style={{fontSize:13, fontWeight:800, minWidth:90, color:THEME.ink}}>{p.hasta_id}</span>
-              <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
+              <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "HSCT"}</span>
+              {p.ptbo == 1 && (p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status)) && <span style={s.badge("red")}>BOS+</span>}
               <span style={{fontSize:12, color:THEME.muted}}>{p.cinsiyet==="e"?"E":"K"} · {p.yas_ay?.toFixed(0)} ay</span>
               <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
               <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
@@ -1282,7 +1285,8 @@ function SelectPatient({ patients, centerInfo, registryType, onSelect, onBack, t
       {filtered.map(p => (
         <button key={p.hasta_id} onClick={() => onSelect(p)} style={{display:"flex", width:"100%", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:10, border:"1px solid #e5e7eb", background:"#fff", cursor:"pointer", marginBottom:6, textAlign:"left"}}>
           <span style={{fontSize:14, fontWeight:500, minWidth:90}}>{p.hasta_id}</span>
-          <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "PTBO"}</span>
+          <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "HSCT"}</span>
+          {p.ptbo == 1 && (p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status)) && <span style={s.badge("red")}>BOS+</span>}
           <span style={{fontSize:12, color:"#6b7280"}}>{p.cinsiyet==="e"?"Erkek":"Kız"} · {p.yas_ay?.toFixed(1)} ay</span>
           <span style={{fontSize:12, color:"#9ca3af"}}>D: {formatDateDisplay(p.dogum_tarihi)}</span>
           <span style={{marginLeft:"auto", fontSize:12, color:"#9ca3af"}}>Tanı {formatDateDisplay(p.tani_tarihi)}</span>
@@ -1296,7 +1300,7 @@ function SelectPatient({ patients, centerInfo, registryType, onSelect, onBack, t
 // ─── Patient Form ─────────────────────────────────────────────────────────────
 function ClinicalFollowUpScreen({ patient, onBack, onEdit }) {
   const displayPatient = {...patient, ...calculateDerivedFields(patient)}
-  const diagnosis = patient?.pibo == 1 ? "PIBO" : patient?.ptbo == 1 ? "PTBO" : "Tanı grubu seçilmemiş"
+  const diagnosis = patient?.pibo == 1 ? "PIBO" : patient?.ptbo == 1 ? "HSCT kohortu" : "Registry kolu seçilmemiş"
 
   return (
     <div style={{maxWidth:720, margin:"0 auto", padding:"20px"}}>
@@ -1372,7 +1376,7 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
       <div style={{display:"flex", alignItems:"center", gap:10, marginBottom:16}}>
         <button onClick={onBack} style={s.btn}>← Geri</button>
         <span style={{fontSize:16, fontWeight:500}}>{isNew ? "Yeni hasta" : form.hasta_id}</span>
-        {!isNew && <span style={s.badge(form.pibo ? "blue" : "amber")}>{form.pibo ? "PIBO" : "PTBO"}</span>}
+        {!isNew && <span style={s.badge(form.pibo ? "blue" : "amber")}>{form.pibo ? "PIBO" : "HSCT"}</span>}
         <button onClick={handleSave} disabled={saving} style={{...s.btnPrimary, marginLeft:"auto", background: saved?"#d1fae5":THEME.redSoft, borderColor: saved?"#6ee7b7":THEME.red, color: saved?"#065f46":THEME.red}}>
           {saving ? "Kaydediliyor..." : saved ? "Kaydedildi ✓" : "Kaydet"}
         </button>
