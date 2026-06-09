@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react"
-import { supabase } from "./supabase.js"
 import { calculateCdcGrowth } from "./growth/cdcGrowth.js"
 import { calculateImmunologyReferenceFields } from "./immunology/reference.js"
+import {
+  createFollowUpVisit,
+  createPftRecord,
+  deleteFollowUpVisit,
+  deletePatientById,
+  deletePftRecord,
+  listFollowUpVisits,
+  listPatients,
+  listPftRecords,
+  upsertPatients,
+} from "./services/registryRepository.js"
 
 const CENTERS = {
   "ADMIN": { label: "Koordinatör (Admin)", prefix: null, isAdmin: true },
@@ -1234,14 +1244,13 @@ function FollowUpPanel({ patient }) {
     ;(async () => {
       setLoading(true)
       setError("")
-      const { data, error } = await supabase
-        .from("follow_up_visits")
-        .select("*")
-        .eq("hasta_id", patient.hasta_id)
-        .order("visit_date", { ascending: false })
-      if (error) setError(formatSupabaseError(error) || "İzlem ziyaretleri yüklenemedi.")
-      else setVisits(data || [])
-      setLoading(false)
+      try {
+        setVisits(await listFollowUpVisits(patient.hasta_id))
+      } catch (error) {
+        setError(formatSupabaseError(error) || "İzlem ziyaretleri yüklenemedi.")
+      } finally {
+        setLoading(false)
+      }
     })()
   }, [patient?.hasta_id])
 
@@ -1273,31 +1282,26 @@ function FollowUpPanel({ patient }) {
       created_at: new Date().toISOString(),
     }
 
-    const { data, error } = await supabase
-      .from("follow_up_visits")
-      .insert(record)
-      .select("*")
-      .single()
-    if (error) {
+    try {
+      const data = await createFollowUpVisit(record)
+      setVisits(prev => [data, ...prev])
+      setDraft({ visit_date: new Date().toISOString().slice(0, 10) })
+      setMessage("İzlem ziyareti kaydedildi.")
+      setTimeout(() => setMessage(""), 2500)
+    } catch (error) {
       setError(formatSupabaseError(error) || "İzlem ziyareti kaydedilemedi. SQL tablosu oluşturuldu mu?")
-      return
     }
-
-    setVisits(prev => [data, ...prev])
-    setDraft({ visit_date: new Date().toISOString().slice(0, 10) })
-    setMessage("İzlem ziyareti kaydedildi.")
-    setTimeout(() => setMessage(""), 2500)
   }
 
   async function deleteVisit(id) {
     const ok = window.confirm("Bu izlem ziyareti silinsin mi?")
     if (!ok) return
-    const { error } = await supabase.from("follow_up_visits").delete().eq("id", id)
-    if (error) {
+    try {
+      await deleteFollowUpVisit(id)
+      setVisits(prev => prev.filter(visit => visit.id !== id))
+    } catch (error) {
       setError(formatSupabaseError(error) || "İzlem ziyareti silinemedi.")
-      return
     }
-    setVisits(prev => prev.filter(visit => visit.id !== id))
   }
 
   function renderVisitField(field) {
@@ -1412,14 +1416,13 @@ function PftPanel({ patient }) {
     ;(async () => {
       setLoading(true)
       setError("")
-      const { data, error } = await supabase
-        .from("pft_records")
-        .select("*")
-        .eq("hasta_id", patient.hasta_id)
-        .order("test_date", { ascending: false })
-      if (error) setError(formatSupabaseError(error) || "SFT kayıtları yüklenemedi.")
-      else setRecords(data || [])
-      setLoading(false)
+      try {
+        setRecords(await listPftRecords(patient.hasta_id))
+      } catch (error) {
+        setError(formatSupabaseError(error) || "SFT kayıtları yüklenemedi.")
+      } finally {
+        setLoading(false)
+      }
     })()
   }, [patient?.hasta_id])
 
@@ -1444,31 +1447,26 @@ function PftPanel({ patient }) {
       created_at: new Date().toISOString(),
     }
 
-    const { data, error } = await supabase
-      .from("pft_records")
-      .insert(record)
-      .select("*")
-      .single()
-    if (error) {
+    try {
+      const data = await createPftRecord(record)
+      setRecords(prev => [data, ...prev])
+      setDraft({ test_date: new Date().toISOString().slice(0, 10), test_type: "izlem" })
+      setMessage("SFT kaydı kaydedildi.")
+      setTimeout(() => setMessage(""), 2500)
+    } catch (error) {
       setError(formatSupabaseError(error) || "SFT kaydı kaydedilemedi. SQL tablosu oluşturuldu mu?")
-      return
     }
-
-    setRecords(prev => [data, ...prev])
-    setDraft({ test_date: new Date().toISOString().slice(0, 10), test_type: "izlem" })
-    setMessage("SFT kaydı kaydedildi.")
-    setTimeout(() => setMessage(""), 2500)
   }
 
   async function deletePft(id) {
     const ok = window.confirm("Bu SFT kaydı silinsin mi?")
     if (!ok) return
-    const { error } = await supabase.from("pft_records").delete().eq("id", id)
-    if (error) {
+    try {
+      await deletePftRecord(id)
+      setRecords(prev => prev.filter(record => record.id !== id))
+    } catch (error) {
       setError(formatSupabaseError(error) || "SFT kaydı silinemedi.")
-      return
     }
-    setRecords(prev => prev.filter(record => record.id !== id))
   }
 
   function renderPftField(field) {
@@ -1980,11 +1978,13 @@ export default function App() {
   useEffect(() => {
     (async () => {
       setLoading(true)
-      const { data, error } = await supabase.from("hastalar").select("*").order("hasta_id")
-      if (error) { console.error(error); setLoading(false); return }
-
-      setPatients(data || [])
-      setLoading(false)
+      try {
+        setPatients(await listPatients())
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setLoading(false)
+      }
     })()
   }, [])
 
@@ -1993,8 +1993,9 @@ export default function App() {
     // UI-only alanları (dogum_ay, dogum_yil, tani_ay, tani_yil vb.) Supabase'e gönderme
     const record = pickRecordColumns(full, DB_COLUMN_KEYS)
 
-    const { error } = await supabase.from("hastalar").upsert(record, { onConflict: "hasta_id" })
-    if (error) {
+    try {
+      await upsertPatients(record)
+    } catch (error) {
       console.error("Supabase save failed:", error)
       const details = formatSupabaseError(error)
       throw new Error(details ? `${details} Supabase SQL migrasyonu eksik olabilir.` : "Supabase kayıt hatası. SQL migrasyonunu kontrol edin.")
@@ -2008,8 +2009,9 @@ export default function App() {
   }
 
   async function deletePatient(hastaId) {
-    const { error } = await supabase.from("hastalar").delete().eq("hasta_id", hastaId)
-    if (error) {
+    try {
+      await deletePatientById(hastaId)
+    } catch (error) {
       console.error("Supabase delete failed:", error)
       throw new Error(formatSupabaseError(error) || "Supabase silme hatası.")
     }
@@ -2023,8 +2025,9 @@ export default function App() {
       merkez: patient.hasta_id.split("-")[0],
       guncelleme_tarihi: new Date().toISOString(),
     }))
-    const { error } = await supabase.from("hastalar").upsert(recalculated, { onConflict: "hasta_id" })
-    if (error) {
+    try {
+      await upsertPatients(recalculated)
+    } catch (error) {
       console.error("Supabase recalculation failed:", error)
       throw new Error(formatSupabaseError(error) || "Supabase toplu güncelleme hatası.")
     }
