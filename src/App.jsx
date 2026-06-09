@@ -6,6 +6,7 @@ import { LandingPage } from "./components/LandingPage.jsx"
 import { Login } from "./components/Login.jsx"
 import { PatientForm } from "./components/PatientForm.jsx"
 import { SelectPatient } from "./components/SelectPatient.jsx"
+import { BRAND, CENTERS } from "./config/appConfig.js"
 import {
   applyRegistryType,
   normalizeRegistryType,
@@ -22,38 +23,8 @@ import {
 import {
   calculateDerivedFields,
 } from "./utils/patientCalculations.js"
-
-const CENTERS = {
-  "ADMIN": { label: "Koordinatör (Admin)", prefix: null, isAdmin: true },
-  "KOC":   { label: "Koç Üniversitesi Hastanesi", prefix: "KOC", isAdmin: false },
-  "MED":   { label: "Medipol", prefix: "MED", isAdmin: false },
-}
-
-const THEME = {
-  navy: "#211f1f",
-  red: "#8f1d2c",
-  burgundy: "#8f1d2c",
-  redSoft: "#f9e9ec",
-  redField: "#f5f5f6",
-  redBorder: "#efcbd2",
-  redHover: "#751725",
-  navySoft: "#f5f5f6",
-  surface: "#ffffff",
-  ink: "#211f1f",
-  muted: "#6f6a6c",
-  page: "#ffffff",
-  card: "#f5f5f6",
-  border: "#ececef",
-  amberSoft: "#fff7e6",
-  amberBorder: "#f0c36a",
-  amberText: "#8a5a00",
-}
-
-const BRAND = {
-  name: "PIBO-TR Registry",
-  subtitle: "Pediatrik ve post-transplant bronşiyolitis obliterans veri ağı",
-  logo: "/pibo-logo.png",
-}
+import { validatePatientBeforeSave } from "./utils/patientValidation.js"
+import { THEME, createUiStyles } from "./styles/uiStyles.js"
 
 const ORIGINAL_HASTALAR_COLUMNS = [
   "hasta_id",
@@ -326,18 +297,7 @@ const DB_COLUMN_KEYS = new Set([
   ...DERIVED_PATIENT_COLUMNS,
 ])
 
-// ─── styles ───────────────────────────────────────────────────────────────────
-const s = {
-  card: { background:"#fff", border:`1px solid ${THEME.border}`, borderRadius:8, padding:"16px 20px", boxShadow:"none" },
-  btn: { padding:"7px 16px", borderRadius:8, border:`1px solid ${THEME.redBorder}`, background:"#fff", color:THEME.burgundy, cursor:"pointer", fontSize:13 },
-  btnPrimary: { padding:"8px 20px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.red, color:"#fff", cursor:"pointer", fontSize:13, fontWeight:800 },
-  btnDanger: { padding:"7px 16px", borderRadius:8, border:`1px solid ${THEME.red}`, background:THEME.red, color:"#fff", cursor:"pointer", fontSize:13, fontWeight:600 },
-  input: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:`1px solid ${THEME.redBorder}`, background:THEME.redField, color:THEME.ink, boxSizing:"border-box", caretColor:THEME.red },
-  select: { width:"100%", fontSize:13, padding:"6px 8px", borderRadius:6, border:`1px solid ${THEME.redBorder}`, background:THEME.redField, color:THEME.ink, boxSizing:"border-box" },
-  label: { display:"block", fontSize:11, color:THEME.burgundy, marginBottom:3, fontWeight:800, textTransform:"uppercase" },
-  hint: { fontSize:10.5, color:THEME.burgundy, opacity:.76, marginTop:3, lineHeight:1.3 },
-  badge: (color) => ({ fontSize:11, padding:"2px 8px", borderRadius:20, background: color==="blue"?THEME.redSoft:color==="amber"?"#fef3c7":color==="red"?"#fee2e2":"#f3f4f6", color: color==="blue"?THEME.red:color==="amber"?"#92400e":color==="red"?"#991b1b":"#374151" }),
-}
+const s = createUiStyles(THEME)
 
 // ─── Login ───────────────────────────────────────────────────────────────────
 // ─── Action Screen ────────────────────────────────────────────────────────────
@@ -369,6 +329,8 @@ export default function App() {
 
   async function savePatient(p) {
     const typed = applyRegistryType(p, p.registry_type || selectedRegistryType || normalizeRegistryType(p))
+    const validation = validatePatientBeforeSave(typed)
+    if (!validation.valid) throw new Error(validation.errors.join(" "))
     const full = { ...typed, ...calculateDerivedFields(typed), merkez: typed.hasta_id.split("-")[0], guncelleme_tarihi: new Date().toISOString() }
     // UI-only alanları (dogum_ay, dogum_yil, tani_ay, tani_yil vb.) Supabase'e gönderme
     const record = pickRecordColumns(full, DB_COLUMN_KEYS)
