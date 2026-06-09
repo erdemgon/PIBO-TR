@@ -1,10 +1,14 @@
-import { readFileSync } from "node:fs"
+import { readdirSync, readFileSync } from "node:fs"
+import { join } from "node:path"
 
 const app = readFileSync("src/App.jsx", "utf8")
 const sqlFiles = [
   "docs/supabase_phase1_columns.sql",
   "docs/supabase_registry_expansion.sql",
   "docs/supabase_missing_columns.sql",
+  ...readdirSync("supabase/migrations", { withFileTypes: true })
+    .filter(entry => entry.isFile() && entry.name.endsWith(".sql"))
+    .map(entry => join("supabase/migrations", entry.name)),
 ]
 
 function extractArray(name) {

@@ -1,4 +1,6 @@
 import { useState } from "react"
+import { REPORT_MODES, normalizeRegistryType } from "../config/registryBranches.js"
+import { summarizeRegistryPatients } from "../utils/reporting.js"
 
 function csvEscape(value) {
   if (value == null) return ""
@@ -82,6 +84,7 @@ function downloadExcel(filename, rows) {
 
 export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calculateDerivedFields, s, THEME }) {
   const [filterGroup, setFilterGroup] = useState("all")
+  const [reportMode, setReportMode] = useState(REPORT_MODES.ALL)
   const [query, setQuery] = useState("")
   const [result, setResult] = useState("")
   const [deleteTarget, setDeleteTarget] = useState("")
@@ -94,6 +97,12 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
   const pibo = patients.filter(p => p.pibo == 1)
   const ptbo = patients.filter(p => p.ptbo == 1)
   const display = filterGroup==="pibo" ? pibo : filterGroup==="ptbo" ? ptbo : patients
+  const reportPatients = reportMode === REPORT_MODES.PIBO
+    ? patients.filter(patient => normalizeRegistryType(patient) === REPORT_MODES.PIBO)
+    : reportMode === REPORT_MODES.PTBO
+      ? patients.filter(patient => normalizeRegistryType(patient) === REPORT_MODES.PTBO)
+      : patients
+  const reportSummary = summarizeRegistryPatients(reportPatients)
 
   async function runAnalysis() {
     if (!query.trim()) return
@@ -103,7 +112,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
       const resp = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, patients })
+        body: JSON.stringify({ query, patients: reportPatients, reportMode })
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data.error || "API hatası")
@@ -120,7 +129,7 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
       const resp = await fetch("/api/report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ patients })
+        body: JSON.stringify({ patients: reportPatients, reportMode })
       })
       const data = await resp.json()
       if (!resp.ok) throw new Error(data.error || "Rapor oluşturulamadı")
@@ -173,26 +182,42 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
   }
 
   function buildExportRows() {
-    return patients.map(patient => ({
+    return reportPatients.map(patient => ({
       ...patient,
       ...calculateDerivedFields(patient),
+      registry_type: normalizeRegistryType(patient),
       merkez: patient.hasta_id.split("-")[0],
     }))
+  }
+
+  function handleMissingnessCsv() {
+    const rows = buildExportRows()
+    const columns = Array.from(new Set(rows.flatMap(row => Object.keys(row)))).sort()
+    const missingRows = columns.map(column => ({
+      registry_mode: reportMode,
+      field: column,
+      missing_count: rows.filter(row => row[column] == null || row[column] === "").length,
+      total: rows.length,
+      missing_pct: rows.length ? Math.round(rows.filter(row => row[column] == null || row[column] === "").length / rows.length * 100) : 0,
+    }))
+    downloadCsv(`pibo_registry_missingness_${reportMode}_${new Date().toISOString().slice(0, 10)}.csv`, missingRows)
+    setDeleteMessage(`${reportMode} missingness raporu indirildi.`)
+    setTimeout(() => setDeleteMessage(""), 2500)
   }
 
   function handleExportPatientsCsv() {
     const today = new Date().toISOString().slice(0, 10)
     const rows = buildExportRows()
-    downloadCsv(`pibo_registry_hastalar_${today}.csv`, rows)
-    setDeleteMessage(`${rows.length} hasta Excel/CSV dosyası olarak indirildi.`)
+    downloadCsv(`pibo_registry_${reportMode}_${today}.csv`, rows)
+    setDeleteMessage(`${rows.length} hasta ${reportMode} CSV dosyası olarak indirildi.`)
     setTimeout(() => setDeleteMessage(""), 2500)
   }
 
   function handleExportPatientsExcel() {
     const today = new Date().toISOString().slice(0, 10)
     const rows = buildExportRows()
-    downloadExcel(`pibo_registry_hastalar_${today}.xls`, rows)
-    setDeleteMessage(`${rows.length} hasta Excel dosyası olarak indirildi.`)
+    downloadExcel(`pibo_registry_${reportMode}_${today}.xls`, rows)
+    setDeleteMessage(`${rows.length} hasta ${reportMode} Excel dosyası olarak indirildi.`)
     setTimeout(() => setDeleteMessage(""), 2500)
   }
 
@@ -210,6 +235,29 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
             <div style={{fontSize:24, fontWeight:600}}>{v}</div>
           </div>
         ))}
+      </div>
+
+      <div style={{...s.card, marginBottom:14}}>
+        <div style={{fontSize:13, fontWeight:500, marginBottom:8}}>Rapor modu</div>
+        <div style={{display:"flex", flexWrap:"wrap", gap:8, alignItems:"center"}}>
+          {[[REPORT_MODES.PIBO,"PIBO"],[REPORT_MODES.PTBO,"PTBO"],[REPORT_MODES.ALL,"PIBO + PTBO"]].map(([mode,label]) => (
+            <button key={mode} onClick={() => setReportMode(mode)} style={{...s.btn, background: reportMode===mode ? THEME.redSoft : "#fff", borderColor: reportMode===mode ? THEME.red : "#e5e7eb", color: reportMode===mode ? THEME.red : "#374151"}}>
+              {label}
+            </button>
+          ))}
+          <span style={{fontSize:12, color:"#6b7280"}}>{reportPatients.length} hasta rapor kapsamına dahil</span>
+        </div>
+        <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:8, marginTop:10}}>
+          <div style={{fontSize:12, color:"#6b7280"}}>Medyan tanı yaşı: {reportSummary.medianAgeAtDiagnosis ?? "-"} ay</div>
+          <div style={{fontSize:12, color:"#6b7280"}}>Medyan tanı gecikmesi: {reportSummary.medianDiagnosticDelay ?? "-"} gün</div>
+          <div style={{fontSize:12, color:"#6b7280"}}>PTBO HSCT→BOS: {reportSummary.ptboMedianHsctToBosDays ?? "-"} gün</div>
+          <div style={{fontSize:12, color:"#6b7280"}}>PTBO PFT uyumu: {reportSummary.ptboSurveillanceCompletionRate ?? "-"}%</div>
+        </div>
+        <div style={{display:"flex", flexWrap:"wrap", gap:6, marginTop:10}}>
+          {reportSummary.byBranchCenter.map(item => (
+            <span key={`${item.branch}-${item.center}`} style={s.badge(item.branch === "PIBO" ? "blue" : "amber")}>{item.branch} · {item.center}: {item.count}</span>
+          ))}
+        </div>
       </div>
 
       {(deleteError || deleteMessage) && (
@@ -238,6 +286,9 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
           </button>
           <button onClick={handleExportPatientsCsv} style={s.btn}>
             CSV indir
+          </button>
+          <button onClick={handleMissingnessCsv} style={s.btn}>
+            Missingness CSV
           </button>
         </div>
         <div style={{fontSize:12, color:"#6b7280"}}>

@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react"
 import { AdminPanel } from "./components/AdminPanel.jsx"
 import { FollowUpPanel } from "./components/FollowUpPanel.jsx"
+import { LandingPage } from "./components/LandingPage.jsx"
 import { PftPanel } from "./components/PftPanel.jsx"
+import {
+  REGISTRY_BRANCHES,
+  REGISTRY_TYPES,
+  applyRegistryType,
+  filterByRegistryType,
+  normalizeRegistryType,
+} from "./config/registryBranches.js"
 import { calculateCdcGrowth } from "./growth/cdcGrowth.js"
 import { calculateImmunologyReferenceFields } from "./immunology/reference.js"
 import {
@@ -9,6 +17,7 @@ import {
   listPatients,
   upsertPatients,
 } from "./services/registryRepository.js"
+import { calculatePtboBosAssessment } from "./utils/ptboBosAssessment.js"
 
 const CENTERS = {
   "ADMIN": { label: "Koordinatör (Admin)", prefix: null, isAdmin: true },
@@ -44,6 +53,7 @@ const BRAND = {
 
 const ORIGINAL_HASTALAR_COLUMNS = [
   "hasta_id",
+  "registry_type",
   "pibo",
   "ptbo",
   "cinsiyet",
@@ -404,8 +414,12 @@ function calculateDerivedFields(patient) {
   const growthFields = calculateGrowthFields(patient, ageMonths, vkiBas)
   const treatmentFields = calculateTreatmentFields(patient)
   const immunologyFields = calculateImmunologyReferenceFields(patient, ageMonths)
+  const registryType = normalizeRegistryType(patient)
+  const registryFields = applyRegistryType({}, registryType)
+  const ptboAssessment = registryType === REGISTRY_TYPES.PTBO ? calculatePtboBosAssessment(patient) : {}
 
   const derived = {
+    ...registryFields,
     tani_yas_gun: taniYasGun,
     tani_yas_ay: taniYasGun == null ? null : round(taniYasGun / 30.4375, 1),
     yas_ay: ageMonths,
@@ -418,6 +432,8 @@ function calculateDerivedFields(patient) {
     ...growthFields,
     ...treatmentFields,
     ...immunologyFields,
+    ...ptboAssessment,
+    ...(ptboAssessment.ptbo_missing_required_fields ? { ptbo_missing_required_fields: ptboAssessment.ptbo_missing_required_fields.join("; ") } : {}),
     dogum_yil: parseDate(patient.dogum_tarihi)?.getFullYear() ?? patient.dogum_yil ?? null,
     dogum_ay: parseDate(patient.dogum_tarihi) ? parseDate(patient.dogum_tarihi).getMonth() + 1 : patient.dogum_ay ?? null,
     tani_yil: parseDate(patient.tani_tarihi)?.getFullYear() ?? patient.tani_yil ?? null,
@@ -515,8 +531,9 @@ const FIELD_GROUPS = {
   genel: {
     label: "Genel", fields: [
       {key:"hasta_id", label:"Hasta ID", type:"text", required:true},
-      {key:"pibo", label:"PIBO", type:"bool", required:true},
-      {key:"ptbo", label:"PTBO", type:"bool", required:true},
+      {key:"registry_type", label:"Registry kolu", type:"select", required:true, options:[{v:"PIBO",l:"PIBO Registry"},{v:"PTBO",l:"PTBO / post-HSCT BOS Registry"}]},
+      {key:"pibo", label:"PIBO", type:"bool", required:true, readonly:true},
+      {key:"ptbo", label:"PTBO", type:"bool", required:true, readonly:true},
       {key:"aydinlatilmis_onam_alindi", label:"Aydınlatılmış onam alındı", type:"bool", required:true},
       {key:"cinsiyet", label:"Cinsiyet", type:"select", options:[{v:"e",l:"Erkek"},{v:"k",l:"Kız"}]},
       {key:"yabanci", label:"Yabancı uyruklu", type:"bool"},
@@ -562,7 +579,7 @@ const FIELD_GROUPS = {
     ]
   },
   akut: {
-    label: "Akut Dönem", fields: [
+    label: "Akut Dönem", registry:"PIBO", fields: [
       {key:"akut_asye_tarihi", label:"İlk akut ASYE tarihi", type:"date"},
       {key:"ates_suresi_gun", label:"Ateş süresi (gün)", type:"num"},
       {key:"agir_pnomoni", label:"Ağır pnömoni", type:"bool"},
@@ -587,7 +604,7 @@ const FIELD_GROUPS = {
     ]
   },
   etiyoloji: {
-    label: "Etiyoloji", fields: [
+    label: "Etiyoloji", registry:"PIBO", fields: [
       {key:"etken_adenovirus", label:"Adenovirüs", type:"bool"},
       {key:"etken_mycoplasma", label:"Mycoplasma pneumoniae", type:"bool"},
       {key:"etken_rsv", label:"RSV", type:"bool"},
@@ -613,7 +630,7 @@ const FIELD_GROUPS = {
     ]
   },
   radyoloji: {
-    label: "Radyoloji (BT)", fields: [
+    label: "Radyoloji (BT)", registry:"PIBO", fields: [
       {key:"bt_infiltrasyon", label:"İnfiltrasyon", type:"bool"},
       {key:"bt_mozaik", label:"Mozaik perfüzyon/attenüasyon", type:"bool"},
       {key:"bt_air_trapping", label:"Air trapping", type:"bool"},
@@ -634,7 +651,7 @@ const FIELD_GROUPS = {
     ]
   },
   tedavi: {
-    label: "Tedavi", fields: [
+    label: "Tedavi", registry:"PIBO", fields: [
       {key:"sistemik_steroid", label:"Sistemik steroid aldı", type:"bool", readonly:true},
       {key:"sistemik_steroid_mgkg_gun", label:"Sistemik steroid dozu (mg/kg/gün)", type:"num"},
       {key:"sistemik_steroid_gun", label:"Sistemik steroid aldığı gün", type:"num"},
@@ -678,7 +695,7 @@ const FIELD_GROUPS = {
     ]
   },
   bal: {
-    label: "BAL", fields: [
+    label: "BAL", registry:"PIBO", fields: [
       {key:"bal_ureme", label:"BAL üreme", type:"bool"},
       {key:"bal_coklu_ureme", label:"BAL çoklu üreme", type:"bool"},
       {key:"bal_kultur1", label:"BAL kültür 1", type:"text"},
@@ -713,7 +730,7 @@ const FIELD_GROUPS = {
     ]
   },
   immunoloji: {
-    label: "İmmünoloji & Lab", fields: [
+    label: "İmmünoloji & Lab", registry:"PIBO", fields: [
       {key:"imun_yetmezlik", label:"İmmün yetmezlik", type:"bool"},
       {key:"imdef", label:"İmmün yetmezlik açıklaması", type:"text"},
       {key:"tani_surecinde_imyetm", label:"Tanı sürecinde immün yetmezlik", type:"bool"},
@@ -819,7 +836,7 @@ const FIELD_GROUPS = {
     ]
   },
   ptbo_tb: {
-    label: "PTBO/TB", fields: [
+    label: "PTBO/TB", registry:"PTBO", fields: [
       {key:"akciger_goruntuleme_yapildi", label:"Akciğer görüntüleme yapıldı", type:"bool"},
       {key:"akciger_goruntuleme_tarihi", label:"Akciğer görüntüleme tarihi", type:"date"},
       {key:"akciger_goruntuleme_yontemi", label:"Görüntüleme yöntemi", type:"select", options:[
@@ -846,6 +863,130 @@ const FIELD_GROUPS = {
       {key:"tb_mikrobiyoloji_pozitif", label:"TB mikrobiyoloji pozitif", type:"bool"},
       {key:"tb_tedavi_baslangic_tarihi", label:"TB tedavi başlangıç tarihi", type:"date"},
       {key:"tb_tedavi_suresi_ay", label:"TB tedavi süresi (ay)", type:"num"},
+    ]
+  },
+  ptbo_hsct: {
+    label: "PTBO - HSCT", registry:"PTBO", fields: [
+      {key:"ptbo_altta_yatan_hastalik", label:"Altta yatan hastalık", type:"text"},
+      {key:"ptbo_malignite_endikasyonu", label:"Malign endikasyon", type:"bool"},
+      {key:"ptbo_hsct_tarihi", label:"Allojenik HSCT tarihi", type:"date"},
+      {key:"ptbo_donor_tipi", label:"Donör tipi", type:"select", options:[{v:"akraba",l:"Akraba"},{v:"akraba_disi",l:"Akraba dışı"},{v:"haplo",l:"Haploidentik"},{v:"kordon",l:"Kordon kanı"},{v:"diger",l:"Diğer"}]},
+      {key:"ptbo_kok_hucre_kaynagi", label:"Kök hücre kaynağı", type:"select", options:[{v:"kemik_iligi",l:"Kemik iliği"},{v:"periferik_kan",l:"Periferik kan"},{v:"kordon",l:"Kordon kanı"},{v:"diger",l:"Diğer"}]},
+      {key:"ptbo_kosullandirma_yogunlugu", label:"Koşullandırma yoğunluğu", type:"select", options:[{v:"myeloablatif",l:"Myeloablatif"},{v:"azaltilmis",l:"Azaltılmış yoğunluk"},{v:"bilinmiyor",l:"Bilinmiyor"}]},
+      {key:"ptbo_onceki_akciger_hastaligi", label:"Önceden akciğer hastalığı", type:"bool"},
+      {key:"ptbo_torasik_radyoterapi", label:"Torasik radyoterapi", type:"bool"},
+      {key:"ptbo_kemo_akciger_toksisite", label:"Kemoterapi akciğer toksisitesi", type:"bool"},
+      {key:"ptbo_akut_gvhd", label:"Akut GVHD", type:"bool"},
+      {key:"ptbo_cgvhd", label:"Kronik GVHD", type:"bool"},
+      {key:"ptbo_extrapulmoner_cgvhd", label:"Ekstrapulmoner cGVHD", type:"bool"},
+      {key:"ptbo_cgvhd_organlari", label:"cGVHD organları", type:"text"},
+      {key:"ptbo_sistemik_immunsupresyon", label:"Sistemik immünsüpresyon", type:"bool"},
+      {key:"ptbo_immunsupresyon_ajanlari", label:"İmmünsüpresyon ajanları", type:"text"},
+    ]
+  },
+  ptbo_pre_hsct: {
+    label: "PTBO - Pre-HSCT akciğer", registry:"PTBO", fields: [
+      {key:"ptbo_pre_hsct_sft_var", label:"Pre-HSCT spirometri var", type:"bool"},
+      {key:"ptbo_pre_hsct_fev1_pct", label:"Pre-HSCT FEV1 %", type:"num"},
+      {key:"ptbo_pre_hsct_fev1_z", label:"Pre-HSCT FEV1 z", type:"num"},
+      {key:"ptbo_pre_hsct_fvc_pct", label:"Pre-HSCT FVC %", type:"num"},
+      {key:"ptbo_pre_hsct_fvc_z", label:"Pre-HSCT FVC z", type:"num"},
+      {key:"ptbo_pre_hsct_fev1_vc", label:"Pre-HSCT FEV1/VC", type:"num"},
+      {key:"ptbo_pre_hsct_fef2575_pct", label:"Pre-HSCT FEF25-75 %", type:"num"},
+      {key:"ptbo_pre_hsct_tlc", label:"Pre-HSCT TLC", type:"num"},
+      {key:"ptbo_pre_hsct_rv", label:"Pre-HSCT RV", type:"num"},
+      {key:"ptbo_pre_hsct_rv_tlc", label:"Pre-HSCT RV/TLC", type:"num"},
+      {key:"ptbo_pre_hsct_dlco", label:"Pre-HSCT DLCO", type:"num"},
+      {key:"ptbo_pre_hsct_lci", label:"Pre-HSCT MBW/LCI", type:"num"},
+      {key:"ptbo_pre_hsct_ct_var", label:"Pre-HSCT inspiratuvar/ekspiratuvar BT", type:"bool"},
+      {key:"ptbo_pre_hsct_ct_bulgu", label:"Pre-HSCT BT anomalileri", type:"text"},
+    ]
+  },
+  ptbo_surveillance: {
+    label: "PTBO - İzlem/PFT", registry:"PTBO", fields: [
+      {key:"ptbo_survey_3ay_tarihi", label:"3. ay planlanan PFT", type:"date"},
+      {key:"ptbo_survey_6ay_tarihi", label:"6. ay planlanan PFT", type:"date"},
+      {key:"ptbo_survey_9ay_tarihi", label:"9. ay planlanan PFT", type:"date"},
+      {key:"ptbo_survey_12ay_tarihi", label:"12. ay planlanan PFT", type:"date"},
+      {key:"ptbo_gercek_pft_tarihleri", label:"Gerçek PFT tarihleri", type:"text"},
+      {key:"ptbo_survey_tamamlik", label:"Surveillance tamamlık (%)", type:"num"},
+      {key:"ptbo_survey_uyumlu", label:"Surveillance uyumlu/tamam", type:"bool"},
+      {key:"ptbo_spirometri_yapabilir", label:"Spirometri yapabilir", type:"bool"},
+      {key:"ptbo_mbw_lci_var", label:"MBW/LCI var", type:"bool"},
+      {key:"ptbo_klinik_adjudikasyon_bos", label:"Klinisyen PTBO/BOS adjudikasyonu", type:"bool"},
+    ]
+  },
+  ptbo_bos_eval: {
+    label: "PTBO - BOS değerlendirme", registry:"PTBO", fields: [
+      {key:"ptbo_bos_suphe_tarihi", label:"BOS şüphe tarihi", type:"date"},
+      {key:"ptbo_bos_tani_tarihi", label:"BOS/PTBO tanı tarihi", type:"date"},
+      {key:"ptbo_yeni_solunum_semptomu", label:"Yeni solunum semptomu", type:"bool"},
+      {key:"ptbo_oksuruk", label:"Öksürük", type:"bool"},
+      {key:"ptbo_dispne", label:"Dispne", type:"bool"},
+      {key:"ptbo_wheezing", label:"Wheezing", type:"bool"},
+      {key:"ptbo_hipoksemi", label:"Hipoksemi", type:"bool"},
+      {key:"ptbo_egzersiz_intoleransi", label:"Egzersiz intoleransı", type:"bool"},
+      {key:"ptbo_asemptomatik_pft_dusus", label:"Asemptomatik PFT düşüşü", type:"bool"},
+      {key:"ptbo_bos_fev1_pct", label:"BOS şüphede FEV1 %", type:"num"},
+      {key:"ptbo_fev1_dusus_iki_test", label:"FEV1 düşüşü ≥2 hafta arayla iki testte kalıcı", type:"bool"},
+      {key:"ptbo_fev1_vc_lln_altinda", label:"FEV1/VC LLN altında", type:"bool"},
+      {key:"ptbo_obstruktif_patern", label:"Obstrüktif patern", type:"bool"},
+      {key:"ptbo_prism_patern", label:"PRISm-benzeri patern", type:"bool"},
+      {key:"ptbo_rv_veya_rvtlc_uln_ustu", label:"RV veya RV/TLC ULN üstünde", type:"bool"},
+      {key:"ptbo_lci", label:"LCI", type:"num"},
+      {key:"ptbo_ct_air_trapping", label:"HRCT air trapping", type:"bool"},
+      {key:"ptbo_ct_mozaik", label:"HRCT mozaik attenüasyon", type:"bool"},
+      {key:"ptbo_ct_bronsektazi", label:"HRCT bronşektazi", type:"bool"},
+      {key:"ptbo_ct_duvar_kalinlasma", label:"HRCT hava yolu duvar kalınlaşması", type:"bool"},
+      {key:"ptbo_ct_infiltrat_enfeksiyon", label:"HRCT infiltrat/enfeksiyon paterni", type:"bool"},
+      {key:"ptbo_bal_yapildi", label:"BAL yapıldı", type:"bool"},
+      {key:"ptbo_bal_kultur", label:"BAL kültür", type:"text"},
+      {key:"ptbo_bal_viral_pcr", label:"BAL viral/multiplex PCR", type:"text"},
+      {key:"ptbo_bal_fungal_bakteriyel_tbc", label:"BAL fungal/bakteriyel/mikobakteri", type:"text"},
+      {key:"ptbo_enfeksiyon_saptandi", label:"Enfeksiyon saptandı", type:"bool"},
+      {key:"ptbo_enfeksiyon_tedavi_duzeldi", label:"Enfeksiyon tedavi edildi/rezolüsyon", type:"bool"},
+      {key:"ptbo_enfeksiyon_sonrasi_suphe_devam", label:"Enfeksiyon sonrası BOS şüphesi devam", type:"bool"},
+      {key:"ptbo_biyopsi_yapildi", label:"Akciğer biyopsisi yapıldı", type:"bool"},
+      {key:"ptbo_biyopsi_endikasyon", label:"Biyopsi endikasyonu", type:"text"},
+      {key:"ptbo_biyopsi_sonuc", label:"Biyopsi sonucu", type:"text"},
+      {key:"ptbo_biyopsi_bo", label:"Biyopsi ile BO doğrulandı", type:"bool"},
+      {key:"ptbo_klinisyen_son_tani", label:"Klinisyen final tanı", type:"select", options:[{v:"no_bos",l:"BOS yok"},{v:"suspected",l:"Şüpheli PTBO/BOS"},{v:"probable",l:"Olası PTBO/BOS"},{v:"confirmed_biopsy",l:"Biyopsi ile doğrulanmış BO"},{v:"uncertain",l:"Belirsiz/alternatif tanı"}]},
+      {key:"ptbo_suspicion_flag", label:"PTBO şüphe bayrağı", type:"bool", readonly:true},
+      {key:"ptbo_criteria_summary", label:"PTBO kriter özeti", type:"text", readonly:true},
+      {key:"ptbo_diagnostic_category", label:"PTBO yardımcı kategori", type:"text", readonly:true},
+      {key:"ptbo_supporting_features_count", label:"Destekleyici bulgu sayısı", type:"num", readonly:true},
+      {key:"ptbo_missing_required_fields", label:"Eksik PTBO alanları", type:"text", readonly:true},
+      {key:"ptbo_recommended_next_step", label:"Önerilen sonraki adım", type:"text", readonly:true},
+    ]
+  },
+  ptbo_tedavi: {
+    label: "PTBO - Tedavi", registry:"PTBO", fields: [
+      {key:"ptbo_ics", label:"İnhale kortikosteroid", type:"bool"},
+      {key:"ptbo_bronkodilator_laba", label:"Bronkodilatör/LABA", type:"bool"},
+      {key:"ptbo_azitromisin", label:"Azitromisin", type:"bool"},
+      {key:"ptbo_montelukast", label:"Montelukast", type:"bool"},
+      {key:"ptbo_fam_baslandi", label:"FAM başlandı", type:"bool"},
+      {key:"ptbo_fam_baslama_tarihi", label:"FAM başlama tarihi", type:"date"},
+      {key:"ptbo_sistemik_steroid_mgkg_gun", label:"Sistemik steroid mg/kg/gün", type:"num"},
+      {key:"ptbo_sistemik_steroid_gun", label:"Sistemik steroid gün", type:"num"},
+      {key:"ptbo_pulse_steroid", label:"Pulse steroid", type:"bool"},
+      {key:"ptbo_ruxolitinib", label:"Ruxolitinib", type:"bool"},
+      {key:"ptbo_belumosudil", label:"Belumosudil", type:"bool"},
+      {key:"ptbo_abatacept", label:"Abatacept", type:"bool"},
+      {key:"ptbo_axatilimab", label:"Axatilimab", type:"bool"},
+      {key:"ptbo_ecp", label:"ECP", type:"bool"},
+      {key:"ptbo_diger_immunsupresif", label:"Diğer immünsüpresif", type:"text"},
+      {key:"ptbo_pulmoner_rehabilitasyon", label:"Pulmoner rehabilitasyon", type:"bool"},
+      {key:"ptbo_gerd_degerlendirme_tedavi", label:"GERD değerlendirme/tedavi", type:"bool"},
+      {key:"ptbo_antimikrobiyal_profilaksi", label:"Antimikrobiyal profilaksi", type:"bool"},
+      {key:"ptbo_oksijen_destegi", label:"Oksijen desteği", type:"bool"},
+      {key:"ptbo_niv_destegi", label:"NIV desteği", type:"bool"},
+      {key:"ptbo_imv_destegi", label:"IMV desteği", type:"bool"},
+      {key:"ptbo_akciger_tx_dusunuldu", label:"Akciğer nakli düşünüldü", type:"bool"},
+      {key:"ptbo_akciger_tx_listelendi", label:"Akciğer nakli listelendi", type:"bool"},
+      {key:"ptbo_akciger_tx_yapildi", label:"Akciğer nakli yapıldı", type:"bool"},
+      {key:"ptbo_4hf_pft_tarihi", label:"Tedavi sonrası 4. hafta PFT tarihi", type:"date"},
+      {key:"ptbo_tedavi_yanit", label:"Tedavi yanıtı", type:"select", options:[{v:"iyi",l:"İyi/stabil"},{v:"kismi",l:"Kısmi yanıt"},{v:"yanitsiz",l:"Yanıtsız/progresif"},{v:"exitus",l:"Exitus"}]},
     ]
   },
 }
@@ -1036,23 +1177,26 @@ function Login({ onLogin }) {
 }
 
 // ─── Action Screen ────────────────────────────────────────────────────────────
-function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
-  const my = centerInfo.isAdmin ? patients : patients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
+function ActionScreen({ center, centerInfo, patients, registryType, onAction, onLogout, onSwitchBranch }) {
+  const branch = REGISTRY_BRANCHES[registryType]
+  const branchPatients = filterByRegistryType(patients, registryType)
+  const my = centerInfo.isAdmin ? branchPatients : branchPatients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
   const pibo = my.filter(p => p.pibo == 1)
   const ptbo = my.filter(p => p.ptbo == 1)
-  const nextId = centerInfo.isAdmin ? "" : `${centerInfo.prefix}-${String(my.length + 1).padStart(3, "0")}`
+  const allCenterPatients = centerInfo.isAdmin ? patients : patients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
+  const nextId = centerInfo.isAdmin ? "" : `${centerInfo.prefix}-${String(allCenterPatients.length + 1).padStart(3, "0")}`
 
   return (
     <div style={{minHeight:"100vh", background:THEME.page}}>
-      <AppHeader right={<button onClick={onLogout} style={{...s.btn, fontSize:12}}>Çıkış</button>} />
+      <AppHeader right={<div style={{display:"flex", gap:8}}><button onClick={onSwitchBranch} style={{...s.btn, fontSize:12}}>Registry değiştir</button><button onClick={onLogout} style={{...s.btn, fontSize:12}}>Çıkış</button></div>} />
 
       <main style={{maxWidth:920, margin:"0 auto", padding:"18px"}}>
         <section style={{...s.card, textAlign:"center", marginBottom:14, padding:"18px"}}>
           <img src={BRAND.logo} alt="" aria-hidden="true" style={{width:"100%", maxWidth:150, height:118, objectFit:"contain", margin:"0 auto 8px", display:"block"}} />
           <div style={{fontSize:13, color:THEME.red, fontWeight:800, marginBottom:8}}>Registry çalışma alanı</div>
-          <h1 style={{fontSize:26, lineHeight:1.2, color:THEME.ink, margin:0, fontWeight:900}}>{centerInfo.label}</h1>
+          <h1 style={{fontSize:26, lineHeight:1.2, color:THEME.ink, margin:0, fontWeight:900}}>{branch.label}</h1>
           <p style={{fontSize:15, color:THEME.muted, lineHeight:1.5, margin:"10px auto 0", maxWidth:520}}>
-            Başlangıç kaydı, klinik takip ve merkez verilerini aynı sakin akış içinde yönetin.
+            {centerInfo.label} · Başlangıç kaydı, klinik takip ve merkez verilerini seçili registry kolunda yönetin.
           </p>
         </section>
 
@@ -1119,9 +1263,10 @@ function ActionScreen({ center, centerInfo, patients, onAction, onLogout }) {
 }
 
 // ─── Patient Select ───────────────────────────────────────────────────────────
-function SelectPatient({ patients, centerInfo, onSelect, onBack, title = "Hasta seç", subtitle = "" }) {
+function SelectPatient({ patients, centerInfo, registryType, onSelect, onBack, title = "Hasta seç", subtitle = "" }) {
   const [search, setSearch] = useState("")
-  const my = centerInfo.isAdmin ? patients : patients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
+  const branchPatients = registryType ? filterByRegistryType(patients, registryType) : patients
+  const my = centerInfo.isAdmin ? branchPatients : branchPatients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
   const filtered = my.filter(p => p.hasta_id.toLowerCase().includes(search.toLowerCase()))
 
   return (
@@ -1197,7 +1342,9 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
     if (activeGroup === "ptbo_tb" && form.ptbo != 1) setActiveGroup("genel")
   }, [activeGroup, form.ptbo])
 
-  function set(key, val) { setForm(f => ({...f, [key]: val})) }
+  function set(key, val) {
+    setForm(f => key === "registry_type" ? applyRegistryType(f, val) : ({...f, [key]: val}))
+  }
 
   async function handleSave() {
     setSaving(true)
@@ -1216,7 +1363,8 @@ function PatientForm({ patient, isNew, onSave, onBack }) {
     }
   }
 
-  const groups = Object.entries(FIELD_GROUPS).filter(([key]) => key !== "ptbo_tb" || form.ptbo == 1)
+  const formRegistryType = normalizeRegistryType(form)
+  const groups = Object.entries(FIELD_GROUPS).filter(([, group]) => !group.registry || group.registry === formRegistryType)
   const displayForm = {...form, ...calculateDerivedFields(form)}
 
   return (
@@ -1341,13 +1489,14 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [screen, setScreen] = useState("action")
   const [editing, setEditing] = useState(null)
+  const [selectedRegistryType, setSelectedRegistryType] = useState(null)
 
   // Supabase gerçek veri kaynağıdır; örnek veri frontend bundle'ına gömülmez
   useEffect(() => {
     (async () => {
       setLoading(true)
       try {
-        setPatients(await listPatients())
+        setPatients((await listPatients()).map(patient => applyRegistryType(patient, normalizeRegistryType(patient))))
       } catch (error) {
         console.error(error)
       } finally {
@@ -1357,7 +1506,8 @@ export default function App() {
   }, [])
 
   async function savePatient(p) {
-    const full = { ...p, ...calculateDerivedFields(p), merkez: p.hasta_id.split("-")[0], guncelleme_tarihi: new Date().toISOString() }
+    const typed = applyRegistryType(p, p.registry_type || selectedRegistryType || normalizeRegistryType(p))
+    const full = { ...typed, ...calculateDerivedFields(typed), merkez: typed.hasta_id.split("-")[0], guncelleme_tarihi: new Date().toISOString() }
     // UI-only alanları (dogum_ay, dogum_yil, tani_ay, tani_yil vb.) Supabase'e gönderme
     const record = pickRecordColumns(full, DB_COLUMN_KEYS)
 
@@ -1435,18 +1585,29 @@ export default function App() {
     </div>
   )
 
-  if (!session) return <Login onLogin={(code, info) => { setSession({code, info}); setScreen("action") }} />
+  if (!session) return <Login onLogin={(code, info) => { setSession({code, info}); setScreen("landing") }} />
+
+  if (screen==="landing" || !selectedRegistryType) return (
+    <LandingPage
+      centerInfo={session.info}
+      s={s}
+      THEME={THEME}
+      onSelect={type => { setSelectedRegistryType(type); setScreen("action") }}
+      onLogout={() => { setSession(null); setSelectedRegistryType(null); setScreen("action") }}
+    />
+  )
 
   if (screen==="action") return (
     <ActionScreen
       center={session.code}
       centerInfo={session.info}
       patients={patients}
+      registryType={selectedRegistryType}
       onAction={a => {
         if (a==="new") {
           const prefix = session.info.isAdmin ? "XXX" : session.info.prefix
           const count = session.info.isAdmin ? patients.length : patients.filter(p=>p.hasta_id.startsWith(prefix+"-")).length
-          setEditing({ hasta_id:`${prefix}-${String(count+1).padStart(3,"0")}`, pibo:0, ptbo:0, merkez:prefix })
+          setEditing(applyRegistryType({ hasta_id:`${prefix}-${String(count+1).padStart(3,"0")}`, merkez:prefix }, selectedRegistryType))
           setScreen("new")
         } else if (a==="update") {
           setScreen("select")
@@ -1456,7 +1617,8 @@ export default function App() {
           setScreen("admin")
         }
       }}
-      onLogout={() => { setSession(null); setScreen("action") }}
+      onSwitchBranch={() => setScreen("landing")}
+      onLogout={() => { setSession(null); setSelectedRegistryType(null); setScreen("action") }}
     />
   )
 
@@ -1464,6 +1626,7 @@ export default function App() {
     <SelectPatient
       patients={patients}
       centerInfo={session.info}
+      registryType={selectedRegistryType}
       onSelect={p => { setEditing({...p}); setScreen("edit") }}
       onBack={() => setScreen("action")}
     />
@@ -1473,6 +1636,7 @@ export default function App() {
     <SelectPatient
       patients={patients}
       centerInfo={session.info}
+      registryType={selectedRegistryType}
       title="Klinik takip için hasta seç"
       subtitle="Başlangıç kaydı yapılmış hastaya yeni izlem ziyareti eklenecek."
       onSelect={p => { setEditing({...p}); setScreen("followup") }}
