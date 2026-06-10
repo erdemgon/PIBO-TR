@@ -15,65 +15,99 @@ export function ActionScreen({ centerInfo, patients, registryType, onAction, onL
     : [["Toplam", my.length], ["PIBO", pibo.length], ["PTBO", ptbo.length]]
   const allCenterPatients = centerInfo.isAdmin ? patients : patients.filter(p => p.hasta_id.startsWith(centerInfo.prefix + "-"))
   const nextId = centerInfo.isAdmin ? "" : `${centerInfo.prefix}-${String(allCenterPatients.length + 1).padStart(3, "0")}`
+  const actionItems = [
+    {
+      key: "new",
+      marker: "+",
+      title: "Yeni hasta ekle",
+      detail: centerInfo.isAdmin ? "Merkez kodu ile yeni kayıt başlat" : `Önerilen ID: ${nextId}`,
+      tone: "primary",
+    },
+    {
+      key: "update",
+      marker: "✎",
+      title: "Mevcut kaydı güncelle",
+      detail: `${my.length} kayıt içinde düzenleme yap`,
+      tone: "neutral",
+    },
+    {
+      key: "followup",
+      marker: "K",
+      title: "Klinik takip",
+      detail: "İzlem ziyareti, atak ve PFT akışını kaydet",
+      tone: "soft",
+    },
+  ]
 
   return (
     <div style={{minHeight:"100vh", background:THEME.page}}>
       <AppHeader THEME={THEME} BRAND={BRAND} right={<div style={{display:"flex", gap:8}}><button onClick={onSwitchBranch} style={{...s.btn, fontSize:12}}>Registry değiştir</button><button onClick={onLogout} style={{...s.btn, fontSize:12}}>Çıkış</button></div>} />
 
-      <main style={{maxWidth:920, margin:"0 auto", padding:"18px"}}>
-        <section style={{...s.card, textAlign:"center", marginBottom:14, padding:"18px"}}>
-          <img src={BRAND.logo} alt="" aria-hidden="true" style={{width:"100%", maxWidth:150, height:118, objectFit:"contain", margin:"0 auto 8px", display:"block"}} />
-          <div style={{fontSize:13, color:THEME.red, fontWeight:800, marginBottom:8}}>Registry çalışma alanı</div>
-          <h1 style={{fontSize:26, lineHeight:1.2, color:THEME.ink, margin:0, fontWeight:900}}>{branch.label}</h1>
-          <p style={{fontSize:15, color:THEME.muted, lineHeight:1.5, margin:"10px auto 0", maxWidth:520}}>
-            {centerInfo.label} · Başlangıç kaydı, klinik takip ve merkez verilerini seçili registry kolunda yönetin.
-          </p>
-        </section>
-
-        <section style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))", gap:10, marginBottom:14}}>
-          {stats.map(([label, value]) => (
-            <div key={label} style={{...s.card, background:THEME.card, padding:"12px 14px"}}>
-              <div style={{fontSize:12, color:THEME.red, fontWeight:900, textTransform:"uppercase"}}>{label}</div>
-              <div style={{fontSize:24, color:THEME.ink, fontWeight:900, marginTop:4}}>{value}</div>
+      <main style={{maxWidth:1040, margin:"0 auto", padding:"20px 18px 32px"}}>
+        <section style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:14, alignItems:"stretch", marginBottom:14}}>
+          <div style={{background:"#fff", border:`1px solid ${THEME.border}`, borderRadius:8, padding:"18px 20px", display:"flex", gap:16, alignItems:"center"}}>
+            <div style={{width:58, height:58, borderRadius:8, border:`1px solid ${THEME.redBorder}`, background:THEME.redSoft, display:"flex", alignItems:"center", justifyContent:"center", flex:"0 0 auto"}}>
+              <img src={BRAND.logo} alt="" aria-hidden="true" style={{width:50, height:50, objectFit:"contain"}} />
             </div>
-          ))}
+            <div style={{minWidth:0}}>
+              <div style={{fontSize:12, color:THEME.red, fontWeight:900, textTransform:"uppercase", letterSpacing:.3}}>Registry çalışma alanı</div>
+              <h1 style={{fontSize:25, lineHeight:1.18, color:THEME.ink, margin:"5px 0 0", fontWeight:900}}>{branch.label}</h1>
+              <div style={{fontSize:13, color:THEME.muted, lineHeight:1.45, marginTop:7}}>
+                {centerInfo.label} · Başlangıç kaydı, klinik takip ve merkez verilerini seçili registry kolunda yönetin.
+              </div>
+            </div>
+          </div>
+          <div style={{background:THEME.card, border:`1px solid ${THEME.border}`, borderRadius:8, padding:14, display:"grid", gap:8}}>
+            {stats.map(([label, value]) => (
+              <div key={label} style={{display:"flex", justifyContent:"space-between", gap:12, alignItems:"baseline", borderBottom:"1px solid #e7e7ea", paddingBottom:7}}>
+                <div style={{fontSize:12, color:THEME.muted, fontWeight:800}}>{label}</div>
+                <div style={{fontSize:22, color:THEME.ink, fontWeight:900}}>{value}</div>
+              </div>
+            ))}
+          </div>
         </section>
 
-        <section style={{...s.card, marginBottom:14, padding:14}}>
-          <div style={{fontSize:13, fontWeight:900, color:THEME.red, textTransform:"uppercase", marginBottom:10}}>Pratik işlem</div>
-          <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap:10}}>
-            <button onClick={() => onAction("new")} style={{background:THEME.card, border:"1px solid #e9e9eb", borderRadius:8, padding:14, textAlign:"left", cursor:"pointer"}}>
-              <div style={{width:34, height:34, borderRadius:8, background:THEME.red, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24, fontWeight:800, marginBottom:10}}>+</div>
-              <div style={{fontSize:15, fontWeight:900, color:THEME.ink}}>Yeni hasta ekle</div>
-              <div style={{fontSize:12, color:THEME.muted, marginTop:5}}>
-                {centerInfo.isAdmin ? "Herhangi bir merkez için" : `Önerilen ID: ${nextId}`}
-              </div>
-            </button>
-
-            <button onClick={() => onAction("update")} style={{background:THEME.card, border:"1px solid #e9e9eb", borderRadius:8, padding:14, textAlign:"left", cursor:"pointer"}}>
-              <div style={{width:34, height:34, borderRadius:8, background:"#fff", border:`1px solid ${THEME.redBorder}`, color:THEME.red, display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:800, marginBottom:10}}>✎</div>
-              <div style={{fontSize:15, fontWeight:900, color:THEME.ink}}>Mevcut kaydı güncelle</div>
-              <div style={{fontSize:12, color:THEME.muted, marginTop:5}}>{my.length} hasta listesinden seç</div>
-            </button>
-
-            <button onClick={() => onAction("followup")} style={{background:THEME.redSoft, border:`1px solid ${THEME.redBorder}`, borderRadius:8, padding:14, textAlign:"left", cursor:"pointer"}}>
-              <div style={{width:34, height:34, borderRadius:8, background:THEME.red, color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, fontWeight:900, marginBottom:10}}>K</div>
-              <div style={{fontSize:15, fontWeight:900, color:THEME.red}}>Klinik takip</div>
-              <div style={{fontSize:12, color:THEME.muted, marginTop:5}}>Başlangıç kaydı yapılmış hastaya izlem ziyareti ekle</div>
-            </button>
+        <section style={{background:"#fff", border:`1px solid ${THEME.border}`, borderRadius:8, padding:14, marginBottom:14}}>
+          <div style={{display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:12, marginBottom:10}}>
+            <div style={{fontSize:13, fontWeight:900, color:THEME.red, textTransform:"uppercase", letterSpacing:.3}}>İşlem menüsü</div>
+            <div style={{fontSize:12, color:THEME.muted}}>Tek kayıt, düzenleme ve takip akışı</div>
+          </div>
+          <div style={{display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))", gap:8}}>
+            {actionItems.map(item => (
+              <button
+                key={item.key}
+                onClick={() => onAction(item.key)}
+                style={{background:item.tone === "soft" ? THEME.redSoft : "#fff", border:`1px solid ${item.tone === "primary" ? THEME.red : THEME.redBorder}`, borderLeft:`5px solid ${item.tone === "primary" ? THEME.red : item.tone === "soft" ? THEME.redBorder : "#d6d6da"}`, borderRadius:8, padding:"13px 14px", textAlign:"left", cursor:"pointer", display:"grid", gridTemplateColumns:"38px 1fr", gap:12, alignItems:"center"}}
+              >
+                <div style={{width:34, height:34, borderRadius:8, background:item.tone === "primary" ? THEME.red : "#fff", border:`1px solid ${item.tone === "primary" ? THEME.red : THEME.redBorder}`, color:item.tone === "primary" ? "#fff" : THEME.red, display:"flex", alignItems:"center", justifyContent:"center", fontSize:item.marker === "+" ? 22 : 16, fontWeight:900}}>{item.marker}</div>
+                <div>
+                  <div style={{fontSize:15, fontWeight:900, color:THEME.ink}}>{item.title}</div>
+                  <div style={{fontSize:12, color:THEME.muted, marginTop:3, lineHeight:1.35}}>{item.detail}</div>
+                </div>
+              </button>
+            ))}
           </div>
         </section>
 
         {centerInfo.isAdmin && (
-          <button onClick={() => onAction("admin")} style={{...s.card, width:"100%", textAlign:"left", cursor:"pointer", border:`1px solid ${THEME.amberBorder}`, background:THEME.amberSoft, marginBottom:14}}>
-            <div style={{fontSize:13, fontWeight:900, color:THEME.amberText}}>Admin paneli — tüm merkezler, analiz, istatistik →</div>
+          <button onClick={() => onAction("admin")} style={{width:"100%", textAlign:"left", cursor:"pointer", border:`1px solid ${THEME.amberBorder}`, borderRadius:8, background:THEME.amberSoft, padding:"12px 14px", marginBottom:14}}>
+            <div style={{display:"flex", justifyContent:"space-between", gap:12, alignItems:"center"}}>
+              <div>
+                <div style={{fontSize:13, fontWeight:900, color:THEME.amberText}}>Admin paneli</div>
+                <div style={{fontSize:12, color:THEME.muted, marginTop:2}}>Tüm merkezler, analiz, dışa aktarım ve veri bakımı</div>
+              </div>
+              <div style={{fontSize:18, color:THEME.amberText}}>→</div>
+            </div>
           </button>
         )}
 
-        <div style={s.card}>
-          <div style={{fontSize:13, fontWeight:900, color:THEME.red, textTransform:"uppercase", marginBottom:10}}>Son eklenen hastalar</div>
+        <div style={{background:"#fff", border:`1px solid ${THEME.border}`, borderRadius:8, padding:"14px 16px"}}>
+          <div style={{display:"flex", justifyContent:"space-between", alignItems:"baseline", gap:12, marginBottom:8}}>
+            <div style={{fontSize:13, fontWeight:900, color:THEME.red, textTransform:"uppercase", letterSpacing:.3}}>Son eklenen hastalar</div>
+            <div style={{fontSize:12, color:THEME.muted}}>{my.length} kayıt</div>
+          </div>
           {my.slice(-5).reverse().map(p => (
-            <div key={p.hasta_id} style={{display:"flex", width:"100%", alignItems:"center", gap:8, padding:"8px 0", borderBottom:"1px solid #f3f4f6", textAlign:"left"}}>
+            <div key={p.hasta_id} style={{display:"flex", width:"100%", alignItems:"center", gap:8, padding:"9px 0", borderTop:"1px solid #f3f4f6", textAlign:"left", minHeight:42}}>
               <span style={{fontSize:13, fontWeight:800, minWidth:90, color:THEME.ink}}>{p.hasta_id}</span>
               <span style={s.badge(p.pibo ? "blue" : "amber")}>{p.pibo ? "PIBO" : "HSCT"}</span>
               {p.ptbo == 1 && (p.ptbo_bos_pozitif == 1 || ["suspected", "probable", "confirmed"].includes(p.ptbo_bos_status)) && <span style={s.badge("red")}>BOS+</span>}

@@ -424,6 +424,7 @@ export default function App() {
       centerInfo={session.info}
       s={s}
       THEME={THEME}
+      BRAND={BRAND}
       onSelect={type => { setSelectedRegistryType(type); setScreen("action") }}
       onLogout={() => { setSession(null); setSelectedRegistryType(null); setScreen("action") }}
     />
