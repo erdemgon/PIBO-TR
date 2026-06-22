@@ -2,6 +2,7 @@ import { useState } from "react"
 import { REPORT_MODES, normalizeRegistryType } from "../config/registryBranches.js"
 import { formatFixed } from "../utils/formatters.js"
 import { summarizeRegistryPatients } from "../utils/reporting.js"
+import { downloadXlsx } from "../utils/xlsxExport.js"
 
 function csvEscape(value) {
   if (value == null) return ""
@@ -26,53 +27,6 @@ function downloadCsv(filename, rows) {
     ...rows.map(row => columns.map(column => csvEscape(row[column])).join(";")),
   ].join("\n")
   const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement("a")
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-}
-
-function xmlEscape(value) {
-  if (value == null) return ""
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-}
-
-function excelCell(value) {
-  if (value == null) return "<Cell><Data ss:Type=\"String\"></Data></Cell>"
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return `<Cell><Data ss:Type="Number">${value}</Data></Cell>`
-  }
-  return `<Cell><Data ss:Type="String">${xmlEscape(value)}</Data></Cell>`
-}
-
-function downloadExcel(filename, rows) {
-  if (!rows.length) return
-  const columns = exportColumns(rows)
-  const header = `<Row>${columns.map(column => `<Cell><Data ss:Type="String">${xmlEscape(column)}</Data></Cell>`).join("")}</Row>`
-  const body = rows.map(row => `<Row>${columns.map(column => excelCell(row[column])).join("")}</Row>`).join("")
-  const workbook = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:html="http://www.w3.org/TR/REC-html40">
- <Worksheet ss:Name="Hastalar">
-  <Table>
-   ${header}
-   ${body}
-  </Table>
- </Worksheet>
-</Workbook>`
-  const blob = new Blob(["\ufeff", workbook], { type: "application/vnd.ms-excel;charset=utf-8" })
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
@@ -218,9 +172,13 @@ export function AdminPanel({ patients, onBack, onDelete, onRecalculateAll, calcu
   function handleExportPatientsExcel() {
     const today = new Date().toISOString().slice(0, 10)
     const rows = buildExportRows()
-    downloadExcel(`pibo_registry_${reportMode}_${today}.xls`, rows)
-    setDeleteMessage(`${rows.length} hasta ${reportMode} Excel dosyası olarak indirildi.`)
-    setTimeout(() => setDeleteMessage(""), 2500)
+    try {
+      downloadXlsx(`pibo_registry_${reportMode}_${today}.xlsx`, rows, exportColumns(rows))
+      setDeleteMessage(`${rows.length} hasta ${reportMode} XLSX dosyası olarak indirildi.`)
+      setTimeout(() => setDeleteMessage(""), 2500)
+    } catch (error) {
+      setDeleteError(error.message || "Excel dosyası oluşturulamadı.")
+    }
   }
 
   return (
